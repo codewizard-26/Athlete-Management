@@ -2,7 +2,9 @@ import express from "express"
 // import morgan from "morgan";
 import cors from "cors";
 import authRoutes from '../src/modules/auth/auth.routes.js'
-import authMiddleware from "./modules/auth/auth.middleware.js";
+import authMiddleware from "./middleware/auth.middleware.js";
+import athleteprofileRoutes from "./modules/athlete/athleteprofile.route.js"
+import organizaitonRoutes from "./modules/organization/organization.routes.js"
 
 const app =express();
 
@@ -22,4 +24,9 @@ app.get("/api/auth/protected", authMiddleware, (req,res)=>{
         user:req.user
     });
 });
+
+app.use("/api/athleteprofile",athleteprofileRoutes)
+// app.use("/api/athleteprofile",)
+app.use("/api/organization",organizaitonRoutes)
+
 export default app;
