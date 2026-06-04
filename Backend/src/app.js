@@ -5,6 +5,7 @@ import authRoutes from '../src/modules/auth/auth.routes.js'
 import authMiddleware from "./middleware/auth.middleware.js";
 import athleteprofileRoutes from "./modules/athlete/athleteprofile.route.js"
 import organizaitonRoutes from "./modules/organization/organization.routes.js"
+import teamRoutes from "./modules/team/team.routes.js"
 
 const app =express();
 
@@ -28,5 +29,6 @@ app.get("/api/auth/protected", authMiddleware, (req,res)=>{
 app.use("/api/athleteprofile",athleteprofileRoutes)
 // app.use("/api/athleteprofile",)
 app.use("/api/organization",organizaitonRoutes)
+app.use("/api/team",teamRoutes)
 
 export default app;

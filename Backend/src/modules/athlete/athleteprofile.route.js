@@ -46,9 +46,7 @@ router.get("/me",authMiddleware,async(req,res)=>{
         userId:userId
     })
     if(!athlete){
-        return res.status(404).json({
-    message:"Athlete profile not found"
-});
+        return res.status(404).json({message:"Athlete profile not found"});
     }
     return res.status(200).json(athlete)
 }

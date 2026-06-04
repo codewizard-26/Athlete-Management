@@ -34,4 +34,37 @@ try {
 }
 })
 
+router.get("/me",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
+    try {
+        const ownerId=req.user.id
+        const organization= await Organization.findOne({ownerId})
+        if(!organization)
+        {
+            return res.status(404).json({message:"Organization profile not found"});
+        }
+        return res.status(200).json(organization)
+    } catch(err){
+    return res.status(500).json({message:err.message})
+}
+})
+
+router.put("/update",authMiddleware,roleMiddleware("organization"),async (req,res)=>{
+    try {
+        const ownerId = req.user.id;
+        const organization = await Organization.findOneAndUpdate(
+    { ownerId },
+    req.body,
+    { new: true }
+);
+if (!organization) {
+    return res.status(404).json({
+        message: "organization profile not found"
+    });
+}
+return res.status(200).json({message:"Profile updated",organization})
+    } catch (err) {
+        return res.status(500).json({message:err.message})
+    }
+})
+
 export default router
