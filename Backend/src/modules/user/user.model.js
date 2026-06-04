@@ -30,7 +30,8 @@ const userSchema = new mongoose.Schema(
         role:{
             type:String,
             enum: ['athlete', 'organization', 'recruiter'],
-        required: true
+        required: true,
+        lowercase:true
         },
         isProfileCompleted:{
             type:Boolean,

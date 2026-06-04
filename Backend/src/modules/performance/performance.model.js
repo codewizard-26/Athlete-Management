@@ -36,14 +36,5 @@ const performanceSchema =new mongoose.Schema({
         unique: true
     }
 );
-performanceSchema.index(
-    {
-        athleteId:1,
-        matchId:1
-    },
-    {
-        unique:true
-    }
-);
     const Performance = mongoose.model("Performance",performanceSchema)
     export default Performance
