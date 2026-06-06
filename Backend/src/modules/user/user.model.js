@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema(
 },
         role:{
             type:String,
-            enum: ['athlete', 'organization', 'recruiter'],
+            enum: ['athlete', 'organization', 'team'],
         required: true,
         lowercase:true
         },

@@ -13,55 +13,57 @@ const router = express.Router()
 router.post(
     "/create",
     authMiddleware,
-    roleMiddleware("organization"),
+    roleMiddleware("team"),
     async (req,res)=>{
         try {
 
-            const {teamId,title,description,sport,ageCategory,
-       applicationDeadline,location,vacancies} = req.body;
+            const {
+                title,
+                description,
+                sport,
+                ageCategory,
+                applicationDeadline,
+                location,
+                vacancies
+            } = req.body;
 
-if(!teamId || !title || !description || !sport ||
-   !ageCategory || !applicationDeadline || !location){
-    return res.status(400).json({
-        message:"All fields required"
-    });
-}
+            if(
+                !title ||
+                !description ||
+                !sport ||
+                !ageCategory ||
+                !applicationDeadline ||
+                !location
+            ){
+                return res.status(400).json({
+                    message:"All fields required"
+                });
+            }
 
-const ownerId = req.user.id;
+            const team = await Team.findOne({
+                userId: req.user.id
+            });
 
-const organization = await Organization.findOne({ ownerId });
+            if(!team){
+                return res.status(404).json({
+                    message:"Team not found"
+                });
+            }
 
-if(!organization){
-    return res.status(404).json({
-        message:"Organization not found"
-    });
-}
+            await RecruitmentDrive.create({
+                teamId: team._id,
+                title,
+                description,
+                sport,
+                ageCategory,
+                applicationDeadline,
+                location,
+                vacancies
+            });
 
-const team = await Team.findOne({
-    _id: teamId,
-    organizationId: organization._id
-});
-
-if(!team){
-    return res.status(404).json({
-        message:"Team not found"
-    });
-}
-
-await RecruitmentDrive.create({
-    teamId,
-    title,
-    description,
-    sport,
-    ageCategory,
-    applicationDeadline,
-    location,
-    vacancies
-});
-
-return res.status(201).json({
-    message:"Recruitment drive created"
-});
+            return res.status(201).json({
+                message:"Recruitment drive created"
+            });
 
         } catch(err){
             return res.status(500).json({
@@ -71,21 +73,31 @@ return res.status(201).json({
     }
 );
 
-router.get("/alldrives",authMiddleware,async(req,res)=>{
-try {
+router.get(
+    "/my-drives",
+    authMiddleware,
+    roleMiddleware("team"),
+    async (req,res)=>{
+        try {
 
-        const drives = await RecruitmentDrive.find({
-            status:"open"
-        }).populate("teamId");
+            const team = await Team.findOne({
+                userId:req.user.id
+            });
 
-        return res.status(200).json(drives);
+            const drives =
+                await RecruitmentDrive.find({
+                    teamId:team._id
+                });
 
-    } catch(err){
-        return res.status(500).json({
-            message: err.message
-        });
+            return res.status(200).json(drives);
+
+        } catch(err){
+            return res.status(500).json({
+                message:err.message
+            });
+        }
     }
-})
+);
 
 
 router.post("/apply/:driveId",authMiddleware,roleMiddleware("athlete"),async (req,res)=>{
@@ -153,55 +165,82 @@ router.get(
         }
     }
 );
+router.put(
+    "/accept/:applicationId",
+    authMiddleware,
+    roleMiddleware("team"),
+    async(req,res)=>{
+        try {
 
-router.put("/accept/:applicationId",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
-    try {
-        const {applicationId}= req.params
-        const application= await RecruitmentApplication.findByIdAndUpdate(
-            applicationId,
-            {
-                status:"accepted"
+            const { applicationId } = req.params;
+
+            const application =
+                await RecruitmentApplication.findByIdAndUpdate(
+                    applicationId,
+                    {
+                        status:"accepted"
+                    },
+                    {
+                        new:true
+                    }
+                );
+
+            if(!application){
+                return res.status(404).json({
+                    message:"Application not found"
+                });
             }
-        )
-        if(!application){
-    return res.status(404).json({
-        message:"Application not found"
-    });
-}
-return res.status(200).json({
-    message:"Application accepted",
-    application
-});
-    } catch (err) {
+
+            return res.status(200).json({
+                message:"Application accepted",
+                application
+            });
+
+        } catch (err) {
             return res.status(500).json({
                 message: err.message
             });
         }
-})
+    }
+);
 
-router.put("/accept/:applicationId",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
-    try {
-        const {applicationId}= req.params
-        const application= await RecruitmentApplication.findByIdAndUpdate(
-            applicationId,
-            {
-                status:"rejected"
+router.put(
+    "/reject/:applicationId",
+    authMiddleware,
+    roleMiddleware("team"),
+    async(req,res)=>{
+        try {
+
+            const { applicationId } = req.params;
+
+            const application =
+                await RecruitmentApplication.findByIdAndUpdate(
+                    applicationId,
+                    {
+                        status:"rejected"
+                    },
+                    {
+                        new:true
+                    }
+                );
+
+            if(!application){
+                return res.status(404).json({
+                    message:"Application not found"
+                });
             }
-        )
-        if(!application){
-    return res.status(404).json({
-        message:"Application not found"
-    });
-}
-return res.status(200).json({
-    message:"Application rejected",
-    application
-});
-    } catch (err) {
+
+            return res.status(200).json({
+                message:"Application rejected",
+                application
+            });
+
+        } catch (err) {
             return res.status(500).json({
                 message: err.message
             });
         }
-})
+    }
+);
 
 export default router

@@ -5,11 +5,14 @@ import Organization from "../organization/organization.model.js"
 import Team from "./team.model.js"
 import Athlete from "../athlete/athlete.model.js"
 import TeamMembership from "./teamMembership.model.js"
+import bcrypt from "bcryptjs";
+import User from "../user/user.model.js";
+
 
 const router = express.Router()
 router.post("/create",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
-    const {teamName,sport,ageCategory,description,logo}=req.body
-    if(!teamName||!sport||!ageCategory){
+    const {teamName,sport,ageCategory,description,logo,teamPhone,teamEmail}=req.body
+    if(!teamName||!sport||!ageCategory||!teamEmail||!teamPhone){
         return res.status(400).json({message:"All feilds required"})
     }
     try {
@@ -28,16 +31,55 @@ router.post("/create",authMiddleware,roleMiddleware("organization"),async(req,re
         if(existingTeam){
             return res.status(400).json({message:"Team already exist"})
         }
-        await Team.create({
-    organizationId:organization._id,
+        const tempPassword = "team123";
+
+const hashedPassword = await bcrypt.hash(
+    tempPassword,
+    10
+);
+const existingEmail = await User.findOne({
+    email: teamEmail
+});
+
+if(existingEmail){
+    return res.status(400).json({
+        message:"Team email already exists"
+    });
+}
+
+const existingPhone = await User.findOne({
+    phoneNumber: teamPhone
+});
+
+if(existingPhone){
+    return res.status(400).json({
+        message:"Team phone already exists"
+    });
+}
+const teamUser = await User.create({
+    name: teamName,
+    email: teamEmail,
+    phoneNumber: teamPhone,
+    password: hashedPassword,
+    role: "team"
+});
+
+const team = await Team.create({
+    organizationId: organization._id,
+    userId: teamUser._id,
     teamName,
     sport,
     ageCategory,
     description,
     logo
 });
+
 res.status(201).json({
-    message:"Team created successfully"
+    message: "Team created successfully",
+    teamLogin: {
+        email: teamUser.email,
+        password: tempPassword
+    }
 });
     } catch (err) {
     res.status(500).json({message:err.message})
@@ -65,39 +107,42 @@ router.get("/myTeams",authMiddleware,roleMiddleware("organization"),async(req,re
         return res.status(500).json({message:err.message})
     }
 })
-router.get("/pending-members",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
-    try {
-        // console.log("1")
-        const ownerId = req.user.id;
-    // console.log("2")
-    const organization = await Organization.findOne({
-        ownerId
-    });
-    // console.log("3")
-            if(!organization){
-                return res.status(400).json({message:"organization does not exist"})
+router.get(
+    "/pending-members",
+    authMiddleware,
+    roleMiddleware("team"),
+    async (req, res) => {
+        try {
+
+            const team = await Team.findOne({
+                userId: req.user.id
+            });
+
+            if (!team) {
+                return res.status(404).json({
+                    message: "Team not found"
+                });
             }
-            const teams = await Team.find({
-        organizationId: organization._id
-    });
-    // console.log("4")
-    if(!teams){
-        return res.status(400).json({message:"Team does not exist"})
-    }
-    const teamIds = teams.map(team => team._id);
-    // console.log("5")
-    const pendingRequests = await TeamMembership.find({
-        teamId: { $in: teamIds },
-        status: "pending"
-    }).populate("athleteId").populate("teamId")
-    return res.status(200).json(pendingRequests);
-    } catch (err) {
+
+            const pendingRequests =
+                await TeamMembership.find({
+                    teamId: team._id,
+                    status: "pending"
+                })
+                .populate("athleteId")
+                .populate("teamId");
+
+            return res.status(200).json(
+                pendingRequests
+            );
+
+        } catch (err) {
             return res.status(500).json({
-            message: err.message
-        });
+                message: err.message
+            });
+        }
     }
-    
-})
+);
 
 router.get("/my-memberships",authMiddleware,roleMiddleware("athlete"),async(req,res)=>{
     try {
@@ -121,7 +166,7 @@ router.get("/my-memberships",authMiddleware,roleMiddleware("athlete"),async(req,
     }
 })
 
-router.put("/approve/:membershipId",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
+router.put("/approve/:membershipId",authMiddleware,roleMiddleware("team"),async(req,res)=>{
     try {
         const {membershipId}= req.params;
         const membership =
@@ -147,7 +192,7 @@ router.put("/approve/:membershipId",authMiddleware,roleMiddleware("organization"
     }
 })
 
-router.put("/reject/:membershipId",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
+router.put("/reject/:membershipId",authMiddleware,roleMiddleware("team"),async(req,res)=>{
     try {
         const {membershipId}= req.params
         const membership = await TeamMembership.findByIdAndUpdate(

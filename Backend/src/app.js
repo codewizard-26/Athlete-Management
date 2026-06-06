@@ -8,6 +8,7 @@ import organizaitonRoutes from "./modules/organization/organization.routes.js"
 import teamRoutes from "./modules/team/team.routes.js"
 import recruitmentRoutes from './modules/recruiter/recruitment.routes.js'
 import bookmarkRoutes from './modules/recruiter/bookmark.routes.js'
+import tournamentRoutes from './modules/tournament/tournament.routes.js'
 
 const app =express();
 
@@ -34,5 +35,7 @@ app.use("/api/organization",organizaitonRoutes)
 app.use("/api/team",teamRoutes)
 app.use("/api/recruitment",recruitmentRoutes)
 app.use("/api/bookmark",bookmarkRoutes)
+app.use("/api/tournament",tournamentRoutes)
+
 
 export default app;

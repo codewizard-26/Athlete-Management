@@ -7,7 +7,7 @@ import roleMiddleware from "../../middleware/role.middleware.js"
 
 const router = express.Router()
 
-router.post("/:athleteId",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
+router.post("/:athleteId",authMiddleware,roleMiddleware("team"),async(req,res)=>{
     try {
         const ownerId = req.user.id
         const organization = await Organization.findOne({ownerId})
@@ -41,7 +41,7 @@ router.post("/:athleteId",authMiddleware,roleMiddleware("organization"),async(re
         }
 })
 
-router.get("/all",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
+router.get("/all",authMiddleware,roleMiddleware("team"),async(req,res)=>{
      try {
         const ownerId = req.user.id
            const organization = await Organization.findOne({ownerId})
@@ -64,7 +64,7 @@ router.get("/all",authMiddleware,roleMiddleware("organization"),async(req,res)=>
         }
 })
 
-router.delete("/:bookmarkId",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
+router.delete("/:bookmarkId",authMiddleware,roleMiddleware("team"),async(req,res)=>{
     const {bookmarkId} = req.params
     const bookmark = await RecruiterBookmark.findById(bookmarkId);
 
