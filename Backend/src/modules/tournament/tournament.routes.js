@@ -71,6 +71,42 @@ router.post(
 );
 
 router.get(
+    "/my-tournaments",
+    authMiddleware,
+    roleMiddleware("organization"),
+    async(req,res)=>{
+        try {
+
+            const organization =
+                await Organization.findOne({
+                    ownerId:req.user.id
+                });
+
+            if(!organization){
+                return res.status(404).json({
+                    message:"Organization not found"
+                });
+            }
+
+            const tournaments =
+                await Tournament.find({
+                    organizationId:
+                    organization._id
+                });
+
+            return res.status(200).json(
+                tournaments
+            );
+
+        } catch(err){
+            return res.status(500).json({
+                message:err.message
+            });
+        }
+    }
+);
+
+router.get(
     "/all",
     authMiddleware,
     async(req,res)=>{

@@ -85,6 +85,46 @@ if(!match){
     }
 );
 
+router.put(
+    "/:performanceId",
+    authMiddleware,
+    roleMiddleware("organization"),
+    async(req,res)=>{
+        try {
+
+            const { performanceId } =
+                req.params;
+
+            const performance =
+                await Performance.findByIdAndUpdate(
+                    performanceId,
+                    req.body,
+                    {
+                        new:true
+                    }
+                );
+
+            if(!performance){
+                return res.status(404).json({
+                    message:
+                    "Performance not found"
+                });
+            }
+
+            return res.status(200).json({
+                message:
+                "Performance updated",
+                performance
+            });
+
+        } catch(err){
+            return res.status(500).json({
+                message:err.message
+            });
+        }
+    }
+);
+
 router.get(
     "/athlete/:athleteId",
     authMiddleware,
@@ -112,6 +152,41 @@ router.get(
         }
     }
 );
+router.delete(
+    "/:performanceId",
+    authMiddleware,
+    roleMiddleware("organization"),
+    async(req,res)=>{
+        try {
+
+            const { performanceId } =
+                req.params;
+
+            const performance =
+                await Performance.findByIdAndDelete(
+                    performanceId
+                );
+
+            if(!performance){
+                return res.status(404).json({
+                    message:
+                    "Performance not found"
+                });
+            }
+
+            return res.status(200).json({
+                message:
+                "Performance deleted"
+            });
+
+        } catch(err){
+            return res.status(500).json({
+                message:err.message
+            });
+        }
+    }
+);
+
 router.get(
     "/team/:teamId",
     authMiddleware,

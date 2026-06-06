@@ -166,6 +166,33 @@ router.get("/my-memberships",authMiddleware,roleMiddleware("athlete"),async(req,
     }
 })
 
+router.get(
+    "/me",
+    authMiddleware,
+    roleMiddleware("team"),
+    async(req,res)=>{
+        try {
+
+            const team = await Team.findOne({
+                userId:req.user.id
+            });
+
+            if(!team){
+                return res.status(404).json({
+                    message:"Team not found"
+                });
+            }
+
+            return res.status(200).json(team);
+
+        } catch(err){
+            return res.status(500).json({
+                message:err.message
+            });
+        }
+    }
+);
+
 router.put("/approve/:membershipId",authMiddleware,roleMiddleware("team"),async(req,res)=>{
     try {
         const {membershipId}= req.params;

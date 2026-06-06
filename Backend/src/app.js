@@ -9,6 +9,11 @@ import teamRoutes from "./modules/team/team.routes.js"
 import recruitmentRoutes from './modules/recruiter/recruitment.routes.js'
 import bookmarkRoutes from './modules/recruiter/bookmark.routes.js'
 import tournamentRoutes from './modules/tournament/tournament.routes.js'
+import matchRoutes from './modules/match/match.routes.js'
+import performanceRoutes from './modules/performance/performance.routes.js'
+import dashboardRoutes from './modules/dashboard/dashboard.routes.js'
+
+
 
 const app =express();
 
@@ -36,6 +41,8 @@ app.use("/api/team",teamRoutes)
 app.use("/api/recruitment",recruitmentRoutes)
 app.use("/api/bookmark",bookmarkRoutes)
 app.use("/api/tournament",tournamentRoutes)
-
+app.use("/api/match",matchRoutes)
+app.use("/api/performance",performanceRoutes)
+app.use("/api/dashboard",dashboardRoutes)
 
 export default app;

@@ -73,6 +73,35 @@ router.get(
     }
 );
 
+
+router.get(
+    "/tournament/:tournamentId",
+    authMiddleware,
+    async(req,res)=>{
+        try {
+
+            const { tournamentId } =
+                req.params;
+
+            const matches =
+                await Match.find({
+                    tournamentId
+                })
+                .populate("homeTeamId")
+                .populate("awayTeamId");
+
+            return res.status(200).json(
+                matches
+            );
+
+        } catch(err){
+            return res.status(500).json({
+                message:err.message
+            });
+        }
+    }
+);
+
 router.put(
     "/score/:matchId",
     authMiddleware,
