@@ -1,39 +1,42 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 
-const tournamentRegistrationSchema=new mongoose.Schema({
+const tournamentRegistrationSchema =
+new mongoose.Schema(
+{
     tournamentId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Tournament',
+        ref:"Tournament",
         required:true
     },
+
     teamId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Team',
+        ref:"Team",
         required:true
     },
+
     status:{
         type:String,
-        enum:['pending','approved','rejected','withdrawn'],
-        default:'pending'
+        enum:[
+            "pending",
+            "approved",
+            "rejected"
+        ],
+        default:"pending"
     },
+
     registeredAt:{
         type:Date,
         default:Date.now
-    },
-    remarks:{
-        type:String,
-        trim:true
     }
-},{timestamps:true})
-tournamentRegistrationSchema.index(
-    {
-        tournamentId:1,
-        teamId:1
-    },
-    {
-        unique:true
-    }
+},
+{timestamps:true}
 );
 
-const TournamentRegistration = mongoose.model("TournamentRegistration",tournamentRegistrationSchema)
-export default TournamentRegistration
+const TournamentRegistration =
+mongoose.model(
+    "TournamentRegistration",
+    tournamentRegistrationSchema
+);
+
+export default TournamentRegistration;
