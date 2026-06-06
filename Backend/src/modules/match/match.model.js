@@ -1,53 +1,60 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 
-const matchSchema=new mongoose.Schema(
-    {
-        teamAId:{
+const matchSchema = new mongoose.Schema(
+{
+    tournamentId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Team',
+        ref:"Tournament",
         required:true
-},
-        teamBId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Team',
-        required:true
-},
-        tournamentId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Tournament',
-        required:true
-        },
-        venue:{
-    type:String,
-    required:true,
-    trim:true
-},
-        matchDate:{
-            type:Date,
-            required:true
-        },
-        status:{
-            type:String,
-            enum:['scheduled','live','completed','cancelled'],
-            default:'scheduled'
-        },
-       result: {
-    type: mongoose.Schema.Types.Mixed,
-    default: {}
-},
-
-winnerTeamId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Team"
-},
-
-resultSummary: {
-    type: String,
-    trim: true
-}
     },
-    {timestamps:true}
-)
 
-const Match = mongoose.model("Match",matchSchema)
-export default Match
+    homeTeamId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Team",
+        required:true
+    },
+
+    awayTeamId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Team",
+        required:true
+    },
+
+    matchDate:{
+        type:Date,
+        required:true
+    },
+
+    venue:{
+        type:String,
+        required:true
+    },
+
+    status:{
+        type:String,
+        enum:[
+            "scheduled",
+            "live",
+            "completed",
+            "cancelled"
+        ],
+        default:"scheduled"
+    },
+
+    homeScore:{
+        type:Number,
+        default:0
+    },
+
+    awayScore:{
+        type:Number,
+        default:0
+    }
+},
+{timestamps:true}
+);
+
+const Match =
+mongoose.model("Match",matchSchema);
+
+export default Match;
