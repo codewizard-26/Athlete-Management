@@ -24,6 +24,11 @@ const performanceSchema =new mongoose.Schema({
     stats:{
     type:mongoose.Schema.Types.Mixed,
     default:{}
+},
+tournamentId:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Tournament",
+    required:true
 }
 },
     {timestamps:true})
@@ -35,6 +40,16 @@ const performanceSchema =new mongoose.Schema({
     {
         unique: true
     }
+);
+
+performanceSchema.index(
+{
+    athleteId:1,
+    matchId:1
+},
+{
+    unique:true
+}
 );
     const Performance = mongoose.model("Performance",performanceSchema)
     export default Performance
