@@ -175,7 +175,7 @@ router.get(
 
             const team = await Team.findOne({
                 userId:req.user.id
-            });
+            }).populate("organizationId");
 
             if(!team){
                 return res.status(404).json({

@@ -91,7 +91,7 @@ function AthleteDashboard() {
             title: "Edit Profile",
             desc: "Update details and sporting biometrics",
             icon: <EditOutlined className="text-lg text-blue-400" />,
-            link: "/athlete/profile/edit" // Can link to edit or create
+            link: "/athlete/profile"
         },
         {
             title: "Browse Recruitment Drives",
@@ -212,7 +212,7 @@ function AthleteDashboard() {
                             <Button 
                                 type="primary" 
                                 icon={<EditOutlined />}
-                                onClick={() => navigate("/athlete/profile/create")}
+                                onClick={() => navigate("/athlete/profile")}
                                 className="shadow-lg shadow-blue-600/10"
                             >
                                 Edit Profile

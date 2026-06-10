@@ -8,6 +8,11 @@ import CreateProfile from "../features/athlete/pages/CreateProfile";
 import CreateOrgProfile from "../features/organization/pages/CreateOrgProfile";
 import AthleteDashboard from "../features/athlete/pages/AthleteDashboard";
 import OrganizationDashboard from "../features/organization/pages/OrganizationDashboard";
+import OrganizationLayout from "../layouts/OrganizationLayout";
+import TeamLayout from "../layouts/TeamLayout";
+import TeamsList from "../features/organization/pages/TeamsList";
+import CreateTeam from "../features/organization/pages/CreateTeam";
+import TeamDashboard from "../features/team/pages/TeamDashboard";
 import ProtectedRoute from "../components/ProtectedRoute";
 import RoleProtectedRoute from "../components/RoleProtectedRoute";
 
@@ -28,13 +33,13 @@ const DashboardRedirector = () => {
             if (isProfileCompleted) {
                 navigate("/athlete/dashboard", { replace: true });
             } else {
-                navigate("/athlete/profile/create", { replace: true });
+                navigate("/athlete/profile", { replace: true });
             }
         } else if (role === "organization") {
             if (isProfileCompleted) {
                 navigate("/organization/dashboard", { replace: true });
             } else {
-                navigate("/organization/profile/create", { replace: true });
+                navigate("/organization/profile", { replace: true });
             }
         } else if (role === "team") {
             navigate("/team/dashboard", { replace: true });
@@ -52,12 +57,6 @@ const DashboardRedirector = () => {
 };
 
 
-const TeamDashboard = () => (
-    <div className="min-h-screen bg-[#080b11] text-white p-8">
-        <h1 className="text-2xl font-bold">Team Workspace</h1>
-        <p className="text-emerald-400 mt-2">Protected page accessible to Teams only.</p>
-    </div>
-);
 
 function AppRoutes() {
     return (
@@ -79,7 +78,7 @@ function AppRoutes() {
 
             {/* Role-Based Protected Routes */}
             <Route
-                path="/athlete/profile/create"
+                path="/athlete/profile"
                 element={
                     <RoleProtectedRoute allowedRole="athlete">
                         <CreateProfile />
@@ -97,7 +96,7 @@ function AppRoutes() {
             />
 
             <Route
-                path="/organization/profile/create"
+                path="/organization/profile"
                 element={
                     <RoleProtectedRoute allowedRole="organization">
                         <CreateOrgProfile />
@@ -106,22 +105,30 @@ function AppRoutes() {
             />
 
             <Route
-                path="/organization/*"
+                path="/organization"
                 element={
                     <RoleProtectedRoute allowedRole="organization">
-                        <OrganizationDashboard />
+                        <OrganizationLayout />
                     </RoleProtectedRoute>
                 }
-            />
+            >
+                <Route index element={<OrganizationDashboard />} />
+                <Route path="dashboard" element={<OrganizationDashboard />} />
+                <Route path="teams" element={<TeamsList />} />
+                <Route path="teams/create" element={<CreateTeam />} />
+            </Route>
 
             <Route
-                path="/team/*"
+                path="/team"
                 element={
                     <RoleProtectedRoute allowedRole="team">
-                        <TeamDashboard />
+                        <TeamLayout />
                     </RoleProtectedRoute>
                 }
-            />
+            >
+                <Route index element={<TeamDashboard />} />
+                <Route path="dashboard" element={<TeamDashboard />} />
+            </Route>
         </Routes>
     );
 }

@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Form, Input, Select, Button, ConfigProvider, theme, message } from "antd";
+import { Form, Input, Select, Button, ConfigProvider, theme, message, Avatar, Card } from "antd";
 import {
     GlobalOutlined,
     TrophyOutlined,
     InfoCircleOutlined,
     LinkOutlined,
     PictureOutlined,
-    CheckOutlined
+    CheckOutlined,
+    ArrowLeftOutlined,
+    EditOutlined
 } from "@ant-design/icons";
 import api from "../../../api/axios";
 import { loginSuccess } from "../../auth/authSlice";
@@ -22,7 +24,29 @@ function CreateOrgProfile() {
     const { user, token } = useSelector((state) => state.auth);
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const [pageLoading, setPageLoading] = useState(false);
     const [draftLoading, setDraftLoading] = useState(false);
+    const [isEditing, setIsEditing] = useState(!user?.isProfileCompleted);
+
+    useEffect(() => {
+        if (user?.isProfileCompleted) {
+            const fetchOrgProfile = async () => {
+                try {
+                    setPageLoading(true);
+                    const res = await api.get("/organization/me");
+                    if (res.data) {
+                        form.setFieldsValue(res.data);
+                    }
+                } catch (err) {
+                    console.error("Error loading org profile:", err);
+                    message.error("Failed to load organization profile details");
+                } finally {
+                    setPageLoading(false);
+                }
+            };
+            fetchOrgProfile();
+        }
+    }, [user, form]);
 
     // Custom Ant Design theme matching the dark sports-tech portal aesthetic
     const darkTheme = {
@@ -71,21 +95,26 @@ function CreateOrgProfile() {
                 website: values.website ? values.website.trim() : ""
             };
 
-            await api.post("/organization/profile", payload);
+            if (user?.isProfileCompleted) {
+                await api.put("/organization/update", payload);
+                message.success("Organization profile updated successfully!");
+                setIsEditing(false);
+            } else {
+                await api.post("/organization/profile", payload);
+                // Update Redux state with profile status
+                dispatch(loginSuccess({
+                    user: { ...user, isProfileCompleted: true },
+                    token
+                }));
+                message.success("Organization profile completed successfully!");
+                setIsEditing(false);
+            }
 
-            // Update Redux state with profile status
-            dispatch(loginSuccess({
-                user: { ...user, isProfileCompleted: true },
-                token
-            }));
-
-            message.success("Organization profile completed successfully!");
-            
             // Redirect to Organization Dashboard
-            navigate("/organization/dashboard");
+            navigate("/dashboard");
 
         } catch (err) {
-            const errMsg = err.response?.data?.message || "Failed to complete organization profile. Please try again.";
+            const errMsg = err.response?.data?.message || "Failed to save organization profile. Please try again.";
             message.error(errMsg);
         } finally {
             setLoading(false);
@@ -100,11 +129,115 @@ function CreateOrgProfile() {
         }, 1000);
     };
 
+    if (!isEditing) {
+        return (
+            <ConfigProvider theme={darkTheme}>
+                <div className="min-h-screen w-full bg-[#080b11] text-slate-100 font-sans selection:bg-blue-600 selection:text-white py-12 px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-4xl mx-auto space-y-6">
+                        {/* Return to Dashboard */}
+                        <div className="flex items-center justify-between">
+                            <Button 
+                                type="text" 
+                                icon={<ArrowLeftOutlined />} 
+                                onClick={() => navigate("/dashboard")}
+                                className="text-slate-400 hover:text-white flex items-center p-0 h-auto"
+                            >
+                                Back to Dashboard
+                            </Button>
+                            <Button 
+                                type="primary" 
+                                icon={<EditOutlined />}
+                                onClick={() => setIsEditing(true)}
+                                className="shadow-md"
+                            >
+                                Edit Profile
+                            </Button>
+                        </div>
+
+                        {/* Profile Card */}
+                        <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/40 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-2xl">
+                            {/* Org Header */}
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-white/[0.04] pb-6">
+                                <Avatar size={80} src={form.getFieldValue("logo") || undefined} icon={!form.getFieldValue("logo") && <TrophyOutlined />} className="bg-blue-600 shadow-lg shrink-0" />
+                                <div className="text-center sm:text-left space-y-1.5 min-w-0">
+                                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">{form.getFieldValue("organizationName")}</h1>
+                                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                        <span className="text-xs text-blue-400 font-semibold uppercase tracking-wider">{user?.role}</span>
+                                        {form.getFieldValue("website") && (
+                                            <>
+                                                <span className="text-slate-500">•</span>
+                                                <a href={form.getFieldValue("website")} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline flex items-center gap-1">
+                                                    <LinkOutlined />
+                                                    <span>{form.getFieldValue("website")}</span>
+                                                </a>
+                                            </>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-slate-500 font-mono">{user?.email}</p>
+                                </div>
+                            </div>
+
+                            {/* Details Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 pt-6">
+                                {/* Location */}
+                                <div className="space-y-4">
+                                    <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                                        <GlobalOutlined />
+                                        <span>Registered Location</span>
+                                    </h3>
+                                    <div className="bg-[#080b11]/30 border border-white/[0.02] rounded-xl p-4 space-y-3">
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-400">City</span>
+                                            <span className="font-bold text-white">{form.getFieldValue("city")}</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-400">State</span>
+                                            <span className="font-bold text-white">{form.getFieldValue("state")}</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-400">Country</span>
+                                            <span className="font-bold text-white">{form.getFieldValue("country")}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Description */}
+                                <div className="space-y-4">
+                                    <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                                        <InfoCircleOutlined />
+                                        <span>Mission & Description</span>
+                                    </h3>
+                                    <p className="text-xs text-slate-300 leading-relaxed bg-[#080b11]/20 border border-white/[0.02] rounded-xl p-4 m-0 min-h-[110px]">
+                                        {form.getFieldValue("description") || "No description configured yet."}
+                                    </p>
+                                </div>
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+            </ConfigProvider>
+        );
+    }
+
     return (
         <ConfigProvider theme={darkTheme}>
             <div className="min-h-screen w-full bg-[#080b11] text-slate-100 font-sans selection:bg-blue-600 selection:text-white py-12 px-4 sm:px-6 lg:px-8">
 
                 <div className="max-w-4xl mx-auto">
+                    {/* Return Navigation */}
+                    {user?.isProfileCompleted && (
+                        <div className="mb-6 flex items-center justify-between">
+                            <Button 
+                                type="text" 
+                                icon={<ArrowLeftOutlined />} 
+                                onClick={() => navigate("/dashboard")}
+                                className="text-slate-400 hover:text-white flex items-center p-0 h-auto"
+                            >
+                                Back to Dashboard
+                            </Button>
+                        </div>
+                    )}
+
                     {/* Header */}
                     <div className="text-center mb-10">
                         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-600/10 border border-blue-500/20 mb-4">
@@ -112,15 +245,24 @@ function CreateOrgProfile() {
                             <span className="text-[10px] font-bold tracking-wider text-blue-400 uppercase">ORGANIZATION REGISTRY PORTAL</span>
                         </div>
                         <h1 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
-                            Complete Your Organization Profile
+                            {user?.isProfileCompleted ? "Edit Your Organization Profile" : "Complete Your Organization Profile"}
                         </h1>
                         <p className="mt-3 text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                            Set up your organization to create teams, manage tournaments, organize matches, and track athlete development.
+                            {user?.isProfileCompleted 
+                                ? "Update your organization name, description, location details, branding logo and official website below."
+                                : "Set up your organization to create teams, manage tournaments, organize matches, and track athlete development."
+                            }
                         </p>
                     </div>
 
                     {/* Form Card Container */}
-                    <div className="bg-[#0f172a]/40 border border-white/[0.04] p-6 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-md">
+                    <div className="bg-[#0f172a]/40 border border-white/[0.04] p-6 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-md relative">
+                        {pageLoading && (
+                            <div className="absolute inset-0 bg-[#080b11]/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-2xl">
+                                <span className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4" />
+                                <p className="text-xs text-slate-400 font-semibold">Loading organization data...</p>
+                            </div>
+                        )}
                         <Form
                             form={form}
                             layout="vertical"
@@ -260,13 +402,22 @@ function CreateOrgProfile() {
 
                             {/* Form Actions Footer */}
                             <div className="mt-8 pt-6 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-end gap-4">
-                                <Button
-                                    onClick={handleSaveDraft}
-                                    loading={draftLoading}
-                                    className="w-full sm:w-auto border border-white/[0.08] hover:border-white/[0.16] bg-white/[0.02] text-slate-300 font-semibold hover:text-white"
-                                >
-                                    Save Draft
-                                </Button>
+                                {user?.isProfileCompleted ? (
+                                    <Button
+                                        onClick={() => setIsEditing(false)}
+                                        className="w-full sm:w-auto border border-white/[0.08] hover:border-white/[0.16] bg-white/[0.02] text-slate-300 font-semibold hover:text-white"
+                                    >
+                                        Cancel
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={handleSaveDraft}
+                                        loading={draftLoading}
+                                        className="w-full sm:w-auto border border-white/[0.08] hover:border-white/[0.16] bg-white/[0.02] text-slate-300 font-semibold hover:text-white"
+                                    >
+                                        Save Draft
+                                    </Button>
+                                )}
                                 <Button
                                     type="primary"
                                     htmlType="submit"
@@ -274,7 +425,10 @@ function CreateOrgProfile() {
                                     icon={!loading && <CheckOutlined />}
                                     className="w-full sm:w-auto uppercase tracking-wider shadow-lg shadow-blue-600/20"
                                 >
-                                    {loading ? "Completing Profile..." : "Complete Profile"}
+                                    {loading 
+                                        ? (user?.isProfileCompleted ? "Updating Profile..." : "Completing Profile...") 
+                                        : (user?.isProfileCompleted ? "Update Profile" : "Complete Profile")
+                                    }
                                 </Button>
                             </div>
                         </Form>

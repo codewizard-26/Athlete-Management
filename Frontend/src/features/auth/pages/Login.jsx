@@ -77,9 +77,9 @@ function Login() {
             setTimeout(() => {
                 const user = res.data.user;
                 if (user?.role === "athlete" && !user?.isProfileCompleted) {
-                    navigate("/athlete/profile/create");
+                    navigate("/athlete/profile");
                 } else if (user?.role === "organization" && !user?.isProfileCompleted) {
-                    navigate("/organization/profile/create");
+                    navigate("/organization/profile");
                 } else {
                     navigate("/dashboard");
                 }

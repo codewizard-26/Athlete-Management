@@ -22,7 +22,10 @@ router.get("/team", authMiddleware, async (req, res) => {
         if (!team) {
             return res.status(200).json({
                 members: 0,
-                pendingRequests: 0
+                pendingRequests: 0,
+                drivesCount: 0,
+                matchesCount: 0,
+                activities: []
             });
         }
 
@@ -36,9 +39,60 @@ router.get("/team", authMiddleware, async (req, res) => {
             status: "pending"
         });
 
+        const drivesCount = await RecruitmentDrive.countDocuments({
+            teamId: team._id,
+            status: "open"
+        });
+
+        const matchesCount = await Match.countDocuments({
+            $or: [{ homeTeamId: team._id }, { awayTeamId: team._id }],
+            status: "completed"
+        });
+
+        // Fetch dynamic activities
+        const recentApplications = await RecruitmentApplication.find({
+            recruitmentDriveId: { $in: await RecruitmentDrive.find({ teamId: team._id }, '_id') }
+        })
+        .populate({ path: 'athleteId', select: 'userId' })
+        .populate({ path: 'recruitmentDriveId', select: 'title' })
+        .sort({ createdAt: -1 })
+        .limit(5);
+
+        const recentMemberships = await TeamMembership.find({ teamId: team._id })
+            .sort({ createdAt: -1 })
+            .limit(5);
+
+        const activities = [];
+
+        recentApplications.forEach(app => {
+            activities.push({
+                id: app._id,
+                type: 'application',
+                title: `Athlete Application Received`,
+                description: `Applied to recruitment: "${app.recruitmentDriveId?.title || 'Open call'}"`,
+                date: app.createdAt || app.appliedAt
+            });
+        });
+
+        recentMemberships.forEach(mem => {
+            activities.push({
+                id: mem._id,
+                type: 'membership',
+                title: `Roster Status Updated`,
+                description: `Player registration changed to ${mem.status.toUpperCase()}`,
+                date: mem.createdAt
+            });
+        });
+
+        // Sort desc
+        activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+
         return res.status(200).json({
             members,
-            pendingRequests
+            pendingRequests,
+            drivesCount,
+            matchesCount,
+            activities: activities.slice(0, 5)
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });

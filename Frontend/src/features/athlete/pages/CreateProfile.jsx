@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Form, Input, Select, DatePicker, InputNumber, Button, ConfigProvider, theme, message } from "antd";
+import { Form, Input, Select, DatePicker, InputNumber, Button, ConfigProvider, theme, message, Avatar, Badge } from "antd";
 import {
     UserOutlined,
     GlobalOutlined,
@@ -10,7 +10,8 @@ import {
     TrophyOutlined,
     InfoCircleOutlined,
     CheckOutlined,
-    ArrowLeftOutlined
+    ArrowLeftOutlined,
+    EditOutlined
 } from "@ant-design/icons";
 import api from "../../../api/axios";
 import { loginSuccess } from "../../auth/authSlice";
@@ -27,6 +28,7 @@ function CreateProfile() {
     const [loading, setLoading] = useState(false);
     const [pageLoading, setPageLoading] = useState(false);
     const [draftLoading, setDraftLoading] = useState(false);
+    const [isEditing, setIsEditing] = useState(!user?.isProfileCompleted);
 
     useEffect(() => {
         if (user?.isProfileCompleted) {
@@ -117,6 +119,7 @@ function CreateProfile() {
             if (user?.isProfileCompleted) {
                 await api.put("/athleteprofile/update", payload);
                 message.success("Athlete profile updated successfully!");
+                setIsEditing(false);
             } else {
                 await api.post("/athleteprofile/profile", payload);
                 // Update Redux state with profile status
@@ -125,6 +128,7 @@ function CreateProfile() {
                     token
                 }));
                 message.success("Athlete profile completed successfully!");
+                setIsEditing(false);
             }
 
             // Redirect to dashboard upon completion
@@ -145,6 +149,122 @@ function CreateProfile() {
             setDraftLoading(false);
         }, 1000);
     };
+
+    if (!isEditing) {
+        return (
+            <ConfigProvider theme={darkTheme}>
+                <div className="min-h-screen w-full bg-[#080b11] text-slate-100 font-sans selection:bg-blue-600 selection:text-white py-12 px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-4xl mx-auto space-y-6">
+                        {/* Return to Dashboard */}
+                        <div className="flex items-center justify-between">
+                            <Button 
+                                type="text" 
+                                icon={<ArrowLeftOutlined />} 
+                                onClick={() => navigate("/dashboard")}
+                                className="text-slate-400 hover:text-white flex items-center p-0 h-auto"
+                            >
+                                Back to Dashboard
+                            </Button>
+                            <Button 
+                                type="primary" 
+                                icon={<EditOutlined />}
+                                onClick={() => setIsEditing(true)}
+                                className="shadow-md"
+                            >
+                                Edit Profile
+                            </Button>
+                        </div>
+
+                        {/* Profile Card */}
+                        <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/40 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-2xl">
+                            {/* Athlete Header */}
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-white/[0.04] pb-6">
+                                <Avatar size={80} icon={<UserOutlined />} className="bg-blue-600 shadow-lg shrink-0" />
+                                <div className="text-center sm:text-left space-y-1.5 min-w-0">
+                                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">{user?.name}</h1>
+                                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                                        <Badge count={form.getFieldValue("sport")?.toUpperCase()} color="#2563eb" className="font-bold text-[10px]" />
+                                        <span className="text-xs text-slate-300 font-semibold">{form.getFieldValue("primaryRole")}</span>
+                                        {form.getFieldValue("secondaryRole") && form.getFieldValue("secondaryRole") !== "None" && (
+                                            <>
+                                                <span className="text-slate-500">•</span>
+                                                <span className="text-xs text-slate-400">{form.getFieldValue("secondaryRole")}</span>
+                                            </>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-slate-500 font-mono">{user?.email}</p>
+                                </div>
+                            </div>
+
+                            {/* Details Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 pt-6">
+                                {/* Left Column: Biometrics */}
+                                <div className="space-y-4">
+                                    <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                                        <TrophyOutlined />
+                                        <span>Personal Biometrics</span>
+                                    </h3>
+                                    <div className="bg-[#080b11]/30 border border-white/[0.02] rounded-xl p-4 space-y-3">
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-400">Gender</span>
+                                            <span className="font-bold text-white capitalize">{form.getFieldValue("gender")}</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-400">Date of Birth</span>
+                                            <span className="font-bold text-white">
+                                                {form.getFieldValue("dob") ? form.getFieldValue("dob").format("MM/DD/YYYY") : "Not provided"}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-400">Height</span>
+                                            <span className="font-bold text-white">{form.getFieldValue("height")} cm</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-400">Weight</span>
+                                            <span className="font-bold text-white">{form.getFieldValue("weight")} kg</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Right Column: Location */}
+                                <div className="space-y-4">
+                                    <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                                        <GlobalOutlined />
+                                        <span>Registry & Location</span>
+                                    </h3>
+                                    <div className="bg-[#080b11]/30 border border-white/[0.02] rounded-xl p-4 space-y-3">
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-400">City</span>
+                                            <span className="font-bold text-white">{form.getFieldValue("city")}</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-400">State</span>
+                                            <span className="font-bold text-white">{form.getFieldValue("state")}</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-400">Country</span>
+                                            <span className="font-bold text-white">{form.getFieldValue("country")}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bio Block */}
+                            <div className="mt-6 pt-6 border-t border-white/[0.04] space-y-3">
+                                <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                                    <InfoCircleOutlined />
+                                    <span>About Athlete</span>
+                                </h3>
+                                <p className="text-xs text-slate-300 leading-relaxed bg-[#080b11]/20 border border-white/[0.02] rounded-xl p-4 m-0">
+                                    {form.getFieldValue("bio") || "No bio description completed yet."}
+                                </p>
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+            </ConfigProvider>
+        );
+    }
 
     return (
         <ConfigProvider theme={darkTheme}>
@@ -379,7 +499,7 @@ function CreateProfile() {
                             <div className="mt-8 pt-6 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-end gap-4">
                                 {user?.isProfileCompleted ? (
                                     <Button
-                                        onClick={() => navigate("/dashboard")}
+                                        onClick={() => setIsEditing(false)}
                                         className="w-full sm:w-auto border border-white/[0.08] hover:border-white/[0.16] bg-white/[0.02] text-slate-300 font-semibold hover:text-white"
                                     >
                                         Cancel

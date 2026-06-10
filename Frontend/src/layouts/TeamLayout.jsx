@@ -1,0 +1,268 @@
+import React, { useState, useEffect } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Button, ConfigProvider, theme, Menu, Avatar, message, Spin } from "antd";
+import { 
+    UserOutlined,
+    TeamOutlined, 
+    BarChartOutlined, 
+    LogoutOutlined,
+    NotificationOutlined,
+    SettingOutlined,
+    DashboardOutlined,
+    SolutionOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined
+} from "@ant-design/icons";
+import { logout } from "../features/auth/authSlice";
+import api from "../api/axios";
+
+function TeamLayout() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const dispatch = useDispatch();
+    const { user } = useSelector((state) => state.auth);
+
+    const [teamData, setTeamData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [collapsed, setCollapsed] = useState(false);
+
+    const fetchTeamData = async () => {
+        try {
+            setLoading(true);
+            const res = await api.get("/team/me");
+            if (res.data) {
+                setTeamData(res.data);
+            }
+        } catch (err) {
+            console.error("Error loading team profile:", err);
+            message.error("Failed to load team workspace details");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTeamData();
+    }, []);
+
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate("/login");
+    };
+
+    const darkTheme = {
+        algorithm: theme.darkAlgorithm,
+        token: {
+            colorPrimary: "#2563eb", // Sports corporate blue
+            colorBgContainer: "#0f172a", // Slate-900
+            colorBorder: "rgba(255, 255, 255, 0.08)",
+            colorText: "#f3f4f6",
+            colorTextSecondary: "#9ca3af",
+            borderRadius: 12,
+            fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+        },
+        components: {
+            Card: {
+                colorBgContainer: "#0f172a", // Dark slate
+            },
+            Button: {
+                colorPrimary: "#2563eb",
+                colorPrimaryHover: "#1d4ed8",
+                borderRadius: 8,
+                controlHeight: 40,
+                fontWeight: 600,
+            }
+        }
+    };
+
+    const sidebarMenuItems = [
+        { key: "dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
+        { key: "profile", icon: <UserOutlined />, label: "Team Profile" },
+        { key: "recruitment", icon: <NotificationOutlined />, label: "Recruitment Drives" },
+        { key: "applications", icon: <SolutionOutlined />, label: "Applications" },
+        { key: "roster", icon: <TeamOutlined />, label: "Roster" },
+        { key: "performance", icon: <BarChartOutlined />, label: "Performance" },
+        { key: "settings", icon: <SettingOutlined />, label: "Settings" }
+    ];
+
+    const getActiveKey = () => {
+        const path = location.pathname;
+        if (path.includes("/team/dashboard")) return "dashboard";
+        if (path.includes("/team/profile")) return "profile";
+        if (path.includes("/team/recruitment")) return "recruitment";
+        if (path.includes("/team/applications")) return "applications";
+        if (path.includes("/team/roster")) return "roster";
+        if (path.includes("/team/performance")) return "performance";
+        if (path.includes("/team/settings")) return "settings";
+        return "dashboard";
+    };
+
+    const handleMenuClick = (key) => {
+        if (key === "dashboard") {
+            navigate("/team/dashboard");
+        } else {
+            const item = sidebarMenuItems.find(i => i.key === key);
+            message.info(`${item?.label || key} section is under development`);
+        }
+    };
+
+    return (
+        <ConfigProvider theme={darkTheme}>
+            <div className="min-h-screen w-full bg-[#080b11] text-slate-100 font-sans selection:bg-blue-600 selection:text-white flex">
+                
+                {/* Left Sidebar Navigation */}
+                <aside className={`${collapsed ? "w-20" : "w-64"} bg-[#0b0f19] border-r border-white/[0.04] hidden md:flex flex-col shrink-0 transition-all duration-300`}>
+                    <div className="p-6 flex items-center justify-between border-b border-white/[0.04]">
+                        {!collapsed && (
+                            <div className="flex items-center space-x-3">
+                                <div className="h-9 w-9 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-black tracking-wide text-white uppercase">APEX</span>
+                                    <span className="text-[8px] uppercase tracking-widest text-blue-400 font-bold -mt-0.5">Team Workspace</span>
+                                </div>
+                            </div>
+                        )}
+                        {collapsed && (
+                            <div className="mx-auto h-9 w-9 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex-grow py-6 px-4">
+                        <Menu
+                            mode="inline"
+                            inlineCollapsed={collapsed}
+                            selectedKeys={[getActiveKey()]}
+                            style={{ background: "transparent", borderRight: 0 }}
+                            items={sidebarMenuItems.map(item => ({
+                                key: item.key,
+                                icon: item.icon,
+                                label: <span className="text-xs font-semibold">{item.label}</span>,
+                                onClick: () => handleMenuClick(item.key)
+                            }))}
+                        />
+                    </div>
+
+                    <div className="p-4 border-t border-white/[0.04] bg-[#090d16] flex flex-col gap-3">
+                        {!collapsed && (
+                            <div className="flex items-center space-x-3">
+                                <Avatar size="small" icon={<UserOutlined />} className="bg-blue-600 shrink-0" />
+                                <div className="min-w-0 flex-grow">
+                                    <p className="text-xs font-bold text-white truncate">{user?.name || "Team Manager"}</p>
+                                    <p className="text-[9px] text-slate-400 truncate uppercase tracking-wider">{user?.role}</p>
+                                </div>
+                            </div>
+                        )}
+                        <Button 
+                            type="text" 
+                            danger 
+                            icon={<LogoutOutlined />} 
+                            onClick={handleLogout}
+                            className={`w-full text-left justify-start hover:bg-red-500/10 text-xs py-2 px-3 h-auto ${collapsed ? "justify-center px-0" : ""}`}
+                        >
+                            {!collapsed && "Sign Out"}
+                        </Button>
+                    </div>
+                </aside>
+
+                {/* Right Area: Content Outlet */}
+                <div className="flex-grow flex flex-col min-w-0">
+                    
+                    {/* Top Header Navbar */}
+                    <header className="w-full flex items-center justify-between py-4 px-6 bg-[#0b0f19]/90 border-b border-white/[0.04] backdrop-blur-sm sticky top-0 z-50">
+                        {/* Collapse Toggle & Brand Info */}
+                        <div className="flex items-center space-x-4">
+                            <Button 
+                                type="text"
+                                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                                onClick={() => setCollapsed(!collapsed)}
+                                className="hidden md:inline-flex text-slate-300 hover:text-white"
+                            />
+                            
+                            <div className="flex items-center space-x-3 md:hidden">
+                                <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <span className="text-base font-black tracking-wide text-white uppercase">APEX</span>
+                            </div>
+
+                            <div className="hidden md:block">
+                                <h2 className="text-xs font-extrabold text-white uppercase tracking-wider">Team Management Portal</h2>
+                            </div>
+                        </div>
+
+                        {/* Middle/Header display: Logo, Team Name, Sport, Organization Name */}
+                        {loading ? (
+                            <Spin size="small" />
+                        ) : (
+                            teamData && (
+                                <div className="flex items-center space-x-3 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-2 hover:border-white/[0.1] transition-all">
+                                    {teamData.logo ? (
+                                        <img src={teamData.logo} alt="Logo" className="w-9 h-9 rounded-lg object-cover border border-white/10 shrink-0" />
+                                    ) : (
+                                        <Avatar size={36} icon={<TeamOutlined />} className="bg-blue-600 text-white rounded-lg font-bold shrink-0" />
+                                    )}
+                                    <div className="min-w-0">
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-xs font-black text-white truncate leading-none">{teamData.teamName}</span>
+                                            <span className="text-[9px] bg-blue-600/20 text-blue-400 font-extrabold uppercase px-1.5 py-0.5 rounded border border-blue-500/20 shrink-0 leading-none">
+                                                {teamData.sport}
+                                            </span>
+                                        </div>
+                                        {teamData.organizationId?.organizationName && (
+                                            <p className="text-[10px] text-slate-400 mt-1 truncate">
+                                                Org: <span className="text-slate-300 font-bold">{teamData.organizationId.organizationName}</span>
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            )
+                        )}
+
+                        {/* Right Area Controls */}
+                        <div className="flex items-center space-x-4">
+                            <span className="text-[10px] text-slate-400 hidden lg:inline-flex items-center space-x-1.5 bg-slate-950/40 px-2.5 py-1 rounded-md border border-white/[0.04]">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Logged in as: <strong className="text-blue-400 font-mono">{user?.email}</strong></span>
+                            </span>
+                            <Button 
+                                type="text" 
+                                danger 
+                                icon={<LogoutOutlined />} 
+                                onClick={handleLogout}
+                                className="hover:bg-red-500/10 text-xs md:hidden"
+                            >
+                                Sign Out
+                            </Button>
+                        </div>
+                    </header>
+
+                    {/* Content Outlets */}
+                    <div className="flex-grow overflow-y-auto bg-[#080b11]">
+                        {loading ? (
+                            <div className="min-h-[60vh] flex flex-col items-center justify-center">
+                                <Spin size="large" />
+                                <p className="text-xs text-slate-400 mt-4 tracking-wider">Syncing workspace...</p>
+                            </div>
+                        ) : (
+                            <Outlet context={{ teamData, setTeamData, fetchTeamData }} />
+                        )}
+                    </div>
+
+                </div>
+            </div>
+        </ConfigProvider>
+    );
+}
+
+export default TeamLayout;
