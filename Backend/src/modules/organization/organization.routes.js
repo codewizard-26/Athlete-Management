@@ -2,6 +2,7 @@ import express from 'express'
 import authMiddleware from '../../middleware/auth.middleware.js'
 import roleMiddleware from '../../middleware/role.middleware.js'
 import Organization from './organization.model.js'
+import User from '../user/user.model.js'
 
 const router = express.Router()
 
@@ -19,13 +20,12 @@ try {
     await Organization.create({
         ownerId,organizationName,description,logo,city,state,country,website
     })
-    // await Organization.findByIdAndUpdate(
-    //     ownerId,
-    //     {
-    //         isVerified:true
-    //     }
-        
-    // )
+    await User.findByIdAndUpdate(
+        ownerId,
+        {
+            isProfileCompleted:true
+        }
+    )
     res.status(201).json({
     message:"Organization profile created successfully"
 })

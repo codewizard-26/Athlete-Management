@@ -258,7 +258,21 @@ router.get(
                     message:"Athlete not found"
                 });
             }
-
+            Performance.aggregate([
+{
+    $match:{
+        athleteId:athlete._id
+    }
+},
+{
+    $group:{
+        _id:null,
+        totalMatches:{
+            $sum:1
+        }
+    }
+}
+])
             const performances =
                 await Performance.find({
                     athleteId:athlete._id
