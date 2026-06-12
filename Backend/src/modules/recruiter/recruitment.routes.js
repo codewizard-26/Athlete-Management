@@ -6,6 +6,7 @@ import Team from '../team/team.model.js'
 import RecruitmentDrive from "./recruitmentDrive.model.js";
 import Athlete from "../athlete/athlete.model.js";
 import RecruitmentApplication from "./recruitmentApplication.model.js";
+import TeamMembership from "../team/teamMembership.model.js";
 import express from 'express'
 
 const router = express.Router()
@@ -144,7 +145,7 @@ await RecruitmentApplication.create({
 router.get(
     "/applications/:driveId",
     authMiddleware,
-    roleMiddleware("organization"),
+    roleMiddleware("organization", "team"),
     async (req, res) => {
         try {
 
@@ -174,21 +175,34 @@ router.put(
 
             const { applicationId } = req.params;
 
-            const application =
-                await RecruitmentApplication.findByIdAndUpdate(
-                    applicationId,
-                    {
-                        status:"accepted"
-                    },
-                    {
-                        new:true
-                    }
-                );
-
-            if(!application){
+            const application = await RecruitmentApplication.findById(applicationId);
+            if (!application) {
                 return res.status(404).json({
-                    message:"Application not found"
+                    message: "Application not found"
                 });
+            }
+
+            application.status = "accepted";
+            await application.save();
+
+            const drive = await RecruitmentDrive.findById(application.recruitmentDriveId);
+            if (drive) {
+                const existingMember = await TeamMembership.findOne({
+                    athleteId: application.athleteId,
+                    teamId: drive.teamId
+                });
+                if (!existingMember) {
+                    await TeamMembership.create({
+                        athleteId: application.athleteId,
+                        teamId: drive.teamId,
+                        status: "active",
+                        joinedAt: new Date()
+                    });
+                } else {
+                    existingMember.status = "active";
+                    existingMember.joinedAt = new Date();
+                    await existingMember.save();
+                }
             }
 
             return res.status(200).json({
@@ -235,6 +249,48 @@ router.put(
                 application
             });
 
+        } catch (err) {
+            return res.status(500).json({
+                message: err.message
+            });
+        }
+    }
+);
+
+router.get(
+    "/all",
+    authMiddleware,
+    async (req, res) => {
+        try {
+            const drives = await RecruitmentDrive.find().populate("teamId");
+            return res.status(200).json(drives);
+        } catch (err) {
+            return res.status(500).json({
+                message: err.message
+            });
+        }
+    }
+);
+
+router.get(
+    "/my-applications",
+    authMiddleware,
+    roleMiddleware("athlete"),
+    async (req, res) => {
+        try {
+            const athlete = await Athlete.findOne({ userId: req.user.id });
+            if (!athlete) {
+                return res.status(404).json({
+                    message: "Athlete profile not found"
+                });
+            }
+            const applications = await RecruitmentApplication.find({
+                athleteId: athlete._id
+            }).populate({
+                path: "recruitmentDriveId",
+                populate: { path: "teamId" }
+            });
+            return res.status(200).json(applications);
         } catch (err) {
             return res.status(500).json({
                 message: err.message

@@ -1,20 +1,48 @@
 import { useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+
+// Auth Components
 import Register from "../features/auth/pages/Register";
 import Login from "../features/auth/pages/Login";
-import Home from "../features/home/pages/Home";
-import CreateProfile from "../features/athlete/pages/CreateProfile";
-import CreateOrgProfile from "../features/organization/pages/CreateOrgProfile";
-import AthleteDashboard from "../features/athlete/pages/AthleteDashboard";
-import OrganizationDashboard from "../features/organization/pages/OrganizationDashboard";
-import OrganizationLayout from "../layouts/OrganizationLayout";
-import TeamLayout from "../layouts/TeamLayout";
-import TeamsList from "../features/organization/pages/TeamsList";
-import CreateTeam from "../features/organization/pages/CreateTeam";
-import TeamDashboard from "../features/team/pages/TeamDashboard";
 import ProtectedRoute from "../components/ProtectedRoute";
 import RoleProtectedRoute from "../components/RoleProtectedRoute";
+
+// Public Page
+import Home from "../features/home/pages/Home";
+
+// Shared Protected Detail Views
+import TournamentDetails from "../features/tournament/pages/TournamentDetails";
+import MatchDetails from "../features/match/pages/MatchDetails";
+
+// Athlete Pages & Layout
+import AthleteLayout from "../layouts/AthleteLayout";
+import CreateProfile from "../features/athlete/pages/CreateProfile";
+import AthleteDashboard from "../features/athlete/pages/AthleteDashboard";
+import MyTeams from "../features/athlete/pages/MyTeams";
+import AthleteRecruitmentDrives from "../features/athlete/pages/RecruitmentDrives";
+import MyApplications from "../features/athlete/pages/MyApplications";
+import AthletePerformance from "../features/athlete/pages/AthletePerformance";
+
+// Organization Pages & Layout
+import OrganizationLayout from "../layouts/OrganizationLayout";
+import CreateOrgProfile from "../features/organization/pages/CreateOrgProfile";
+import OrganizationDashboard from "../features/organization/pages/OrganizationDashboard";
+import TeamsList from "../features/organization/pages/TeamsList";
+import CreateTeam from "../features/organization/pages/CreateTeam";
+import TournamentManagement from "../features/organization/pages/TournamentManagement";
+import CreateTournament from "../features/organization/pages/CreateTournament";
+import MatchManagement from "../features/organization/pages/MatchManagement";
+
+// Team Pages & Layout
+import TeamLayout from "../layouts/TeamLayout";
+import TeamDashboard from "../features/team/pages/TeamDashboard";
+import TeamProfile from "../features/team/pages/TeamProfile";
+import CreateRecruitmentDrive from "../features/team/pages/CreateRecruitmentDrive";
+import TeamRecruitmentDrives from "../features/team/pages/RecruitmentDrives";
+import TeamApplications from "../features/team/pages/TeamApplications";
+import TeamRoster from "../features/team/pages/TeamRoster";
+import TeamPerformance from "../features/team/pages/TeamPerformance";
 
 // Dashboard Redirector Component (centralized role-based routing)
 const DashboardRedirector = () => {
@@ -56,8 +84,6 @@ const DashboardRedirector = () => {
     );
 };
 
-
-
 function AppRoutes() {
     return (
         <Routes>
@@ -76,7 +102,25 @@ function AppRoutes() {
                 }
             />
 
-            {/* Role-Based Protected Routes */}
+            {/* Shared Detail Views (requires auth) */}
+            <Route
+                path="/tournament/:tournamentId"
+                element={
+                    <ProtectedRoute>
+                        <TournamentDetails />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/match/:matchId"
+                element={
+                    <ProtectedRoute>
+                        <MatchDetails />
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* Athlete Role Routes */}
             <Route
                 path="/athlete/profile"
                 element={
@@ -87,14 +131,22 @@ function AppRoutes() {
             />
 
             <Route
-                path="/athlete/*"
+                path="/athlete"
                 element={
                     <RoleProtectedRoute allowedRole="athlete">
-                        <AthleteDashboard />
+                        <AthleteLayout />
                     </RoleProtectedRoute>
                 }
-            />
+            >
+                <Route index element={<AthleteDashboard />} />
+                <Route path="dashboard" element={<AthleteDashboard />} />
+                <Route path="teams" element={<MyTeams />} />
+                <Route path="recruitment" element={<AthleteRecruitmentDrives />} />
+                <Route path="applications" element={<MyApplications />} />
+                <Route path="performance" element={<AthletePerformance />} />
+            </Route>
 
+            {/* Organization Role Routes */}
             <Route
                 path="/organization/profile"
                 element={
@@ -116,8 +168,12 @@ function AppRoutes() {
                 <Route path="dashboard" element={<OrganizationDashboard />} />
                 <Route path="teams" element={<TeamsList />} />
                 <Route path="teams/create" element={<CreateTeam />} />
+                <Route path="tournaments" element={<TournamentManagement />} />
+                <Route path="tournaments/create" element={<CreateTournament />} />
+                <Route path="matches" element={<MatchManagement />} />
             </Route>
 
+            {/* Team Role Routes */}
             <Route
                 path="/team"
                 element={
@@ -128,6 +184,12 @@ function AppRoutes() {
             >
                 <Route index element={<TeamDashboard />} />
                 <Route path="dashboard" element={<TeamDashboard />} />
+                <Route path="profile" element={<TeamProfile />} />
+                <Route path="recruitment" element={<TeamRecruitmentDrives />} />
+                <Route path="recruitment/create" element={<CreateRecruitmentDrive />} />
+                <Route path="applications" element={<TeamApplications />} />
+                <Route path="roster" element={<TeamRoster />} />
+                <Route path="performance" element={<TeamPerformance />} />
             </Route>
         </Routes>
     );

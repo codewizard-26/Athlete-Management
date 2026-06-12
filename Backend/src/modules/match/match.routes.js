@@ -1,6 +1,9 @@
 import express from 'express'
 import roleMiddleware from '../../middleware/role.middleware.js';
 import authMiddleware from '../../middleware/auth.middleware.js';
+import Match from "./match.model.js";
+import Tournament from "../tournament/tournament.model.js";
+import Team from "../team/team.model.js";
 const router = express.Router()
 
 router.post(
@@ -185,6 +188,26 @@ router.put(
             return res.status(500).json({
                 message:err.message
             });
+        }
+    }
+);
+
+router.get(
+    "/:matchId",
+    authMiddleware,
+    async (req, res) => {
+        try {
+            const { matchId } = req.params;
+            const match = await Match.findById(matchId)
+                .populate("homeTeamId")
+                .populate("awayTeamId")
+                .populate("tournamentId");
+            if (!match) {
+                return res.status(404).json({ message: "Match not found" });
+            }
+            return res.status(200).json(match);
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
         }
     }
 );

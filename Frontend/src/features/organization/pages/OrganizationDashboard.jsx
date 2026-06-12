@@ -198,7 +198,7 @@ function OrganizationDashboard() {
 
                         {/* Action 2 */}
                         <div 
-                            onClick={() => message.info("Navigate to Launch Recruitment Drive Form (Under Development)")}
+                            onClick={() => navigate("/organization/teams")}
                             className="p-5 bg-[#0f172a]/40 border border-white/[0.04] rounded-xl hover:border-purple-500/35 hover:bg-[#0c1428]/30 transition-all duration-300 shadow-md cursor-pointer flex flex-col space-y-3 group"
                         >
                             <div className="h-10 w-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
@@ -206,16 +206,16 @@ function OrganizationDashboard() {
                             </div>
                             <div>
                                 <h3 className="text-sm font-bold text-white group-hover:text-purple-400 transition-colors flex items-center justify-between">
-                                    <span>Launch Recruiter Call</span>
+                                    <span>Manage Teams Recruitment</span>
                                     <ArrowRightOutlined className="text-xs opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                                 </h3>
-                                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">Post open scouting spots for athletes to discover and submit applications.</p>
+                                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">Check team roster structures, positions, and active recruitment calls.</p>
                             </div>
                         </div>
 
                         {/* Action 3 */}
                         <div 
-                            onClick={() => message.info("Navigate to Create Tournament Form (Under Development)")}
+                            onClick={() => navigate("/organization/tournaments/create")}
                             className="p-5 bg-[#0f172a]/40 border border-white/[0.04] rounded-xl hover:border-emerald-500/35 hover:bg-[#0c1428]/30 transition-all duration-300 shadow-md cursor-pointer flex flex-col space-y-3 group"
                         >
                             <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">

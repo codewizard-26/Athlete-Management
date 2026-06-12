@@ -101,6 +101,16 @@ function TeamLayout() {
     const handleMenuClick = (key) => {
         if (key === "dashboard") {
             navigate("/team/dashboard");
+        } else if (key === "profile") {
+            navigate("/team/profile");
+        } else if (key === "recruitment") {
+            navigate("/team/recruitment");
+        } else if (key === "applications") {
+            navigate("/team/applications");
+        } else if (key === "roster") {
+            navigate("/team/roster");
+        } else if (key === "performance") {
+            navigate("/team/performance");
         } else {
             const item = sidebarMenuItems.find(i => i.key === key);
             message.info(`${item?.label || key} section is under development`);

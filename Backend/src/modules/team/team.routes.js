@@ -322,13 +322,50 @@ await TeamMembership.create({
     message:"Join request sent successfully"
 });
     
-        } catch (err) {
+     
+    } catch (err) {
             return res.status(500).json({
             message: err.message
         });
     }
 })
 
+router.get(
+    "/me/members",
+    authMiddleware,
+    roleMiddleware("team"),
+    async (req, res) => {
+        try {
+            const team = await Team.findOne({ userId: req.user.id });
+            if (!team) {
+                return res.status(404).json({ message: "Team not found" });
+            }
+            const members = await TeamMembership.find({
+                teamId: team._id,
+                status: "active"
+            }).populate("athleteId");
+            return res.status(200).json(members);
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    }
+);
 
+router.get(
+    "/members/:teamId",
+    authMiddleware,
+    async (req, res) => {
+        try {
+            const { teamId } = req.params;
+            const members = await TeamMembership.find({
+                teamId,
+                status: "active"
+            }).populate("athleteId");
+            return res.status(200).json(members);
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    }
+);
 
 export default router

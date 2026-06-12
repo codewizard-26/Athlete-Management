@@ -114,7 +114,18 @@ function TeamDashboard() {
     };
 
     const handleActionClick = (section) => {
-        message.info(`${section} workspace is under development`);
+        const sec = section.toLowerCase();
+        if (sec.includes("recruitment") || sec.includes("campaign") || sec.includes("drive")) {
+            navigate("/team/recruitment/create");
+        } else if (sec.includes("application") || sec.includes("review")) {
+            navigate("/team/applications");
+        } else if (sec.includes("roster")) {
+            navigate("/team/roster");
+        } else if (sec.includes("performance") || sec.includes("stats")) {
+            navigate("/team/performance");
+        } else {
+            message.info(`${section} workspace is under development`);
+        }
     };
 
     return (

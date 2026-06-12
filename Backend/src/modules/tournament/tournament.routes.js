@@ -1,6 +1,10 @@
 import express from 'express'
 import authMiddleware from '../../middleware/auth.middleware.js'
 import roleMiddleware from '../../middleware/role.middleware.js';
+import Tournament from "./tournament.model.js";
+import TournamentRegistration from "./tournamentRegistration.model.js";
+import Organization from "../organization/organization.model.js";
+import Team from "../team/team.model.js";
 const router = express.Router()
 router.post(
     "/create",
@@ -299,6 +303,23 @@ router.put(
             return res.status(500).json({
                 message:err.message
             });
+        }
+    }
+);
+
+router.get(
+    "/:tournamentId",
+    authMiddleware,
+    async (req, res) => {
+        try {
+            const { tournamentId } = req.params;
+            const tournament = await Tournament.findById(tournamentId).populate("organizationId");
+            if (!tournament) {
+                return res.status(404).json({ message: "Tournament not found" });
+            }
+            return res.status(200).json(tournament);
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
         }
     }
 );

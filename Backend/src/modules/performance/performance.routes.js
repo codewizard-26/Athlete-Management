@@ -4,7 +4,7 @@ import roleMiddleware from "../../middleware/role.middleware.js";
 
 import Performance from "./performance.model.js";
 import Athlete from "../athlete/athlete.model.js";
-// import Match from "../match/match.model.js";
+import Match from "../match/match.model.js";
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ router.post(
     "/create",
     authMiddleware,
     roleMiddleware("organization"),
-    async(req,res)=>{
+    async (req, res) => {
         try {
 
             const {
@@ -24,15 +24,15 @@ router.post(
                 stats
             } = req.body;
 
-            if(
+            if (
                 !athleteId ||
                 !matchId ||
                 !teamId ||
                 !tournamentId ||
                 !sport
-            ){
+            ) {
                 return res.status(400).json({
-                    message:"All fields required"
+                    message: "All fields required"
                 });
             }
 
@@ -42,26 +42,26 @@ router.post(
                     matchId
                 });
 
-            if(existing){
+            if (existing) {
                 return res.status(400).json({
                     message:
-                    "Performance already exists"
+                        "Performance already exists"
                 });
             }
-const athlete = await Athlete.findById(athleteId);
+            const athlete = await Athlete.findById(athleteId);
 
-if(!athlete){
-    return res.status(404).json({
-        message:"Athlete not found"
-    });
-}
-const match = await Match.findById(matchId);
+            if (!athlete) {
+                return res.status(404).json({
+                    message: "Athlete not found"
+                });
+            }
+            const match = await Match.findById(matchId);
 
-if(!match){
-    return res.status(404).json({
-        message:"Match not found"
-    });
-}
+            if (!match) {
+                return res.status(404).json({
+                    message: "Match not found"
+                });
+            }
             const performance =
                 await Performance.create({
                     athleteId,
@@ -73,13 +73,13 @@ if(!match){
                 });
 
             return res.status(201).json({
-                message:"Performance added",
+                message: "Performance added",
                 performance
             });
 
-        } catch(err){
+        } catch (err) {
             return res.status(500).json({
-                message:err.message
+                message: err.message
             });
         }
     }
@@ -89,7 +89,7 @@ router.put(
     "/:performanceId",
     authMiddleware,
     roleMiddleware("organization"),
-    async(req,res)=>{
+    async (req, res) => {
         try {
 
             const { performanceId } =
@@ -100,26 +100,26 @@ router.put(
                     performanceId,
                     req.body,
                     {
-                        new:true
+                        new: true
                     }
                 );
 
-            if(!performance){
+            if (!performance) {
                 return res.status(404).json({
                     message:
-                    "Performance not found"
+                        "Performance not found"
                 });
             }
 
             return res.status(200).json({
                 message:
-                "Performance updated",
+                    "Performance updated",
                 performance
             });
 
-        } catch(err){
+        } catch (err) {
             return res.status(500).json({
-                message:err.message
+                message: err.message
             });
         }
     }
@@ -128,7 +128,7 @@ router.put(
 router.get(
     "/athlete/:athleteId",
     authMiddleware,
-    async(req,res)=>{
+    async (req, res) => {
         try {
 
             const { athleteId } =
@@ -138,16 +138,16 @@ router.get(
                 await Performance.find({
                     athleteId
                 })
-                .populate("matchId")
-                .populate("teamId");
+                    .populate("matchId")
+                    .populate("teamId");
 
             return res.status(200).json(
                 performances
             );
 
-        } catch(err){
+        } catch (err) {
             return res.status(500).json({
-                message:err.message
+                message: err.message
             });
         }
     }
@@ -156,7 +156,7 @@ router.delete(
     "/:performanceId",
     authMiddleware,
     roleMiddleware("organization"),
-    async(req,res)=>{
+    async (req, res) => {
         try {
 
             const { performanceId } =
@@ -167,21 +167,21 @@ router.delete(
                     performanceId
                 );
 
-            if(!performance){
+            if (!performance) {
                 return res.status(404).json({
                     message:
-                    "Performance not found"
+                        "Performance not found"
                 });
             }
 
             return res.status(200).json({
                 message:
-                "Performance deleted"
+                    "Performance deleted"
             });
 
-        } catch(err){
+        } catch (err) {
             return res.status(500).json({
-                message:err.message
+                message: err.message
             });
         }
     }
@@ -190,7 +190,7 @@ router.delete(
 router.get(
     "/team/:teamId",
     authMiddleware,
-    async(req,res)=>{
+    async (req, res) => {
         try {
 
             const { teamId } =
@@ -200,15 +200,15 @@ router.get(
                 await Performance.find({
                     teamId
                 })
-                .populate("athleteId");
+                    .populate("athleteId");
 
             return res.status(200).json(
                 performances
             );
 
-        } catch(err){
+        } catch (err) {
             return res.status(500).json({
-                message:err.message
+                message: err.message
             });
         }
     }
@@ -217,7 +217,7 @@ router.get(
 router.get(
     "/tournament/:tournamentId",
     authMiddleware,
-    async(req,res)=>{
+    async (req, res) => {
         try {
 
             const { tournamentId } =
@@ -227,16 +227,16 @@ router.get(
                 await Performance.find({
                     tournamentId
                 })
-                .populate("athleteId")
-                .populate("teamId");
+                    .populate("athleteId")
+                    .populate("teamId");
 
             return res.status(200).json(
                 performances
             );
 
-        } catch(err){
+        } catch (err) {
             return res.status(500).json({
-                message:err.message
+                message: err.message
             });
         }
     }
@@ -246,56 +246,56 @@ router.get(
     "/my-performance-summary",
     authMiddleware,
     roleMiddleware("athlete"),
-    async(req,res)=>{
+    async (req, res) => {
         try {
 
             const athlete = await Athlete.findOne({
-                userId:req.user.id
+                userId: req.user.id
             });
 
-            if(!athlete){
+            if (!athlete) {
                 return res.status(404).json({
-                    message:"Athlete not found"
+                    message: "Athlete not found"
                 });
             }
             Performance.aggregate([
-{
-    $match:{
-        athleteId:athlete._id
-    }
-},
-{
-    $group:{
-        _id:null,
-        totalMatches:{
-            $sum:1
-        }
-    }
-}
-])
+                {
+                    $match: {
+                        athleteId: athlete._id
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        totalMatches: {
+                            $sum: 1
+                        }
+                    }
+                }
+            ])
             const performances =
                 await Performance.find({
-                    athleteId:athlete._id
+                    athleteId: athlete._id
                 });
 
             const summary = {};
 
-performances.forEach((p) => {
-    Object.entries(p.stats).forEach(([key, value]) => {
-        if (typeof value === "number") {
-            summary[key] = (summary[key] || 0) + value;
-        }
-    });
-});
+            performances.forEach((p) => {
+                Object.entries(p.stats).forEach(([key, value]) => {
+                    if (typeof value === "number") {
+                        summary[key] = (summary[key] || 0) + value;
+                    }
+                });
+            });
 
-return res.status(200).json({
-    totalMatches: performances.length,
-    stats: summary
-});
+            return res.status(200).json({
+                totalMatches: performances.length,
+                stats: summary
+            });
 
-        } catch(err){
+        } catch (err) {
             return res.status(500).json({
-                message:err.message
+                message: err.message
             });
         }
     }
@@ -305,34 +305,53 @@ router.get(
     "/my-performance",
     authMiddleware,
     roleMiddleware("athlete"),
-    async(req,res)=>{
-        try{
+    async (req, res) => {
+        try {
 
             const athlete = await Athlete.findOne({
-                userId:req.user.id
+                userId: req.user.id
             });
 
-            if(!athlete){
+            if (!athlete) {
                 return res.status(404).json({
-                    message:"Athlete not found"
+                    message: "Athlete not found"
                 });
             }
 
             const performances =
                 await Performance.find({
-                    athleteId:athlete._id
+                    athleteId: athlete._id
                 })
-                .populate("matchId")
-                .populate("teamId");
+                    .populate("matchId")
+                    .populate("teamId");
 
             return res.status(200).json(
                 performances
             );
 
-        }catch(err){
+        } catch (err) {
             return res.status(500).json({
-                message:err.message
+                message: err.message
             });
+        }
+    }
+);
+
+router.get(
+    "/match/:matchId",
+    authMiddleware,
+    async (req, res) => {
+        try {
+            const { matchId } = req.params;
+            const performances = await Performance.find({ matchId })
+                .populate({
+                    path: "athleteId",
+                    populate: { path: "userId" }
+                })
+                .populate("teamId");
+            return res.status(200).json(performances);
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
         }
     }
 );

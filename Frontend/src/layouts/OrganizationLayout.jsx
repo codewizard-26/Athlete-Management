@@ -79,9 +79,13 @@ function OrganizationLayout() {
         if (key === "dashboard") {
             navigate("/organization/dashboard");
         } else if (key === "profile") {
-            navigate("/organization/profile/create");
+            navigate("/organization/profile");
         } else if (key === "teams") {
             navigate("/organization/teams");
+        } else if (key === "tournaments") {
+            navigate("/organization/tournaments");
+        } else if (key === "matches") {
+            navigate("/organization/matches");
         } else {
             message.info(`${key.toUpperCase()} section is under development`);
         }
