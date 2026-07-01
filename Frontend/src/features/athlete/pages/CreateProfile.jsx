@@ -157,16 +157,16 @@ function CreateProfile() {
                     <div className="max-w-4xl mx-auto space-y-6">
                         {/* Return to Dashboard */}
                         <div className="flex items-center justify-between">
-                            <Button 
-                                type="text" 
-                                icon={<ArrowLeftOutlined />} 
+                            <Button
+                                type="text"
+                                icon={<ArrowLeftOutlined />}
                                 onClick={() => navigate("/dashboard")}
                                 className="text-slate-400 hover:text-white flex items-center p-0 h-auto"
                             >
                                 Back to Dashboard
                             </Button>
-                            <Button 
-                                type="primary" 
+                            <Button
+                                type="primary"
                                 icon={<EditOutlined />}
                                 onClick={() => setIsEditing(true)}
                                 className="shadow-md"
@@ -274,9 +274,9 @@ function CreateProfile() {
                     {/* Return Navigation */}
                     {user?.isProfileCompleted && (
                         <div className="mb-6 flex items-center justify-between">
-                            <Button 
-                                type="text" 
-                                icon={<ArrowLeftOutlined />} 
+                            <Button
+                                type="text"
+                                icon={<ArrowLeftOutlined />}
                                 onClick={() => navigate("/dashboard")}
                                 className="text-slate-400 hover:text-white flex items-center p-0 h-auto"
                             >
@@ -295,7 +295,7 @@ function CreateProfile() {
                             {user?.isProfileCompleted ? "Edit Your Athlete Profile" : "Complete Your Athlete Profile"}
                         </h1>
                         <p className="mt-3 text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                            {user?.isProfileCompleted 
+                            {user?.isProfileCompleted
                                 ? "Update your sporting credentials, location records, and personal biometrics profile below."
                                 : "Provide your sporting and personal information to participate in recruitment drives, join teams, compete in tournaments, and track your performance."
                             }
@@ -435,8 +435,8 @@ function CreateProfile() {
                                         label={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Country</span>}
                                         rules={[{ required: true, message: "Country is required" }]}
                                     >
-                                        <Select 
-                                            showSearch 
+                                        <Select
+                                            showSearch
                                             placeholder="Search and select country"
                                             optionFilterProp="children"
                                             filterOption={(input, option) =>
@@ -495,7 +495,7 @@ function CreateProfile() {
 
                             </div>
 
-                             {/* Form Actions Footer */}
+                            {/* Form Actions Footer */}
                             <div className="mt-8 pt-6 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-end gap-4">
                                 {user?.isProfileCompleted ? (
                                     <Button
@@ -520,8 +520,8 @@ function CreateProfile() {
                                     icon={!loading && <CheckOutlined />}
                                     className="w-full sm:w-auto uppercase tracking-wider shadow-lg shadow-blue-600/20"
                                 >
-                                    {loading 
-                                        ? (user?.isProfileCompleted ? "Updating Profile..." : "Completing Profile...") 
+                                    {loading
+                                        ? (user?.isProfileCompleted ? "Updating Profile..." : "Completing Profile...")
                                         : (user?.isProfileCompleted ? "Update Profile" : "Complete Profile")
                                     }
                                 </Button>

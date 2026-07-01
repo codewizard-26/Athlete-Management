@@ -50,7 +50,7 @@ router.post(
                 });
             }
 
-            await Tournament.create({
+            const tournament = await Tournament.create({
                 organizationId:organization._id,
                 name,
                 sport,
@@ -63,7 +63,8 @@ router.post(
             });
 
             return res.status(201).json({
-                message:"Tournament created"
+                message:"Tournament created",
+                tournament
             });
 
         } catch(err){

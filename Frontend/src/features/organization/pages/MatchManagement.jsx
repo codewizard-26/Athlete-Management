@@ -4,11 +4,9 @@ import { Card, Button, Table, Modal, Form, Input, Select, DatePicker, Tag, messa
 import { 
     CalendarOutlined, 
     EnvironmentOutlined, 
-    TrophyOutlined, 
     PlusOutlined, 
     EditOutlined,
     CheckOutlined,
-    SwapOutlined,
     EyeOutlined
 } from "@ant-design/icons";
 import api from "../../../api/axios";
@@ -121,79 +119,78 @@ function MatchManagement() {
 
     const columns = [
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Match Details</span>,
+            title: "MATCH DETAILS",
             key: "details",
             render: (_, record) => (
-                <div className="space-y-1">
-                    <p className="text-xs font-bold text-white">
+                <div className="space-y-0.5">
+                    <p className="text-xs font-semibold text-text-primary">
                         {record.homeTeamId?.teamName} vs {record.awayTeamId?.teamName}
                     </p>
-                    <p className="text-[10px] text-slate-400">
+                    <p className="text-[10px] text-text-secondary">
                         {record.tournamentId?.name || "Friendly"}
                     </p>
                 </div>
             )
         },
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Schedule</span>,
+            title: "SCHEDULE",
             key: "schedule",
             render: (_, record) => (
-                <div className="space-y-0.5 text-[10px] text-slate-300">
-                    <p className="font-semibold"><CalendarOutlined className="mr-1.5 text-blue-500" />{new Date(record.matchDate).toLocaleString()}</p>
-                    <p><EnvironmentOutlined className="mr-1.5 text-slate-500" />{record.venue}</p>
+                <div className="space-y-0.5 text-xs text-text-secondary">
+                    <p className="font-semibold text-text-primary"><CalendarOutlined className="mr-1.5 text-brand-primary text-[10px]" />{new Date(record.matchDate).toLocaleString()}</p>
+                    <p><EnvironmentOutlined className="mr-1.5 text-text-secondary/50 text-[10px]" />{record.venue}</p>
                 </div>
             )
         },
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Score</span>,
+            title: "SCORE",
             key: "score",
             render: (_, record) => (
-                <span className="text-xs font-black text-blue-400 font-mono">
+                <span className="text-xs font-bold text-brand-primary font-mono">
                     {record.homeScore !== undefined ? record.homeScore : "-"} : {record.awayScore !== undefined ? record.awayScore : "-"}
                 </span>
             )
         },
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Status</span>,
+            title: "STATUS",
             dataIndex: "status",
             key: "status",
             render: (status) => (
-                <Tag color={status === "completed" ? "success" : "processing"} className="m-0 border-0 font-bold uppercase text-[9px]">
+                <Tag color={status === "completed" ? "success" : "processing"} className="m-0 border-0 font-semibold uppercase text-[9px] px-2 py-0.5 rounded">
                     {status}
                 </Tag>
             )
         },
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Actions</span>,
+            title: "ACTIONS",
             key: "actions",
             render: (_, record) => (
                 <div className="flex space-x-2">
                     <Button 
                         size="small"
-                        icon={<EyeOutlined />}
+                        icon={<EyeOutlined className="text-xs" />}
                         onClick={() => navigate(`/match/${record._id}`)}
-                        className="text-xs"
+                        className="text-xs h-7 cursor-pointer"
                     >
                         View
                     </Button>
                     {record.status !== "completed" && (
                         <>
                             <Button 
-                                type="dashed"
                                 size="small"
-                                icon={<EditOutlined />}
+                                icon={<EditOutlined className="text-xs" />}
                                 onClick={() => handleOpenScoreModal(record)}
-                                className="text-xs hover:border-blue-500 hover:text-blue-400"
+                                className="text-xs h-7 hover:border-brand-primary hover:text-brand-primary cursor-pointer"
                             >
                                 Score
                             </Button>
                             <Button 
                                 type="primary"
                                 size="small"
-                                icon={<CheckOutlined />}
+                                icon={<CheckOutlined className="text-xs" />}
                                 onClick={() => handleCompleteMatch(record._id)}
                                 loading={completeLoading[record._id]}
-                                className="bg-emerald-600 border-0 hover:bg-emerald-500 text-xs"
+                                className="bg-status-success border-0 hover:bg-status-success/80 text-xs h-7 cursor-pointer"
                             >
                                 End
                             </Button>
@@ -205,78 +202,81 @@ function MatchManagement() {
     ];
 
     return (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+        <div className="space-y-6 animate-fadeIn">
             
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                 <div>
-                    <h1 className="text-2xl font-black text-white uppercase tracking-wider flex items-center space-x-2">
-                        <CalendarOutlined className="text-blue-500" />
-                        <span>Match Management</span>
+                    <h1 className="text-lg font-bold text-text-primary tracking-tight flex items-center space-x-2">
+                        <CalendarOutlined className="text-brand-primary" />
+                        <span>Match Fixtures & Logs</span>
                     </h1>
-                    <p className="text-xs text-slate-400 mt-1">Schedule tournaments fixtures, record final scores, and update details.</p>
+                    <p className="text-xs text-text-secondary mt-0.5">Organize match events, update live scores, and complete scheduled fixtures.</p>
                 </div>
                 <Button 
                     type="primary" 
-                    icon={<PlusOutlined />} 
+                    icon={<PlusOutlined className="text-xs" />} 
                     onClick={() => setCreateModalOpen(true)}
-                    className="shadow-lg shadow-blue-600/10 font-bold text-xs"
+                    className="text-xs font-semibold h-9 rounded-md cursor-pointer"
                 >
                     Schedule Match
                 </Button>
             </div>
 
-            {/* List */}
+            {/* Content List */}
             {loading ? (
                 <div className="min-h-[40vh] flex flex-col items-center justify-center">
-                    <Spin size="large" />
-                    <p className="text-xs text-slate-400 mt-4">Syncing matches database...</p>
+                    <Spin size="middle" />
+                    <p className="text-xs text-text-secondary mt-3">Syncing match sheets...</p>
                 </div>
             ) : matches.length === 0 ? (
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/25 py-16 text-center">
-                    <Empty description={<span className="text-slate-400 text-xs">No matches scheduled. Click the button to schedule one!</span>} />
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface py-16 text-center rounded-xl shadow-sm">
+                    <Empty description={<span className="text-text-secondary text-xs">No matches scheduled in the system. Get started by scheduling your first fixture!</span>} />
                 </Card>
             ) : (
                 <Table 
                     columns={columns}
                     dataSource={matches.map(m => ({ ...m, key: m._id }))}
-                    className="custom-table border border-white/[0.04] bg-[#0f172a]/30 rounded-xl overflow-hidden shadow-md"
+                    className="custom-table border border-border-subtle bg-bg-surface rounded-xl overflow-hidden shadow-sm"
+                    pagination={{ pageSize: 8 }}
+                    size="small"
                 />
             )}
 
-            {/* Create Match Modal */}
+            {/* CREATE MATCH MODAL */}
             <Modal
-                title={<span className="text-sm font-extrabold uppercase text-white tracking-wider">Schedule New Match</span>}
+                title={<span className="text-xs font-bold uppercase text-text-primary tracking-wider">Schedule New Match</span>}
                 open={createModalOpen}
                 onCancel={() => setCreateModalOpen(false)}
                 footer={null}
-                className="custom-modal"
+                width={500}
+                centered
             >
                 <Form
                     form={createForm}
                     layout="vertical"
                     onFinish={handleCreateMatch}
                     requiredMark={false}
+                    className="mt-4"
                 >
                     <Form.Item
                         name="tournamentId"
-                        label={<span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Tournament Name</span>}
-                        rules={[{ required: true, message: "Select a tournament" }]}
+                        label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Tournament (Optional)</span>}
                     >
-                        <Select placeholder="Select Tournament">
+                        <Select placeholder="Select tournament championship" allowClear>
                             {tournaments.map(t => (
-                                <Option key={t._id} value={t._id}>{t.name} ({t.sport})</Option>
+                                <Option key={t._id} value={t._id}>{t.name}</Option>
                             ))}
                         </Select>
                     </Form.Item>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         <Form.Item
                             name="homeTeamId"
-                            label={<span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Home Team</span>}
-                            rules={[{ required: true, message: "Select home team" }]}
+                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Home Team</span>}
+                            rules={[{ required: true, message: "Home team selection is required" }]}
                         >
-                            <Select placeholder="Select Home Team">
+                            <Select placeholder="Select home team">
                                 {teams.map(t => (
                                     <Option key={t._id} value={t._id}>{t.teamName}</Option>
                                 ))}
@@ -285,10 +285,20 @@ function MatchManagement() {
 
                         <Form.Item
                             name="awayTeamId"
-                            label={<span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Away Team</span>}
-                            rules={[{ required: true, message: "Select away team" }]}
+                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Away Team</span>}
+                            rules={[
+                                { required: true, message: "Away team selection is required" },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue('homeTeamId') !== value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error('Home and Away teams must be different'));
+                                    },
+                                }),
+                            ]}
                         >
-                            <Select placeholder="Select Away Team">
+                            <Select placeholder="Select away team">
                                 {teams.map(t => (
                                     <Option key={t._id} value={t._id}>{t.teamName}</Option>
                                 ))}
@@ -296,73 +306,73 @@ function MatchManagement() {
                         </Form.Item>
                     </div>
 
-                    <Form.Item
-                        name="matchDate"
-                        label={<span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Match Date & Time</span>}
-                        rules={[{ required: true, message: "Please select date and time" }]}
-                    >
-                        <DatePicker showTime className="w-full" />
-                    </Form.Item>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Form.Item
+                            name="matchDate"
+                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Match Date & Time</span>}
+                            rules={[{ required: true, message: "Match date-time is required" }]}
+                        >
+                            <DatePicker showTime format="YYYY-MM-DD HH:mm" className="w-full" />
+                        </Form.Item>
 
-                    <Form.Item
-                        name="venue"
-                        label={<span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Venue</span>}
-                        rules={[{ required: true, message: "Enter match venue" }]}
-                    >
-                        <Input placeholder="e.g. Field Arena 3, New York" />
-                    </Form.Item>
+                        <Form.Item
+                            name="venue"
+                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Match Venue</span>}
+                            rules={[{ required: true, message: "Match venue location is required" }]}
+                        >
+                            <Input placeholder="E.g. Wembley Stadium" />
+                        </Form.Item>
+                    </div>
 
-                    <div className="pt-4 flex justify-end space-x-2">
-                        <Button onClick={() => setCreateModalOpen(false)}>Cancel</Button>
-                        <Button type="primary" htmlType="submit" loading={createLoading}>Schedule</Button>
+                    <div className="pt-4 border-t border-border-subtle flex justify-end space-x-2">
+                        <Button onClick={() => setCreateModalOpen(false)} className="text-xs">Cancel</Button>
+                        <Button type="primary" htmlType="submit" loading={createLoading} className="text-xs font-semibold h-9 rounded-md">Schedule Match</Button>
                     </div>
                 </Form>
             </Modal>
 
-            {/* Edit Score Modal */}
+            {/* UPDATE SCORE MODAL */}
             <Modal
-                title={<span className="text-sm font-extrabold uppercase text-white tracking-wider">Record Score</span>}
+                title={<span className="text-xs font-bold uppercase text-text-primary tracking-wider">Update Match Score</span>}
                 open={scoreModalOpen}
                 onCancel={() => setScoreModalOpen(false)}
                 footer={null}
                 width={400}
-                className="custom-modal"
+                centered
             >
                 <Form
                     form={scoreForm}
                     layout="vertical"
                     onFinish={handleUpdateScore}
                     requiredMark={false}
+                    className="mt-4"
                 >
-                    <div className="flex items-center justify-between gap-6 py-4">
+                    <div className="grid grid-cols-2 gap-4 py-2">
                         <Form.Item
                             name="homeScore"
-                            label={<span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider truncate max-w-[120px]">{selectedMatch?.homeTeamId?.teamName || "Home"}</span>}
-                            rules={[{ required: true }]}
+                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{selectedMatch?.homeTeamId?.teamName || "Home"} Score</span>}
+                            rules={[{ required: true, message: "Score is required" }]}
                         >
-                            <InputNumber min={0} className="w-full text-center text-lg font-bold font-mono" />
+                            <InputNumber min={0} className="w-full" />
                         </Form.Item>
 
-                        <SwapOutlined className="text-slate-500 text-lg mt-4" />
-
-                        Form.Item
                         <Form.Item
                             name="awayScore"
-                            label={<span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider truncate max-w-[120px]">{selectedMatch?.awayTeamId?.teamName || "Away"}</span>}
-                            rules={[{ required: true }]}
+                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{selectedMatch?.awayTeamId?.teamName || "Away"} Score</span>}
+                            rules={[{ required: true, message: "Score is required" }]}
                         >
-                            <InputNumber min={0} className="w-full text-center text-lg font-bold font-mono" />
+                            <InputNumber min={0} className="w-full" />
                         </Form.Item>
                     </div>
 
-                    <div className="pt-4 flex justify-end space-x-2">
-                        <Button onClick={() => setScoreModalOpen(false)}>Cancel</Button>
-                        <Button type="primary" htmlType="submit" loading={scoreLoading}>Save Score</Button>
+                    <div className="pt-4 border-t border-border-subtle flex justify-end space-x-2">
+                        <Button onClick={() => setScoreModalOpen(false)} className="text-xs">Cancel</Button>
+                        <Button type="primary" htmlType="submit" loading={scoreLoading} className="text-xs font-semibold h-9 rounded-md">Update Score</Button>
                     </div>
                 </Form>
             </Modal>
 
-        </main>
+        </div>
     );
 }
 

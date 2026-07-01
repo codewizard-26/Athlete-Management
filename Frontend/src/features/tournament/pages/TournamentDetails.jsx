@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, Tabs, Button, Tag, Avatar, Table, Spin, Empty, Descriptions, Row, Col } from "antd";
+import { Card, Tabs, Button, Tag, Avatar, Table, Spin, Empty, Descriptions } from "antd";
 import { 
     TrophyOutlined, 
     EnvironmentOutlined, 
     CalendarOutlined, 
     TeamOutlined, 
     ArrowLeftOutlined,
-    ClockCircleOutlined,
     GlobalOutlined
 } from "@ant-design/icons";
 import api from "../../../api/axios";
@@ -100,100 +99,100 @@ function TournamentDetails() {
 
     const standingsColumns = [
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">Pos</span>,
+            title: "POS",
             key: "pos",
-            render: (_, __, index) => <span className="text-xs font-bold text-slate-400">{index + 1}</span>
+            render: (_, __, index) => <span className="text-xs font-semibold text-text-secondary">{index + 1}</span>
         },
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">Team</span>,
+            title: "TEAM",
             key: "team",
             render: (_, record) => (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2.5">
                     {record.logo ? (
-                        <img src={record.logo} alt="Logo" className="w-6 h-6 rounded object-cover border border-white/5" />
+                        <img src={record.logo} alt="Logo" className="w-6 h-6 rounded object-cover border border-border-subtle" />
                     ) : (
-                        <Avatar size="small" icon={<TeamOutlined />} className="bg-blue-600 rounded" />
+                        <Avatar size={24} icon={<TeamOutlined />} className="bg-brand-primary rounded" />
                     )}
-                    <span className="text-xs font-bold text-white">{record.teamName}</span>
+                    <span className="text-xs font-semibold text-text-primary">{record.teamName}</span>
                 </div>
             )
         },
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">P</span>,
+            title: "P",
             dataIndex: "played",
             key: "played",
-            render: (v) => <span className="text-xs text-slate-300 font-mono font-bold">{v}</span>
+            render: (v) => <span className="text-xs text-text-primary font-mono font-semibold">{v}</span>
         },
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">W</span>,
+            title: "W",
             dataIndex: "won",
             key: "won",
-            render: (v) => <span className="text-xs text-emerald-400 font-mono font-bold">{v}</span>
+            render: (v) => <span className="text-xs text-brand-secondary font-mono font-semibold">{v}</span>
         },
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">L</span>,
+            title: "L",
             dataIndex: "lost",
             key: "lost",
-            render: (v) => <span className="text-xs text-red-400 font-mono font-bold">{v}</span>
+            render: (v) => <span className="text-xs text-status-error font-mono font-semibold">{v}</span>
         },
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">D</span>,
+            title: "D",
             dataIndex: "drawn",
             key: "drawn",
-            render: (v) => <span className="text-xs text-slate-400 font-mono font-bold">{v}</span>
+            render: (v) => <span className="text-xs text-text-secondary font-mono font-semibold">{v}</span>
         },
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">Pts</span>,
+            title: "PTS",
             dataIndex: "points",
             key: "points",
-            render: (v) => <span className="text-xs text-blue-400 font-mono font-bold">{v}</span>
+            render: (v) => <span className="text-xs text-brand-primary font-mono font-semibold">{v}</span>
         }
     ];
 
     const matchColumns = [
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">Match Details</span>,
+            title: "MATCH DETAILS",
             key: "teams",
             render: (_, record) => (
-                <span className="text-xs font-bold text-white">
+                <span className="text-xs font-semibold text-text-primary">
                     {record.homeTeamId?.teamName} vs {record.awayTeamId?.teamName}
                 </span>
             )
         },
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">Schedule</span>,
+            title: "SCHEDULE",
             key: "schedule",
             render: (_, record) => (
-                <div className="space-y-0.5 text-[10px] text-slate-300">
-                    <p className="font-semibold"><CalendarOutlined className="mr-1 text-blue-500" />{new Date(record.matchDate).toLocaleString()}</p>
-                    <p><EnvironmentOutlined className="mr-1 text-slate-500" />{record.venue}</p>
+                <div className="space-y-0.5 text-xs text-text-secondary">
+                    <p className="font-semibold text-text-primary"><CalendarOutlined className="mr-1.5 text-brand-primary text-[10px]" />{new Date(record.matchDate).toLocaleString()}</p>
+                    <p><EnvironmentOutlined className="mr-1.5 text-text-secondary/50 text-[10px]" />{record.venue}</p>
                 </div>
             )
         },
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">Score</span>,
+            title: "SCORE",
             key: "score",
             render: (_, record) => (
-                <span className="text-xs font-black text-blue-400 font-mono">
+                <span className="text-xs font-bold text-brand-primary font-mono">
                     {record.homeScore !== undefined ? record.homeScore : "-"} : {record.awayScore !== undefined ? record.awayScore : "-"}
                 </span>
             )
         },
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">Status</span>,
+            title: "STATUS",
             dataIndex: "status",
             key: "status",
             render: (status) => (
-                <Tag color={status === "completed" ? "success" : "processing"} className="m-0 border-0 font-bold uppercase text-[8px]">
+                <Tag color={status === "completed" ? "success" : "processing"} className="m-0 border-0 font-semibold uppercase text-[9px] px-2 py-0.5 rounded">
                     {status}
                 </Tag>
             )
         },
         {
-            title: <span className="text-[10px] uppercase font-bold text-slate-400">Link</span>,
+            title: "LINK",
             key: "link",
             render: (_, record) => (
-                <Button size="small" type="link" onClick={() => navigate(`/match/${record._id}`)} className="text-xs font-bold">
+                <Button size="small" type="link" onClick={() => navigate(`/match/${record._id}`)} className="text-xs font-semibold text-brand-primary p-0 h-auto cursor-pointer">
                     Stats
                 </Button>
             )
@@ -203,9 +202,9 @@ function TournamentDetails() {
     const tabItems = [
         {
             key: "overview",
-            label: <span className="font-bold text-xs">Overview</span>,
+            label: <span className="font-semibold text-xs">Overview</span>,
             children: (
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/45 backdrop-blur-sm p-4">
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface p-4 sm:p-6 rounded-xl shadow-sm">
                     <Descriptions column={{ xs: 1, sm: 2 }} className="custom-descriptions">
                         <Descriptions.Item label="Sport Limit">{tournament?.sport?.toUpperCase()}</Descriptions.Item>
                         <Descriptions.Item label="Age Bracket">{tournament?.ageCategory}</Descriptions.Item>
@@ -214,34 +213,34 @@ function TournamentDetails() {
                         <Descriptions.Item label="Trials Venue">{tournament?.location}</Descriptions.Item>
                         <Descriptions.Item label="Max Teams Limit">{tournament?.maxTeams} Teams</Descriptions.Item>
                     </Descriptions>
-                    <div className="mt-6 border-t border-white/[0.04] pt-4 space-y-2">
-                        <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider block">Description</span>
-                        <p className="text-xs text-slate-300 leading-relaxed">{tournament?.description || "No description set by organization manager."}</p>
+                    <div className="mt-5 border-t border-border-subtle pt-4 space-y-1.5">
+                        <span className="text-[10px] text-text-secondary uppercase font-bold tracking-wider block">Description</span>
+                        <p className="text-xs text-text-secondary leading-relaxed m-0">{tournament?.description || "No description set by organization manager."}</p>
                     </div>
                 </Card>
             )
         },
         {
             key: "teams",
-            label: <span className="font-bold text-xs">Approved Teams ({approvedTeams.length})</span>,
+            label: <span className="font-semibold text-xs">Approved Teams ({approvedTeams.length})</span>,
             children: (
                 approvedTeams.length === 0 ? (
-                    <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/25 py-12 text-center">
-                        <Empty description={<span className="text-slate-400 text-xs">No teams approved in this tournament yet.</span>} />
+                    <Card bordered={false} className="border border-border-subtle bg-bg-surface py-12 text-center rounded-xl shadow-sm">
+                        <Empty description={<span className="text-text-secondary text-xs">No teams approved in this tournament yet.</span>} />
                     </Card>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-fadeIn">
                         {approvedTeams.map(t => (
-                            <Card key={t._id} bordered={false} className="border border-white/[0.04] bg-[#0f172a]/30">
+                            <Card key={t._id} bordered={false} className="border border-border-subtle bg-bg-surface rounded-xl shadow-sm p-4">
                                 <div className="flex items-center space-x-3">
                                     {t.logo ? (
-                                        <img src={t.logo} alt="Logo" className="w-10 h-10 rounded-lg object-cover border border-white/5" />
+                                        <img src={t.logo} alt="Logo" className="w-10 h-10 rounded object-cover border border-border-subtle" />
                                     ) : (
-                                        <Avatar size={40} icon={<TeamOutlined />} className="bg-blue-600 rounded-lg" />
+                                        <Avatar size={40} icon={<TeamOutlined />} className="bg-brand-primary rounded" />
                                     )}
                                     <div>
-                                        <span className="text-xs font-black text-white">{t.teamName}</span>
-                                        <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-wider">{t.ageCategory} • {t.sport}</p>
+                                        <span className="text-xs font-semibold text-text-primary">{t.teamName}</span>
+                                        <p className="text-[10px] text-text-secondary mt-1 uppercase tracking-wider">{t.ageCategory} • {t.sport}</p>
                                     </div>
                                 </div>
                             </Card>
@@ -252,36 +251,38 @@ function TournamentDetails() {
         },
         {
             key: "fixtures",
-            label: <span className="font-bold text-xs">Matches & Fixtures ({matches.length})</span>,
+            label: <span className="font-semibold text-xs">Matches & Fixtures ({matches.length})</span>,
             children: (
                 matches.length === 0 ? (
-                    <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/25 py-12 text-center">
-                        <Empty description={<span className="text-slate-400 text-xs">No matches scheduled for this tournament yet.</span>} />
+                    <Card bordered={false} className="border border-border-subtle bg-bg-surface py-12 text-center rounded-xl shadow-sm">
+                        <Empty description={<span className="text-text-secondary text-xs">No matches scheduled for this tournament yet.</span>} />
                     </Card>
                 ) : (
                     <Table 
                         columns={matchColumns}
                         dataSource={matches.map(m => ({ ...m, key: m._id }))}
                         pagination={false}
-                        className="custom-table border border-white/[0.04] bg-[#0f172a]/30 rounded-xl overflow-hidden shadow-md"
+                        size="small"
+                        className="custom-table border border-border-subtle bg-bg-surface rounded-xl overflow-hidden shadow-sm"
                     />
                 )
             )
         },
         {
             key: "standings",
-            label: <span className="font-bold text-xs">Standings</span>,
+            label: <span className="font-semibold text-xs">Standings</span>,
             children: (
                 approvedTeams.length === 0 ? (
-                    <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/25 py-12 text-center">
-                        <Empty description={<span className="text-slate-400 text-xs">Standings will be calculated once teams are approved.</span>} />
+                    <Card bordered={false} className="border border-border-subtle bg-bg-surface py-12 text-center rounded-xl shadow-sm">
+                        <Empty description={<span className="text-text-secondary text-xs">Standings will be calculated once teams are approved.</span>} />
                     </Card>
                 ) : (
                     <Table 
                         columns={standingsColumns}
                         dataSource={getStandingsData()}
                         pagination={false}
-                        className="custom-table border border-white/[0.04] bg-[#0f172a]/30 rounded-xl overflow-hidden shadow-md animate-fadeIn"
+                        size="small"
+                        className="custom-table border border-border-subtle bg-bg-surface rounded-xl overflow-hidden shadow-sm animate-fadeIn"
                     />
                 )
             )
@@ -289,34 +290,33 @@ function TournamentDetails() {
     ];
 
     return (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
-            
+        <div className="space-y-6 animate-fadeIn">
             {/* Nav */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center">
                 <Button 
                     type="text" 
-                    icon={<ArrowLeftOutlined />} 
+                    icon={<ArrowLeftOutlined className="text-xs" />} 
                     onClick={() => navigate(-1)}
-                    className="text-slate-400 hover:text-white"
+                    className="text-text-secondary hover:text-text-primary p-0 h-auto cursor-pointer"
                 >
                     Go Back
                 </Button>
             </div>
 
             {loading ? (
-                <div className="py-16 flex justify-center"><Spin size="large" /></div>
+                <div className="py-16 flex justify-center"><Spin size="middle" /></div>
             ) : (
                 <>
                     {/* Header Banner */}
-                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-950/40 via-slate-900/30 to-[#0f172a]/60 border border-blue-500/10 p-6 sm:p-8 rounded-2xl shadow-xl flex items-center justify-between">
-                        <div className="space-y-2">
+                    <div className="bg-bg-surface border border-border-subtle p-6 sm:p-8 rounded-xl flex items-center justify-between relative overflow-hidden">
+                        <div className="space-y-2 relative z-10">
                             <div className="flex items-center space-x-2">
-                                <TrophyOutlined className="text-xl text-blue-500" />
-                                <h1 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider">{tournament?.name}</h1>
+                                <TrophyOutlined className="text-lg text-brand-primary" />
+                                <h1 className="text-lg sm:text-xl font-bold text-text-primary uppercase tracking-wider m-0">{tournament?.name}</h1>
                             </div>
-                            <p className="text-[10px] text-slate-400 flex items-center">
-                                <GlobalOutlined className="mr-1 text-slate-500" />
-                                Organized by: <strong className="text-slate-300 ml-1">{tournament?.organizationId?.organizationName}</strong>
+                            <p className="text-[10px] text-text-secondary flex items-center m-0">
+                                <GlobalOutlined className="mr-1 text-text-secondary/50 text-[10px]" />
+                                Organized by: <strong className="text-text-primary ml-1">{tournament?.organizationId?.organizationName}</strong>
                             </p>
                         </div>
                     </div>
@@ -325,8 +325,7 @@ function TournamentDetails() {
                     <Tabs items={tabItems} className="custom-tabs" />
                 </>
             )}
-
-        </main>
+        </div>
     );
 }
 

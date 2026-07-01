@@ -1,89 +1,368 @@
 @import "tailwindcss";
 
+/* --------------------------------------------------------------------------
+   DESIGN SYSTEM - CSS VARIABLES (GLASSMORPHISM EXTENDED)
+   -------------------------------------------------------------------------- */
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Light Mode Colors (Glassmorphism Tinted) */
+  --color-bg-base: #F1F3F7;
+  --color-bg-surface: rgba(255, 255, 255, 0.45);
+  --color-bg-surface-rgb: 255, 255, 255;
+  --color-bg-elevated: rgba(243, 244, 246, 0.6);
+  
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  
+  --color-primary: #4F46E5;
+  --color-primary-hover: #4338CA;
+  --color-secondary: #059669;
+  --color-accent: #D97706;
+  
+  --color-border-subtle: rgba(15, 23, 42, 0.08);
+  --color-border-hover: rgba(79, 70, 229, 0.2);
+  --color-border-glass: rgba(255, 255, 255, 0.4);
+  
+  --color-success: #059669;
+  --color-warning: #D97706;
+  --color-danger: #DC2626;
+  --color-info: #0284C7;
+  
+  --color-shadow: rgba(31, 38, 135, 0.04);
+  --color-shadow-lg: rgba(31, 38, 135, 0.08);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+}
+
+/* Dark Mode Overrides */
+.dark, [data-theme="dark"] {
+  /* Dark Mode Colors (Glassmorphism Tinted) */
+  --color-bg-base: #07090E;
+  --color-bg-surface: rgba(15, 22, 36, 0.45);
+  --color-bg-surface-rgb: 15, 22, 36;
+  --color-bg-elevated: rgba(22, 30, 49, 0.6);
+  
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  
+  --color-primary: #6366F1;
+  --color-primary-hover: #4F46E5;
+  --color-secondary: #34D399;
+  --color-accent: #F59E0B;
+  
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(99, 102, 241, 0.25);
+  --color-border-glass: rgba(255, 255, 255, 0.04);
+  
+  --color-success: #34D399;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #38BDF8;
+  
+  --color-shadow: rgba(0, 0, 0, 0.2);
+  --color-shadow-lg: rgba(0, 0, 0, 0.4);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* --------------------------------------------------------------------------
+   TAILWIND V4 THEME CONFIGURATION
+   -------------------------------------------------------------------------- */
+@theme {
+  --color-bg-base: var(--color-bg-base);
+  --color-bg-surface: var(--color-bg-surface);
+  --color-bg-elevated: var(--color-bg-elevated);
+  
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  
+  --color-brand-primary: var(--color-primary);
+  --color-brand-primary-hover: var(--color-primary-hover);
+  --color-brand-secondary: var(--color-secondary);
+  --color-brand-accent: var(--color-accent);
+  
+  --color-border-subtle: var(--color-border-subtle);
+  --color-border-hover: var(--color-border-hover);
+  
+  --color-status-success: var(--color-success);
+  --color-status-warning: var(--color-warning);
+  --color-status-danger: var(--color-danger);
+  --color-status-info: var(--color-info);
+  
+  --shadow-sm: var(--shadow-glass);
+  --shadow-md: var(--shadow-glass);
+  --shadow-lg: var(--color-shadow-lg);
+}
+
+/* --------------------------------------------------------------------------
+   GLOBAL RESET & ANIMATED BACKGROUND
+   -------------------------------------------------------------------------- */
 html, body, #root {
   margin: 0;
   padding: 0;
   width: 100%;
+  max-width: 100vw;
   overflow-x: hidden;
-  background-color: #080b11;
+  background-color: var(--color-bg-base) !important;
+  color: var(--color-text-primary) !important;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-@theme {
-  --animate-float-slow: float-slow 8s ease-in-out infinite;
-  --animate-float-medium: float-medium 6s ease-in-out infinite;
-  --animate-pulse-slow: pulse-slow 3s ease-in-out infinite;
-  --animate-pulse-glow: pulse-glow 4s ease-in-out infinite;
-  
-  @keyframes float-slow {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(1deg); }
-  }
-  @keyframes float-medium {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-  }
-  @keyframes pulse-slow {
-    0%, 100% { transform: scale(1); opacity: 0.9; }
-    50% { transform: scale(1.03); opacity: 1; }
-  }
-  @keyframes pulse-glow {
-    0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.3)); }
-    50% { opacity: 0.8; filter: drop-shadow(0 0 25px rgba(99, 102, 241, 0.6)); }
-  }
+/* Dynamic Animated Background Blobs */
+body {
+  position: relative;
 }
 
-/* Custom Utilities for Premium Visuals */
-.sports-grid-bg {
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(30, 41, 59, 0.35) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
-    linear-gradient(rgba(255, 255, 255, 0.007) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.007) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+body::before {
+  content: "";
+  position: fixed;
+  top: -10%;
+  left: -10%;
+  width: 55%;
+  height: 55%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0) 70%);
+  border-radius: 50%;
+  z-index: -1;
+  filter: blur(80px);
+  pointer-events: none;
+  animation: float-slow 22s infinite alternate ease-in-out;
 }
 
-.glassmorphism {
-  background: rgba(13, 20, 35, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+body::after {
+  content: "";
+  position: fixed;
+  bottom: -10%;
+  right: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.08) 0%, rgba(52, 211, 153, 0) 70%);
+  border-radius: 50%;
+  z-index: -1;
+  filter: blur(100px);
+  pointer-events: none;
+  animation: float-slow-reverse 28s infinite alternate ease-in-out;
 }
 
-.glassmorphism-light {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+@keyframes float-slow {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(8%, 12%) scale(1.15); }
 }
 
-.glow-border-hover:hover {
-  border-color: rgba(99, 102, 241, 0.5);
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+@keyframes float-slow-reverse {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-12%, -6%) scale(1.1); }
 }
 
-/* SVG Line Flow Animation */
-@keyframes line-flow {
-  to {
-    stroke-dashoffset: -20;
-  }
-}
-
-.animate-line-flow {
-  stroke-dasharray: 6, 4;
-  animation: line-flow 1.5s linear infinite;
-}
-
-/* Custom Scrollbar */
+/* Subtle custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #060814;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #111827;
-  border-radius: 3px;
+  background: var(--color-border-subtle);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #6366f1;
+  background: var(--color-primary);
+}
+
+/* --------------------------------------------------------------------------
+   PREMIUM GLASSMORPHISM CORE
+   -------------------------------------------------------------------------- */
+.premium-card, .ant-card {
+  background-color: var(--color-bg-surface) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid var(--color-border-glass) !important;
+  box-shadow: var(--shadow-glass) !important;
+  border-radius: 16px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.premium-card:hover, .ant-card:hover {
+  border-color: var(--color-border-hover) !important;
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12) !important;
+  transform: translateY(-2px);
+}
+
+/* Apply backdrop-blur globally to sidebars, headers, modals, drawers, and select dropdowns */
+aside, 
+header, 
+.ant-modal-content, 
+.ant-drawer-content,
+.ant-select-dropdown {
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  background-color: var(--color-bg-surface) !important;
+  border-color: var(--color-border-glass) !important;
+}
+
+/* Tables */
+.premium-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.premium-table th {
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background-color: rgba(var(--color-bg-surface-rgb), 0.3);
+}
+
+.premium-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-subtle);
+  transition: background-color 0.2s ease;
+}
+
+.premium-table tr:hover td {
+  background-color: rgba(var(--color-bg-surface-rgb), 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   ANT DESIGN OVERRIDES FOR GLASS INTEGRATION
+   -------------------------------------------------------------------------- */
+.ant-btn {
+  font-family: var(--font-sans) !important;
+  box-shadow: none !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-btn-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+.ant-btn-primary:hover {
+  background-color: var(--color-primary-hover) !important;
+  border-color: var(--color-primary-hover) !important;
+  transform: translateY(-1px);
+}
+
+.ant-card-head {
+  border-bottom: 1px solid var(--color-border-subtle) !important;
+  background: transparent !important;
+}
+
+.ant-card-head-title {
+  color: var(--color-text-primary) !important;
+  font-weight: 600 !important;
+}
+
+.ant-statistic-title {
+  color: var(--color-text-secondary) !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 600 !important;
+}
+
+.ant-statistic-content-value {
+  color: var(--color-text-primary) !important;
+  font-weight: 700 !important;
+  font-size: 24px !important;
+}
+
+.ant-select-item-option-selected {
+  background-color: var(--color-primary) !important;
+  color: #FFFFFF !important;
+}
+
+.ant-select-item-option-active {
+  background-color: rgba(var(--color-bg-surface-rgb), 0.2) !important;
+}
+
+/* --------------------------------------------------------------------------
+   PREMIUM GLASS INPUTS & AUTOFILL FIX
+   -------------------------------------------------------------------------- */
+.ant-input, 
+.ant-input-password, 
+.ant-input-affix-wrapper, 
+.ant-select-selector, 
+.ant-picker,
+input, 
+select, 
+textarea {
+  background-color: rgba(var(--color-bg-surface-rgb), 0.25) !important;
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--color-border-subtle) !important;
+  color: var(--color-text-primary) !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-input:hover, 
+.ant-input-affix-wrapper:hover, 
+.ant-select-selector:hover, 
+.ant-picker:hover,
+input:hover, 
+select:hover, 
+textarea:hover {
+  border-color: var(--color-border-hover) !important;
+  background-color: rgba(var(--color-bg-surface-rgb), 0.35) !important;
+}
+
+.ant-input:focus, 
+.ant-input-focused, 
+.ant-input-affix-wrapper-focused, 
+.ant-select-focused .ant-select-selector, 
+.ant-picker-focused,
+input:focus, 
+select:focus, 
+textarea:focus {
+  background-color: rgba(var(--color-bg-surface-rgb), 0.45) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15) !important;
+  outline: none !important;
+}
+
+/* Chrome/Safari/Firefox Autofill Overrides: Prevents solid white background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active,
+.ant-input:-webkit-autofill,
+.ant-input-affix-wrapper input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px rgba(var(--color-bg-surface-rgb), 0.3) inset !important;
+  -webkit-text-fill-color: var(--color-text-primary) !important;
+  transition: background-color 5000s ease-in-out 0s;
+  border: 1px solid var(--color-border-subtle) !important;
+}
+
+/* --------------------------------------------------------------------------
+   MICRO-ANIMATIONS
+   -------------------------------------------------------------------------- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Ensure menu items in sidebar animate nicely */
+.ant-menu-item {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.ant-menu-item:hover {
+  transform: translateX(3px);
 }

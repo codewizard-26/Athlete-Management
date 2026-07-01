@@ -82,7 +82,6 @@ function TournamentManagement() {
         }
     };
 
-    // Date calculations to classify status
     const now = new Date();
     const upcoming = tournaments.filter(t => new Date(t.startDate) > now);
     const ongoing = tournaments.filter(t => {
@@ -95,8 +94,8 @@ function TournamentManagement() {
     const renderTournamentCards = (list) => {
         if (list.length === 0) {
             return (
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/25 py-12 text-center">
-                    <Empty description={<span className="text-slate-400 text-xs">No tournaments in this category.</span>} />
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface py-12 text-center rounded-xl shadow-sm">
+                    <Empty description={<span className="text-text-secondary text-xs">No tournaments in this category.</span>} />
                 </Card>
             );
         }
@@ -107,54 +106,53 @@ function TournamentManagement() {
                     <Card 
                         key={tour._id}
                         bordered={false} 
-                        className="border border-white/[0.04] bg-[#0f172a]/40 backdrop-blur-sm shadow-md hover:border-blue-500/20 transition-all flex flex-col justify-between"
+                        className="border border-border-subtle bg-bg-surface shadow-sm hover:border-brand-primary/25 transition-all duration-150 flex flex-col justify-between rounded-xl group"
                     >
                         <div className="space-y-4 flex-grow">
                             <div className="flex justify-between items-start">
-                                <h3 className="text-sm font-black text-white truncate max-w-[70%]">{tour.name}</h3>
-                                <Tag color={tour.sport?.toLowerCase() === "football" ? "blue" : "gold"} className="m-0 border-0 font-bold uppercase text-[9px]">
+                                <h3 className="text-xs font-semibold text-text-primary truncate max-w-[70%]">{tour.name}</h3>
+                                <Tag color={tour.sport?.toLowerCase() === "football" ? "blue" : "gold"} className="m-0 border-0 font-semibold uppercase text-[9px]">
                                     {tour.sport}
                                 </Tag>
                             </div>
 
-                            <p className="text-[11px] text-slate-400 line-clamp-3 leading-relaxed">
+                            <p className="text-xs text-text-secondary line-clamp-3 leading-relaxed">
                                 {tour.description || "No tournament description provided."}
                             </p>
 
-                            <div className="bg-[#0b0f19]/40 border border-white/[0.03] p-3 rounded-lg text-[10px] space-y-2.5">
-                                <div className="flex items-center text-slate-300">
-                                    <EnvironmentOutlined className="mr-2 text-blue-500 shrink-0" />
+                            <div className="bg-bg-elevated/50 border border-border-subtle p-3.5 rounded-lg text-[11px] space-y-2.5">
+                                <div className="flex items-center text-text-primary">
+                                    <EnvironmentOutlined className="mr-2 text-brand-primary shrink-0 text-[10px]" />
                                     <span className="truncate">{tour.location}</span>
                                 </div>
-                                <div className="flex items-center text-slate-300">
-                                    <CalendarOutlined className="mr-2 text-emerald-500 shrink-0" />
+                                <div className="flex items-center text-text-primary">
+                                    <CalendarOutlined className="mr-2 text-brand-secondary shrink-0 text-[10px]" />
                                     <span>{new Date(tour.startDate).toLocaleDateString()} - {new Date(tour.endDate).toLocaleDateString()}</span>
                                 </div>
-                                <div className="flex items-center justify-between text-slate-300">
+                                <div className="flex items-center justify-between text-text-primary">
                                     <span className="flex items-center">
-                                        <TeamOutlined className="mr-2 text-purple-500 shrink-0" />
+                                        <TeamOutlined className="mr-2 text-brand-primary shrink-0 text-[10px]" />
                                         <span>Max Teams:</span>
                                     </span>
-                                    <span className="font-extrabold text-blue-400">{tour.maxTeams || 8} Teams</span>
+                                    <span className="font-semibold text-brand-primary">{tour.maxTeams || 8} Teams</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Card Actions */}
-                        <div className="mt-5 border-t border-white/[0.03] pt-4 flex gap-2">
+                        <div className="mt-5 border-t border-border-subtle pt-4 flex gap-2">
                             <Button 
                                 type="primary" 
-                                icon={<EyeOutlined />}
+                                icon={<EyeOutlined className="text-xs" />}
                                 onClick={() => navigate(`/tournament/${tour._id}`)}
-                                className="flex-grow text-xs h-9 font-bold"
+                                className="flex-grow text-xs h-9 font-semibold cursor-pointer"
                             >
                                 Details
                             </Button>
                             <Button 
-                                type="dashed" 
-                                icon={<SettingOutlined />}
+                                icon={<SettingOutlined className="text-xs" />}
                                 onClick={() => handleOpenRegistrations(tour)}
-                                className="h-9 hover:border-blue-500 hover:text-blue-400"
+                                className="h-9 border-border-subtle hover:border-brand-primary hover:text-brand-primary cursor-pointer"
                             />
                         </div>
                     </Card>
@@ -166,69 +164,70 @@ function TournamentManagement() {
     const tabItems = [
         {
             key: "upcoming",
-            label: <span className="font-bold text-xs">Upcoming Championships ({upcoming.length})</span>,
+            label: <span className="font-semibold text-xs">Upcoming ({upcoming.length})</span>,
             children: renderTournamentCards(upcoming)
         },
         {
             key: "ongoing",
-            label: <span className="font-bold text-xs">Ongoing Competitions ({ongoing.length})</span>,
+            label: <span className="font-semibold text-xs">Ongoing ({ongoing.length})</span>,
             children: renderTournamentCards(ongoing)
         },
         {
             key: "completed",
-            label: <span className="font-bold text-xs">Completed Tournaments ({completed.length})</span>,
+            label: <span className="font-semibold text-xs">Completed ({completed.length})</span>,
             children: renderTournamentCards(completed)
         }
     ];
 
     const regColumns = [
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Team Name</span>,
+            title: "TEAM NAME",
             dataIndex: "teamId",
             key: "team",
             render: (team) => (
                 <div className="flex items-center space-x-2.5">
                     {team?.logo ? (
-                        <img src={team.logo} alt="Logo" className="w-8 h-8 rounded object-cover border border-white/5" />
+                        <img src={team.logo} alt="Logo" className="w-6 h-6 rounded object-cover border border-border-subtle" />
                     ) : (
-                        <Avatar size="small" icon={<TeamOutlined />} className="bg-blue-600 rounded" />
+                        <Avatar size={24} icon={<TeamOutlined />} className="bg-brand-primary rounded" />
                     )}
-                    <span className="text-xs font-bold text-white">{team?.teamName || "N/A"}</span>
+                    <span className="text-xs font-semibold text-text-primary">{team?.teamName || "N/A"}</span>
                 </div>
             )
         },
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Status</span>,
+            title: "STATUS",
             dataIndex: "status",
             key: "status",
             render: (status) => {
                 let color = "warning";
                 if (status === "approved") color = "success";
                 if (status === "rejected") color = "error";
-                return <Tag color={color} className="m-0 border-0 font-bold uppercase text-[9px]">{status}</Tag>;
+                return <Tag color={color} className="m-0 border-0 font-semibold uppercase text-[9px] px-2 py-0.5 rounded">{status}</Tag>;
             }
         },
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Actions</span>,
+            title: "ACTIONS",
             key: "actions",
             render: (_, record) => {
-                if (record.status !== "pending") return <span className="text-[10px] text-slate-500 italic">Decision Made</span>;
+                if (record.status !== "pending") return <span className="text-xs text-text-secondary italic font-medium">Decision Made</span>;
                 return (
                     <div className="flex space-x-2">
                         <Button 
                             type="primary" 
                             size="small" 
-                            icon={<CheckOutlined />} 
+                            icon={<CheckOutlined className="text-xs" />} 
                             onClick={() => handleAction(record._id, "approve")}
                             loading={actionLoading[record._id]}
-                            className="bg-emerald-600 border-0 hover:bg-emerald-500"
+                            className="bg-status-success border-0 hover:bg-status-success/80 h-7 w-7 cursor-pointer flex items-center justify-center"
                         />
                         <Button 
                             danger 
                             size="small" 
-                            icon={<CloseOutlined />} 
+                            icon={<CloseOutlined className="text-xs" />} 
                             onClick={() => handleAction(record._id, "reject")}
                             loading={actionLoading[record._id]}
+                            className="h-7 w-7 cursor-pointer flex items-center justify-center"
                         />
                     </div>
                 );
@@ -237,22 +236,22 @@ function TournamentManagement() {
     ];
 
     return (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+        <div className="space-y-6 animate-fadeIn">
             
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                 <div>
-                    <h1 className="text-2xl font-black text-white uppercase tracking-wider flex items-center space-x-2">
-                        <TrophyOutlined className="text-blue-500" />
+                    <h1 className="text-lg font-bold text-text-primary tracking-tight flex items-center space-x-2">
+                        <TrophyOutlined className="text-brand-primary" />
                         <span>Tournament Management</span>
                     </h1>
-                    <p className="text-xs text-slate-400 mt-1">Organize and monitor championships, review team signups, and check schedules.</p>
+                    <p className="text-xs text-text-secondary mt-0.5">Organize and monitor championships, review team signups, and check schedules.</p>
                 </div>
                 <Button 
                     type="primary" 
-                    icon={<PlusOutlined />} 
+                    icon={<PlusOutlined className="text-xs" />} 
                     onClick={() => navigate("/organization/tournaments/create")}
-                    className="shadow-lg shadow-blue-600/10 font-bold text-xs"
+                    className="text-xs font-semibold h-9 rounded-md cursor-pointer"
                 >
                     New Tournament
                 </Button>
@@ -261,8 +260,8 @@ function TournamentManagement() {
             {/* List */}
             {loading ? (
                 <div className="min-h-[40vh] flex flex-col items-center justify-center">
-                    <Spin size="large" />
-                    <p className="text-xs text-slate-400 mt-4">Syncing tournaments...</p>
+                    <Spin size="middle" />
+                    <p className="text-xs text-text-secondary mt-3">Syncing tournaments...</p>
                 </div>
             ) : (
                 <Tabs items={tabItems} className="custom-tabs" />
@@ -270,28 +269,29 @@ function TournamentManagement() {
 
             {/* Registrations Review Modal */}
             <Modal
-                title={<span className="text-sm font-extrabold uppercase text-white tracking-wider">Registrations: {selectedTournament?.name}</span>}
+                title={<span className="text-xs font-bold uppercase text-text-primary tracking-wider">Registrations: {selectedTournament?.name}</span>}
                 open={regModalOpen}
                 onCancel={() => setRegModalOpen(false)}
                 footer={null}
                 width={650}
-                className="custom-modal"
+                centered
             >
                 {regLoading ? (
-                    <div className="py-12 flex justify-center"><Spin /></div>
+                    <div className="py-12 flex justify-center"><Spin size="small" /></div>
                 ) : registrations.length === 0 ? (
-                    <div className="py-12 text-center text-slate-400 text-xs">No teams have registered for this tournament yet.</div>
+                    <div className="py-12 text-center text-text-secondary text-xs">No teams have registered for this tournament yet.</div>
                 ) : (
                     <Table 
                         columns={regColumns} 
                         dataSource={registrations.map(r => ({ ...r, key: r._id }))} 
                         pagination={false}
-                        className="custom-table mt-4"
+                        size="small"
+                        className="custom-table mt-3"
                     />
                 )}
             </Modal>
 
-        </main>
+        </div>
     );
 }
 

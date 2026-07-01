@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Button, ConfigProvider, theme, Menu, Avatar, message, Spin } from "antd";
+import { Button, ConfigProvider, theme, Menu, Avatar, message, Spin, Drawer } from "antd";
 import { 
     UserOutlined,
     TeamOutlined, 
@@ -12,7 +12,8 @@ import {
     DashboardOutlined,
     SolutionOutlined,
     MenuFoldOutlined,
-    MenuUnfoldOutlined
+    MenuUnfoldOutlined,
+    MenuOutlined
 } from "@ant-design/icons";
 import { logout } from "../features/auth/authSlice";
 import api from "../api/axios";
@@ -26,6 +27,12 @@ function TeamLayout() {
     const [teamData, setTeamData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [collapsed, setCollapsed] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    
+    // Theme state
+    const [themeMode, setThemeMode] = useState(() => {
+        return localStorage.getItem("theme") || "dark";
+    });
 
     const fetchTeamData = async () => {
         try {
@@ -46,44 +53,61 @@ function TeamLayout() {
         fetchTeamData();
     }, []);
 
+    // Theme effect
+    useEffect(() => {
+        if (themeMode === "dark") {
+            document.documentElement.classList.add("dark");
+            document.documentElement.setAttribute("data-theme", "dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+            document.documentElement.setAttribute("data-theme", "light");
+        }
+        localStorage.setItem("theme", themeMode);
+    }, [themeMode]);
+
+    const toggleTheme = () => {
+        setThemeMode(prev => prev === "dark" ? "light" : "dark");
+    };
+
     const handleLogout = () => {
         dispatch(logout());
         navigate("/login");
     };
 
-    const darkTheme = {
-        algorithm: theme.darkAlgorithm,
+    // Custom Ant Design theme synced with our CSS design system
+    const antdTheme = {
+        algorithm: themeMode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
         token: {
-            colorPrimary: "#2563eb", // Sports corporate blue
-            colorBgContainer: "#0f172a", // Slate-900
-            colorBorder: "rgba(255, 255, 255, 0.08)",
-            colorText: "#f3f4f6",
-            colorTextSecondary: "#9ca3af",
-            borderRadius: 12,
+            colorPrimary: themeMode === "dark" ? "#6366F1" : "#4F46E5",
+            colorBgLayout: "transparent",
+            colorBgContainer: themeMode === "dark" ? "rgba(15, 22, 36, 0.45)" : "rgba(255, 255, 255, 0.45)",
+            colorBorder: themeMode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(15, 23, 42, 0.08)",
+            colorText: themeMode === "dark" ? "#F8FAFC" : "#0F172A",
+            colorTextSecondary: themeMode === "dark" ? "#94A3B8" : "#475569",
+            borderRadius: 8,
             fontFamily: "Inter, system-ui, -apple-system, sans-serif",
         },
         components: {
-            Card: {
-                colorBgContainer: "#0f172a", // Dark slate
-            },
             Button: {
-                colorPrimary: "#2563eb",
-                colorPrimaryHover: "#1d4ed8",
-                borderRadius: 8,
-                controlHeight: 40,
-                fontWeight: 600,
+                borderRadius: 6,
+                controlHeight: 36,
+                fontWeight: 500,
+                boxShadow: "none",
+            },
+            Card: {
+                borderRadius: 12,
             }
         }
     };
 
     const sidebarMenuItems = [
-        { key: "dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
-        { key: "profile", icon: <UserOutlined />, label: "Team Profile" },
-        { key: "recruitment", icon: <NotificationOutlined />, label: "Recruitment Drives" },
-        { key: "applications", icon: <SolutionOutlined />, label: "Applications" },
-        { key: "roster", icon: <TeamOutlined />, label: "Roster" },
-        { key: "performance", icon: <BarChartOutlined />, label: "Performance" },
-        { key: "settings", icon: <SettingOutlined />, label: "Settings" }
+        { key: "dashboard", icon: <DashboardOutlined className="text-sm" />, label: "Dashboard" },
+        { key: "profile", icon: <UserOutlined className="text-sm" />, label: "Team Profile" },
+        { key: "recruitment", icon: <NotificationOutlined className="text-sm" />, label: "Recruitment" },
+        { key: "applications", icon: <SolutionOutlined className="text-sm" />, label: "Applications" },
+        { key: "roster", icon: <TeamOutlined className="text-sm" />, label: "Roster" },
+        { key: "performance", icon: <BarChartOutlined className="text-sm" />, label: "Performance" },
+        { key: "settings", icon: <SettingOutlined className="text-sm" />, label: "Settings" }
     ];
 
     const getActiveKey = () => {
@@ -111,6 +135,8 @@ function TeamLayout() {
             navigate("/team/roster");
         } else if (key === "performance") {
             navigate("/team/performance");
+        } else if (key === "settings") {
+            navigate("/team/settings");
         } else {
             const item = sidebarMenuItems.find(i => i.key === key);
             message.info(`${item?.label || key} section is under development`);
@@ -118,35 +144,35 @@ function TeamLayout() {
     };
 
     return (
-        <ConfigProvider theme={darkTheme}>
-            <div className="min-h-screen w-full bg-[#080b11] text-slate-100 font-sans selection:bg-blue-600 selection:text-white flex">
+        <ConfigProvider theme={antdTheme}>
+            <div className="h-screen w-full bg-bg-base text-text-primary font-sans flex overflow-hidden">
                 
                 {/* Left Sidebar Navigation */}
-                <aside className={`${collapsed ? "w-20" : "w-64"} bg-[#0b0f19] border-r border-white/[0.04] hidden md:flex flex-col shrink-0 transition-all duration-300`}>
-                    <div className="p-6 flex items-center justify-between border-b border-white/[0.04]">
+                <aside className={`${collapsed ? "w-16" : "w-60"} bg-bg-surface border-r border-border-subtle hidden md:flex flex-col shrink-0 transition-all duration-200`}>
+                    <div className="h-14 px-5 flex items-center justify-between border-b border-border-subtle">
                         {!collapsed && (
-                            <div className="flex items-center space-x-3">
-                                <div className="h-9 w-9 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-                                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <div className="flex items-center space-x-2.5">
+                                <div className="h-7 w-7 rounded bg-brand-primary flex items-center justify-center shadow-sm">
+                                    <svg className="w-4.5 h-4.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                     </svg>
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-black tracking-wide text-white uppercase">APEX</span>
-                                    <span className="text-[8px] uppercase tracking-widest text-blue-400 font-bold -mt-0.5">Team Workspace</span>
+                                    <span className="text-xs font-bold tracking-wider text-text-primary uppercase">APEX</span>
+                                    <span className="text-[9px] uppercase tracking-widest text-brand-primary font-medium -mt-1">TEAM HUB</span>
                                 </div>
                             </div>
                         )}
                         {collapsed && (
-                            <div className="mx-auto h-9 w-9 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-                                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <div className="mx-auto h-7 w-7 rounded bg-brand-primary flex items-center justify-center shadow-sm">
+                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
                             </div>
                         )}
                     </div>
 
-                    <div className="flex-grow py-6 px-4">
+                    <div className="flex-grow py-4 px-2 overflow-y-auto">
                         <Menu
                             mode="inline"
                             inlineCollapsed={collapsed}
@@ -155,30 +181,31 @@ function TeamLayout() {
                             items={sidebarMenuItems.map(item => ({
                                 key: item.key,
                                 icon: item.icon,
-                                label: <span className="text-xs font-semibold">{item.label}</span>,
+                                label: <span className="text-xs font-medium">{item.label}</span>,
                                 onClick: () => handleMenuClick(item.key)
                             }))}
+                            className="custom-sidebar-menu"
                         />
                     </div>
 
-                    <div className="p-4 border-t border-white/[0.04] bg-[#090d16] flex flex-col gap-3">
+                    <div className="p-3 border-t border-border-subtle bg-bg-elevated/50 flex flex-col gap-2">
                         {!collapsed && (
-                            <div className="flex items-center space-x-3">
-                                <Avatar size="small" icon={<UserOutlined />} className="bg-blue-600 shrink-0" />
+                            <div className="flex items-center space-x-2.5 px-2 py-1.5">
+                                <Avatar size={28} icon={<UserOutlined />} className="bg-brand-primary shrink-0" />
                                 <div className="min-w-0 flex-grow">
-                                    <p className="text-xs font-bold text-white truncate">{user?.name || "Team Manager"}</p>
-                                    <p className="text-[9px] text-slate-400 truncate uppercase tracking-wider">{user?.role}</p>
+                                    <p className="text-xs font-semibold text-text-primary truncate">{user?.name || "Team Manager"}</p>
+                                    <p className="text-[10px] text-text-secondary truncate font-mono">{user?.email}</p>
                                 </div>
                             </div>
                         )}
                         <Button 
                             type="text" 
                             danger 
-                            icon={<LogoutOutlined />} 
+                            icon={<LogoutOutlined className="text-xs" />} 
                             onClick={handleLogout}
-                            className={`w-full text-left justify-start hover:bg-red-500/10 text-xs py-2 px-3 h-auto ${collapsed ? "justify-center px-0" : ""}`}
+                            className={`w-full text-left justify-start hover:bg-status-danger/10 text-xs py-1.5 px-2.5 h-8 ${collapsed ? "justify-center px-0" : ""}`}
                         >
-                            {!collapsed && "Sign Out"}
+                            {!collapsed && <span className="text-xs">Sign Out</span>}
                         </Button>
                     </div>
                 </aside>
@@ -187,89 +214,165 @@ function TeamLayout() {
                 <div className="flex-grow flex flex-col min-w-0">
                     
                     {/* Top Header Navbar */}
-                    <header className="w-full flex items-center justify-between py-4 px-6 bg-[#0b0f19]/90 border-b border-white/[0.04] backdrop-blur-sm sticky top-0 z-50">
+                    <header className="h-14 w-full flex items-center justify-between px-6 bg-bg-surface border-b border-border-subtle sticky top-0 z-40">
                         {/* Collapse Toggle & Brand Info */}
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-3">
                             <Button 
                                 type="text"
                                 icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                                 onClick={() => setCollapsed(!collapsed)}
-                                className="hidden md:inline-flex text-slate-300 hover:text-white"
+                                className="hidden md:inline-flex text-text-secondary hover:text-text-primary"
                             />
                             
-                            <div className="flex items-center space-x-3 md:hidden">
-                                <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                            <div className="flex items-center space-x-2 md:hidden">
+                                <Button 
+                                    type="text"
+                                    icon={<MenuOutlined />}
+                                    onClick={() => setMobileMenuOpen(true)}
+                                    className="text-text-secondary hover:text-text-primary mr-1"
+                                />
+                                <div className="h-7 w-7 rounded bg-brand-primary flex items-center justify-center">
                                     <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                     </svg>
                                 </div>
-                                <span className="text-base font-black tracking-wide text-white uppercase">APEX</span>
+                                <span className="text-sm font-bold tracking-wide text-text-primary uppercase">APEX</span>
                             </div>
 
                             <div className="hidden md:block">
-                                <h2 className="text-xs font-extrabold text-white uppercase tracking-wider">Team Management Portal</h2>
+                                <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Team Portal</span>
                             </div>
                         </div>
 
-                        {/* Middle/Header display: Logo, Team Name, Sport, Organization Name */}
-                        {loading ? (
-                            <Spin size="small" />
-                        ) : (
-                            teamData && (
-                                <div className="flex items-center space-x-3 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-2 hover:border-white/[0.1] transition-all">
+                        {/* Right Area Controls */}
+                        <div className="flex items-center space-x-3.5">
+                            {/* Theme Toggle Button */}
+                            <button 
+                                onClick={toggleTheme}
+                                className="h-8 w-8 rounded-lg border border-border-subtle hover:border-brand-primary/30 flex items-center justify-center text-text-secondary hover:text-text-primary bg-bg-surface transition-colors cursor-pointer"
+                                aria-label="Toggle theme"
+                            >
+                                {themeMode === "dark" ? (
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                                    </svg>
+                                ) : (
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                    </svg>
+                                )}
+                            </button>
+
+                            {!loading && teamData && (
+                                <div className="flex items-center space-x-2.5 px-3 py-1 bg-bg-elevated border border-border-subtle rounded-full">
                                     {teamData.logo ? (
-                                        <img src={teamData.logo} alt="Logo" className="w-9 h-9 rounded-lg object-cover border border-white/10 shrink-0" />
+                                        <img src={teamData.logo} alt="Logo" className="w-5 h-5 rounded-full object-cover shrink-0" />
                                     ) : (
-                                        <Avatar size={36} icon={<TeamOutlined />} className="bg-blue-600 text-white rounded-lg font-bold shrink-0" />
+                                        <Avatar size={20} icon={<TeamOutlined />} className="bg-brand-primary text-white text-[10px] flex items-center justify-center" />
                                     )}
-                                    <div className="min-w-0">
-                                        <div className="flex items-center space-x-2">
-                                            <span className="text-xs font-black text-white truncate leading-none">{teamData.teamName}</span>
-                                            <span className="text-[9px] bg-blue-600/20 text-blue-400 font-extrabold uppercase px-1.5 py-0.5 rounded border border-blue-500/20 shrink-0 leading-none">
-                                                {teamData.sport}
-                                            </span>
-                                        </div>
-                                        {teamData.organizationId?.organizationName && (
-                                            <p className="text-[10px] text-slate-400 mt-1 truncate">
-                                                Org: <span className="text-slate-300 font-bold">{teamData.organizationId.organizationName}</span>
-                                            </p>
-                                        )}
+                                    <div className="flex items-center space-x-1.5">
+                                        <span className="text-xs font-semibold text-text-primary truncate max-w-[120px]">{teamData.teamName}</span>
+                                        <span className="text-[9px] bg-brand-primary/10 text-brand-primary font-bold uppercase px-1.5 py-0.5 rounded border border-brand-primary/10 shrink-0">
+                                            {teamData.sport}
+                                        </span>
                                     </div>
                                 </div>
-                            )
-                        )}
+                            )}
 
-                        {/* Right Area Controls */}
-                        <div className="flex items-center space-x-4">
-                            <span className="text-[10px] text-slate-400 hidden lg:inline-flex items-center space-x-1.5 bg-slate-950/40 px-2.5 py-1 rounded-md border border-white/[0.04]">
-                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span>Logged in as: <strong className="text-blue-400 font-mono">{user?.email}</strong></span>
-                            </span>
-                            <Button 
-                                type="text" 
-                                danger 
-                                icon={<LogoutOutlined />} 
-                                onClick={handleLogout}
-                                className="hover:bg-red-500/10 text-xs md:hidden"
-                            >
-                                Sign Out
-                            </Button>
+                            <div className="md:hidden">
+                                <Button 
+                                    type="text" 
+                                    danger 
+                                    icon={<LogoutOutlined />} 
+                                    onClick={handleLogout}
+                                    className="hover:bg-status-danger/10 text-xs py-1 px-2.5 h-8"
+                                >
+                                    Sign Out
+                                </Button>
+                            </div>
                         </div>
                     </header>
 
                     {/* Content Outlets */}
-                    <div className="flex-grow overflow-y-auto bg-[#080b11]">
+                    <div className="flex-grow overflow-y-auto bg-transparent">
                         {loading ? (
                             <div className="min-h-[60vh] flex flex-col items-center justify-center">
-                                <Spin size="large" />
-                                <p className="text-xs text-slate-400 mt-4 tracking-wider">Syncing workspace...</p>
+                                <Spin size="middle" />
+                                <p className="text-xs text-text-secondary mt-3 tracking-wider">Syncing workspace...</p>
                             </div>
                         ) : (
-                            <Outlet context={{ teamData, setTeamData, fetchTeamData }} />
+                            <div className="p-6 md:p-8 max-w-7xl w-full mx-auto">
+                                <Outlet context={{ teamData, setTeamData, fetchTeamData }} />
+                            </div>
                         )}
                     </div>
 
                 </div>
+
+                {/* Mobile Menu Drawer */}
+                <Drawer
+                    title={
+                        <div className="flex items-center space-x-2.5">
+                            <div className="h-7 w-7 rounded bg-brand-primary flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-xs font-bold tracking-wider text-text-primary uppercase">APEX</span>
+                                <span className="text-[9px] uppercase tracking-widest text-brand-primary font-medium -mt-1">TEAM HUB</span>
+                            </div>
+                        </div>
+                    }
+                    placement="left"
+                    onClose={() => setMobileMenuOpen(false)}
+                    open={mobileMenuOpen}
+                    width={260}
+                    styles={{
+                        body: { padding: '12px 8px', display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'var(--color-bg-surface)' }
+                    }}
+                >
+                    <div className="flex flex-col h-full justify-between">
+                        <div className="flex-grow">
+                            <Menu
+                                mode="inline"
+                                selectedKeys={[getActiveKey()]}
+                                style={{ background: "transparent", borderRight: 0 }}
+                                items={sidebarMenuItems.map(item => ({
+                                    key: item.key,
+                                    icon: item.icon,
+                                    label: <span className="text-xs font-medium">{item.label}</span>,
+                                    onClick: () => {
+                                        handleMenuClick(item.key);
+                                        setMobileMenuOpen(false);
+                                    }
+                                }))}
+                            />
+                        </div>
+                        <div className="p-3 border-t border-border-subtle bg-bg-elevated/50 flex flex-col gap-2 rounded-lg">
+                            <div className="flex items-center space-x-2.5 px-2 py-1.5">
+                                <Avatar size={28} icon={<UserOutlined />} className="bg-brand-primary shrink-0" />
+                                <div className="min-w-0 flex-grow">
+                                    <p className="text-xs font-semibold text-text-primary truncate">{user?.name || "Team Manager"}</p>
+                                    <p className="text-[10px] text-text-secondary truncate font-mono">{user?.email}</p>
+                                </div>
+                            </div>
+                            <Button 
+                                type="text" 
+                                danger 
+                                icon={<LogoutOutlined className="text-xs" />} 
+                                onClick={() => {
+                                    handleLogout();
+                                    setMobileMenuOpen(false);
+                                }}
+                                className="w-full text-left justify-start hover:bg-status-danger/10 text-xs py-1.5 px-2.5 h-8"
+                            >
+                                Sign Out
+                            </Button>
+                        </div>
+                    </div>
+                </Drawer>
+
             </div>
         </ConfigProvider>
     );

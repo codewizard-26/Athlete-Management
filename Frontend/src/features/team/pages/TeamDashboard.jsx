@@ -28,15 +28,29 @@ function TeamDashboard() {
         activities: []
     });
     const [loading, setLoading] = useState(true);
+    const [openDrives, setOpenDrives] = useState([]);
+    const [pendingApps, setPendingApps] = useState([]);
+    const [recentMembers, setRecentMembers] = useState([]);
 
     useEffect(() => {
         let isMounted = true;
         const fetchDashboardData = async () => {
             try {
                 setLoading(true);
-                const res = await api.get("/dashboard/team");
-                if (isMounted && res.data) {
-                    setStats(res.data);
+                const [dashRes, drivesRes, pendingRes, membersRes] = await Promise.all([
+                    api.get("/dashboard/team"),
+                    api.get("/recruitment/my-drives"),
+                    api.get("/team/pending-members"),
+                    api.get("/team/me/members")
+                ]);
+                if (isMounted) {
+                    if (dashRes.data) setStats(dashRes.data);
+                    if (drivesRes.data) {
+                        const open = drivesRes.data.filter(d => d.status === "open");
+                        setOpenDrives(open);
+                    }
+                    if (pendingRes.data) setPendingApps(pendingRes.data);
+                    if (membersRes.data) setRecentMembers(membersRes.data);
                 }
             } catch (err) {
                 console.error("Error fetching team dashboard stats:", err);
@@ -53,7 +67,6 @@ function TeamDashboard() {
         };
     }, []);
 
-    // Helper to format timestamps relative to current time
     const getRelativeTimeString = (dateStr) => {
         if (!dateStr) return "";
         const date = new Date(dateStr);
@@ -72,19 +85,14 @@ function TeamDashboard() {
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
     };
 
-    // Format timeline items dynamically
     const getTimelineItems = () => {
         if (!stats.activities || stats.activities.length === 0) {
-            // Return visual sports actions as fallback if database has zero logs
             return [
                 {
-                    color: "blue",
+                    color: "gray",
                     children: (
                         <div>
-                            <span className="font-bold text-white text-xs">Platform Onboarding Completed</span>
-                            <p className="text-[10px] text-slate-400 mt-0.5">
-                                Team profile initialized successfully under parent organization • Just now
-                            </p>
+                            <span className="text-text-secondary text-[11px] italic">No recent activities recorded.</span>
                         </div>
                     )
                 }
@@ -92,19 +100,19 @@ function TeamDashboard() {
         }
 
         return stats.activities.map((act) => {
-            let color = "blue";
+            let color = "#6366F1";
             if (act.type === "membership") {
-                color = act.description.includes("ACTIVE") ? "green" : "orange";
+                color = act.description.includes("ACTIVE") ? "#059669" : "#D97706";
             } else if (act.type === "application") {
-                color = "purple";
+                color = "#4F46E5";
             }
 
             return {
                 color: color,
                 children: (
-                    <div key={act.id}>
-                        <span className="font-bold text-white text-xs">{act.title}</span>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
+                    <div key={act.id} className="pb-1">
+                        <span className="font-semibold text-text-primary text-xs">{act.title}</span>
+                        <p className="text-[11px] text-text-secondary mt-0.5">
                             {act.description} • {getRelativeTimeString(act.date)}
                         </p>
                     </div>
@@ -116,7 +124,7 @@ function TeamDashboard() {
     const handleActionClick = (section) => {
         const sec = section.toLowerCase();
         if (sec.includes("recruitment") || sec.includes("campaign") || sec.includes("drive")) {
-            navigate("/team/recruitment/create");
+            navigate("/team/recruitment");
         } else if (sec.includes("application") || sec.includes("review")) {
             navigate("/team/applications");
         } else if (sec.includes("roster")) {
@@ -129,310 +137,300 @@ function TeamDashboard() {
     };
 
     return (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
-            
-            {/* SECTION 1 — Welcome Banner */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-blue-950/50 via-slate-900/30 to-[#0f172a]/60 border border-blue-500/15 p-6 sm:p-8 rounded-2xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
-                <div className="space-y-2">
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+        <div className="space-y-6 animate-fadeIn">
+            {/* Welcome Banner */}
+            <div className="bg-bg-surface border border-border-subtle p-6 sm:p-8 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+                <div className="space-y-1.5 relative z-10">
+                    <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">
                         Welcome Back, {teamData?.teamName || "Coach"}
                     </h1>
-                    <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+                    <p className="text-xs sm:text-sm text-text-secondary max-w-xl leading-relaxed">
                         Manage your squad, recruitment drives, athlete applications, and performance tracking.
                     </p>
                 </div>
                 {teamData && (
-                    <div className="shrink-0 flex items-center space-x-3 bg-blue-500/10 border border-blue-500/20 px-4 py-3 rounded-xl">
-                        <Avatar size="large" src={teamData.logo} icon={<TeamOutlined />} className="bg-blue-600" />
+                    <div className="shrink-0 flex items-center space-x-3 bg-brand-primary/10 border border-brand-primary/20 px-4 py-3 rounded-xl relative z-10">
+                        <Avatar size={36} src={teamData.logo} icon={<TeamOutlined />} className="bg-brand-primary rounded" />
                         <div>
-                            <p className="text-[10px] text-blue-400 uppercase tracking-widest font-black leading-none">Category</p>
-                            <p className="text-xs font-bold text-white mt-1 leading-none">{teamData.ageCategory}</p>
+                            <p className="text-[9px] text-brand-primary uppercase tracking-wider font-semibold leading-none">Category</p>
+                            <p className="text-xs font-bold text-text-primary mt-1.5 leading-none">{teamData.ageCategory}</p>
                         </div>
                     </div>
                 )}
             </div>
 
-            {/* SECTION 2 — Statistics Cards */}
+            {/* Statistics Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/45 backdrop-blur-sm shadow-md hover:border-blue-500/20 transition-all">
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                     <Statistic 
-                        title={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Players</span>}
+                        title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Active Players</span>}
                         value={loading ? "..." : stats.members} 
-                        valueStyle={{ color: '#60a5fa', fontWeight: 'bold' }}
-                        prefix={<TeamOutlined className="text-blue-400 mr-2 text-lg" />}
+                        valueStyle={{ color: 'var(--color-primary)', fontWeight: '750', fontSize: '24px' }}
+                        prefix={<TeamOutlined className="text-brand-primary mr-2 text-base" />}
                     />
                 </Card>
 
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/45 backdrop-blur-sm shadow-md hover:border-purple-500/20 transition-all">
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                     <Statistic 
-                        title={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Recruitment Drives</span>}
+                        title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Recruitment Drives</span>}
                         value={loading ? "..." : stats.drivesCount} 
-                        valueStyle={{ color: '#c084fc', fontWeight: 'bold' }}
-                        prefix={<NotificationOutlined className="text-purple-400 mr-2 text-lg" />}
+                        valueStyle={{ color: 'var(--color-primary)', fontWeight: '750', fontSize: '24px' }}
+                        prefix={<NotificationOutlined className="text-brand-primary mr-2 text-base" />}
                     />
                 </Card>
 
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/45 backdrop-blur-sm shadow-md hover:border-orange-500/20 transition-all">
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                     <Statistic 
-                        title={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Applications</span>}
+                        title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Pending Applications</span>}
                         value={loading ? "..." : stats.pendingRequests} 
-                        valueStyle={{ color: '#fb923c', fontWeight: 'bold' }}
-                        prefix={<SolutionOutlined className="text-orange-400 mr-2 text-lg" />}
+                        valueStyle={{ color: 'var(--color-accent)', fontWeight: '750', fontSize: '24px' }}
+                        prefix={<SolutionOutlined className="text-brand-accent mr-2 text-base" />}
                     />
                 </Card>
 
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/45 backdrop-blur-sm shadow-md hover:border-emerald-500/20 transition-all">
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                     <Statistic 
-                        title={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Matches Played</span>}
+                        title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Matches Played</span>}
                         value={loading ? "..." : stats.matchesCount} 
-                        valueStyle={{ color: '#34d399', fontWeight: 'bold' }}
-                        prefix={<CalendarOutlined className="text-emerald-400 mr-2 text-lg" />}
+                        valueStyle={{ color: 'var(--color-secondary)', fontWeight: '750', fontSize: '24px' }}
+                        prefix={<CalendarOutlined className="text-brand-secondary mr-2 text-base" />}
                     />
                 </Card>
             </div>
 
-            {/* SECTION 3 — Quick Actions */}
+            {/* Quick Actions */}
             <div className="space-y-4">
-                <h2 className="text-xs font-bold text-slate-300 tracking-wider uppercase border-b border-white/[0.04] pb-2 flex items-center space-x-2">
-                    <PlayCircleOutlined className="text-blue-500" />
+                <h2 className="text-xs font-bold text-text-secondary tracking-wider uppercase border-b border-border-subtle pb-2 flex items-center space-x-1.5">
+                    <PlayCircleOutlined className="text-brand-primary text-xs" />
                     <span>Quick Actions</span>
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Action 1 */}
                     <div 
                         onClick={() => handleActionClick("Create Recruitment Drive")}
-                        className="p-5 bg-[#0f172a]/45 border border-white/[0.04] rounded-xl hover:border-purple-500/40 hover:bg-[#0f172a]/70 transition-all duration-300 shadow-md cursor-pointer flex flex-col space-y-3 group"
+                        className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
                     >
-                        <div className="h-10 w-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                            <NotificationOutlined className="text-lg text-purple-400" />
+                        <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
+                            <NotificationOutlined className="text-sm text-brand-primary" />
                         </div>
-                        <div>
-                            <h3 className="text-xs font-bold text-white group-hover:text-purple-400 transition-colors flex items-center justify-between">
-                                <span>Create Recruitment Drive</span>
-                                <ArrowRightOutlined className="text-[10px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                        <div className="space-y-1">
+                            <h3 className="text-xs font-semibold text-text-primary group-hover:text-brand-primary transition-colors flex items-center justify-between">
+                                <span>Recruitment Drives</span>
+                                <ArrowRightOutlined className="text-[9px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                             </h3>
-                            <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">Launch scouting campaigns for position vacancies.</p>
+                            <p className="text-[11px] text-text-secondary leading-relaxed">Launch scouting campaigns for position vacancies.</p>
                         </div>
                     </div>
 
                     {/* Action 2 */}
                     <div 
                         onClick={() => handleActionClick("View Applications")}
-                        className="p-5 bg-[#0f172a]/45 border border-white/[0.04] rounded-xl hover:border-orange-500/40 hover:bg-[#0f172a]/70 transition-all duration-300 shadow-md cursor-pointer flex flex-col space-y-3 group"
+                        className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
                     >
-                        <div className="h-10 w-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                            <SolutionOutlined className="text-lg text-orange-400" />
+                        <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
+                            <SolutionOutlined className="text-sm text-brand-primary" />
                         </div>
-                        <div>
-                            <h3 className="text-xs font-bold text-white group-hover:text-orange-400 transition-colors flex items-center justify-between">
+                        <div className="space-y-1">
+                            <h3 className="text-xs font-semibold text-text-primary group-hover:text-brand-primary transition-colors flex items-center justify-between">
                                 <span>View Applications</span>
-                                <ArrowRightOutlined className="text-[10px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                                <ArrowRightOutlined className="text-[9px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                             </h3>
-                            <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">Review incoming athlete trials and registrations.</p>
+                            <p className="text-[11px] text-text-secondary leading-relaxed">Review incoming athlete trials and registrations.</p>
                         </div>
                     </div>
 
                     {/* Action 3 */}
                     <div 
                         onClick={() => handleActionClick("Manage Roster")}
-                        className="p-5 bg-[#0f172a]/45 border border-white/[0.04] rounded-xl hover:border-blue-500/40 hover:bg-[#0f172a]/70 transition-all duration-300 shadow-md cursor-pointer flex flex-col space-y-3 group"
+                        className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
                     >
-                        <div className="h-10 w-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                            <TeamOutlined className="text-lg text-blue-400" />
+                        <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
+                            <TeamOutlined className="text-sm text-brand-primary" />
                         </div>
-                        <div>
-                            <h3 className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors flex items-center justify-between">
+                        <div className="space-y-1">
+                            <h3 className="text-xs font-semibold text-text-primary group-hover:text-brand-primary transition-colors flex items-center justify-between">
                                 <span>Manage Roster</span>
-                                <ArrowRightOutlined className="text-[10px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                                <ArrowRightOutlined className="text-[9px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                             </h3>
-                            <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">Update squad player lists and manage player status.</p>
+                            <p className="text-[11px] text-text-secondary leading-relaxed">Update squad player lists and manage player status.</p>
                         </div>
                     </div>
 
                     {/* Action 4 */}
                     <div 
                         onClick={() => handleActionClick("View Team Performance")}
-                        className="p-5 bg-[#0f172a]/45 border border-white/[0.04] rounded-xl hover:border-emerald-500/40 hover:bg-[#0f172a]/70 transition-all duration-300 shadow-md cursor-pointer flex flex-col space-y-3 group"
+                        className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
                     >
-                        <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                            <CalendarOutlined className="text-lg text-emerald-400" />
+                        <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
+                            <CalendarOutlined className="text-sm text-brand-secondary" />
                         </div>
-                        <div>
-                            <h3 className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center justify-between">
-                                <span>View Team Performance</span>
-                                <ArrowRightOutlined className="text-[10px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                        <div className="space-y-1">
+                            <h3 className="text-xs font-semibold text-text-primary group-hover:text-brand-primary transition-colors flex items-center justify-between">
+                                <span>Team Performance</span>
+                                <ArrowRightOutlined className="text-[9px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                             </h3>
-                            <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">Track analytics, scores, and individual logs.</p>
+                            <p className="text-[11px] text-text-secondary leading-relaxed">Track analytics, scores, and individual logs.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 
-                {/* SECTION 4 — Recent Activity & SECTION 5 — Team Information */}
-                <div className="lg:col-span-2 space-y-8">
+                {/* Team Info & Recent Activity */}
+                <div className="lg:col-span-2 space-y-6">
                     
-                    {/* SECTION 5 — Team Information */}
+                    {/* Team Information */}
                     <div className="space-y-4">
-                        <h2 className="text-xs font-bold text-slate-300 tracking-wider uppercase border-b border-white/[0.04] pb-2 flex items-center space-x-2">
-                            <InfoCircleOutlined className="text-blue-500" />
+                        <h2 className="text-xs font-bold text-text-secondary tracking-wider uppercase border-b border-border-subtle pb-2 flex items-center space-x-1.5">
+                            <InfoCircleOutlined className="text-brand-primary text-xs" />
                             <span>Team Information</span>
                         </h2>
                         {teamData ? (
-                            <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/25 backdrop-blur-sm p-4 shadow-lg">
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                                    <div className="flex flex-col space-y-1 bg-[#0b0f19]/40 border border-white/[0.03] p-4 rounded-xl">
-                                        <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Team Name</span>
-                                        <span className="text-sm font-extrabold text-white">{teamData.teamName}</span>
+                            <Card bordered={false} className="border border-border-subtle bg-bg-surface p-4 shadow-sm rounded-xl">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div className="flex flex-col space-y-1 bg-bg-elevated/50 border border-border-subtle p-3.5 rounded-lg">
+                                        <span className="text-[9px] text-text-secondary font-semibold uppercase tracking-wider">Team Name</span>
+                                        <span className="text-xs font-bold text-text-primary">{teamData.teamName}</span>
                                     </div>
-                                    <div className="flex flex-col space-y-1 bg-[#0b0f19]/40 border border-white/[0.03] p-4 rounded-xl">
-                                        <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Sport Category</span>
-                                        <span className="text-sm font-extrabold text-blue-400 uppercase tracking-wide">{teamData.sport}</span>
+                                    <div className="flex flex-col space-y-1 bg-bg-elevated/50 border border-border-subtle p-3.5 rounded-lg">
+                                        <span className="text-[9px] text-text-secondary font-semibold uppercase tracking-wider">Sport Category</span>
+                                        <span className="text-xs font-bold text-brand-primary uppercase tracking-wide">{teamData.sport}</span>
                                     </div>
-                                    <div className="flex flex-col space-y-1 bg-[#0b0f19]/40 border border-white/[0.03] p-4 rounded-xl">
-                                        <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Age Group Limit</span>
-                                        <span className="text-sm font-extrabold text-emerald-400">{teamData.ageCategory}</span>
+                                    <div className="flex flex-col space-y-1 bg-bg-elevated/50 border border-border-subtle p-3.5 rounded-lg">
+                                        <span className="text-[9px] text-text-secondary font-semibold uppercase tracking-wider">Age Group Limit</span>
+                                        <span className="text-xs font-bold text-brand-secondary">{teamData.ageCategory}</span>
                                     </div>
                                 </div>
-                                <div className="mt-6 bg-[#0b0f19]/30 border border-white/[0.03] p-5 rounded-xl">
-                                    <h3 className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-2">Workspace Description</h3>
-                                    <p className="text-xs text-slate-300 leading-relaxed italic">
+                                <div className="mt-4 bg-bg-elevated/20 border border-border-subtle p-4 rounded-lg">
+                                    <h3 className="text-[9px] text-text-secondary font-semibold uppercase tracking-wider mb-1.5">Workspace Description</h3>
+                                    <p className="text-xs text-text-secondary leading-relaxed italic">
                                         {teamData.description || "No description set. Edit your team details in Organization settings to describe the squad values, schedule, and home venue details."}
                                     </p>
                                 </div>
                             </Card>
                         ) : (
-                            <Card bordered={false} loading className="border border-white/[0.04] bg-[#0f172a]/25" />
+                            <Card bordered={false} loading className="border border-border-subtle bg-bg-surface rounded-xl" />
                         )}
                     </div>
 
-                    {/* SECTION 4 — Recent Activity */}
+                    {/* Recent Activity */}
                     <div className="space-y-4">
-                        <h2 className="text-xs font-bold text-slate-300 tracking-wider uppercase border-b border-white/[0.04] pb-2 flex items-center space-x-2">
-                            <ClockCircleOutlined className="text-blue-500" />
+                        <h2 className="text-xs font-bold text-text-secondary tracking-wider uppercase border-b border-border-subtle pb-2 flex items-center space-x-1.5">
+                            <ClockCircleOutlined className="text-brand-primary text-xs" />
                             <span>Recent Activity</span>
                         </h2>
-                        <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/25 backdrop-blur-sm p-4 sm:p-6 shadow-md">
-                            <Timeline items={getTimelineItems()} className="custom-timeline mt-2" />
+                        <Card bordered={false} className="border border-border-subtle bg-bg-surface p-5 shadow-sm rounded-xl">
+                            <Timeline items={getTimelineItems()} className="custom-timeline mt-2 text-xs" />
                         </Card>
                     </div>
 
                 </div>
 
-                {/* SECTION 6 — Upcoming Actions Placeholders */}
+                {/* Side Panels */}
                 <div className="space-y-6">
-                    <h2 className="text-xs font-bold text-slate-300 tracking-wider uppercase border-b border-white/[0.04] pb-2 flex items-center space-x-2">
-                        <CheckCircleOutlined className="text-blue-500" />
+                    <h2 className="text-xs font-bold text-text-secondary tracking-wider uppercase border-b border-border-subtle pb-2 flex items-center space-x-1.5">
+                        <CheckCircleOutlined className="text-brand-primary text-xs" />
                         <span>Upcoming Actions</span>
                     </h2>
 
-                    {/* 1. Open Recruitment Drives */}
+                    {/* Open Recruitment Drives */}
                     <Card 
-                        title={<span className="text-xs font-extrabold text-white tracking-wide uppercase">Open Recruitment Drives</span>} 
+                        title={<span className="text-xs font-semibold text-text-primary tracking-wide uppercase">Open Recruitment Drives</span>} 
                         bordered={false} 
-                        className="border border-white/[0.04] bg-[#0f172a]/30"
-                        headStyle={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}
-                        extra={<Tag color="purple" className="m-0 border-0 font-bold text-[9px]">ACTIVE</Tag>}
+                        className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl"
+                        extra={<Tag color="purple" className="m-0 border-0 font-semibold text-[9px] px-2 py-0.5 rounded">ACTIVE</Tag>}
                     >
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 rounded-lg bg-[#0b0f19]/45 border border-white/[0.02]">
-                                <div>
-                                    <p className="text-xs font-bold text-white">Elite Trial Call</p>
-                                    <p className="text-[9px] text-slate-400 mt-0.5">Expires: Aug 12, 2026</p>
-                                </div>
-                                <span className="text-[10px] text-purple-400 font-bold">2 Vacancies</span>
-                            </div>
-                            <div className="flex items-center justify-between p-3 rounded-lg bg-[#0b0f19]/45 border border-white/[0.02]">
-                                <div>
-                                    <p className="text-xs font-bold text-white">Junior Roster Search</p>
-                                    <p className="text-[9px] text-slate-400 mt-0.5">Expires: Sep 30, 2026</p>
-                                </div>
-                                <span className="text-[10px] text-purple-400 font-bold">5 Vacancies</span>
-                            </div>
+                            {openDrives.length === 0 ? (
+                                <p className="text-[11px] text-text-secondary italic py-2">No active recruitment drives.</p>
+                            ) : (
+                                openDrives.map(drive => (
+                                    <div key={drive._id} className="flex items-center justify-between p-3 rounded-lg bg-bg-elevated/40 border border-border-subtle">
+                                        <div>
+                                            <p className="text-xs font-semibold text-text-primary">{drive.title}</p>
+                                            <p className="text-[10px] text-text-secondary mt-0.5">Expires: {new Date(drive.applicationDeadline).toLocaleDateString()}</p>
+                                        </div>
+                                        <span className="text-xs text-brand-primary font-semibold">{drive.vacancies || 0} Spots</span>
+                                    </div>
+                                ))
+                            )}
                             <Button 
                                 type="dashed" 
                                 size="small" 
-                                icon={<PlusOutlined />} 
+                                icon={<PlusOutlined className="text-xs" />} 
                                 onClick={() => handleActionClick("Add Campaign")}
-                                className="w-full text-xs hover:border-purple-500 hover:text-purple-400"
+                                className="w-full text-xs hover:border-brand-primary hover:text-brand-primary cursor-pointer h-8 rounded-md"
                             >
                                 New Drive
                             </Button>
                         </div>
                     </Card>
 
-                    {/* 2. Pending Applications */}
+                    {/* Pending Applications */}
                     <Card 
-                        title={<span className="text-xs font-extrabold text-white tracking-wide uppercase">Pending Applications</span>} 
+                        title={<span className="text-xs font-semibold text-text-primary tracking-wide uppercase">Pending Applications</span>} 
                         bordered={false} 
-                        className="border border-white/[0.04] bg-[#0f172a]/30"
-                        headStyle={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}
-                        extra={<Tag color="orange" className="m-0 border-0 font-bold text-[9px]">{stats.pendingRequests} REVIEW</Tag>}
+                        className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl"
+                        extra={<Tag color="orange" className="m-0 border-0 font-semibold text-[9px] px-2 py-0.5 rounded">{pendingApps.length} REVIEW</Tag>}
                     >
                         <div className="space-y-4">
-                            <div className="flex items-center space-x-3 p-3 rounded-lg bg-[#0b0f19]/45 border border-white/[0.02]">
-                                <Avatar size="small" icon={<UserAddOutlined />} className="bg-orange-500" />
-                                <div className="flex-grow min-w-0">
-                                    <p className="text-xs font-bold text-white truncate">Ethan Hunt</p>
-                                    <p className="text-[9px] text-slate-400 truncate">Football • Age: 17 • Midfielder</p>
-                                </div>
-                                <span className="text-[9px] text-slate-500 font-bold shrink-0">1h ago</span>
-                            </div>
-                            <div className="flex items-center space-x-3 p-3 rounded-lg bg-[#0b0f19]/45 border border-white/[0.02]">
-                                <Avatar size="small" icon={<UserAddOutlined />} className="bg-orange-500" />
-                                <div className="flex-grow min-w-0">
-                                    <p className="text-xs font-bold text-white truncate">Chloe Frazer</p>
-                                    <p className="text-[9px] text-slate-400 truncate">Football • Age: 16 • Striker</p>
-                                </div>
-                                <span className="text-[9px] text-slate-500 font-bold shrink-0">1d ago</span>
-                            </div>
+                            {pendingApps.length === 0 ? (
+                                <p className="text-[11px] text-text-secondary italic py-2">No pending applications.</p>
+                            ) : (
+                                pendingApps.map(app => (
+                                    <div key={app._id} className="flex items-center space-x-3 p-3 rounded-lg bg-bg-elevated/40 border border-border-subtle">
+                                        <Avatar size="small" icon={<UserAddOutlined className="text-xs" />} className="bg-brand-primary shrink-0" />
+                                        <div className="flex-grow min-w-0">
+                                            <p className="text-xs font-semibold text-text-primary truncate">{app.athleteId?.userId?.name || "Squad Player"}</p>
+                                            <p className="text-[10px] text-text-secondary truncate mt-0.5">{app.athleteId?.sport?.toUpperCase()} • {app.athleteId?.primaryRole}</p>
+                                        </div>
+                                        <span className="text-[10px] text-text-secondary shrink-0 font-medium">{getRelativeTimeString(app.createdAt)}</span>
+                                    </div>
+                                ))
+                            )}
                             <Button 
                                 type="dashed" 
                                 size="small" 
                                 onClick={() => handleActionClick("Review Applications")}
-                                className="w-full text-xs hover:border-orange-500 hover:text-orange-400"
+                                className="w-full text-xs hover:border-brand-primary hover:text-brand-primary cursor-pointer h-8 rounded-md"
                             >
-                                View All Applications
+                                View Applications
                             </Button>
                         </div>
                     </Card>
 
-                    {/* 3. Recent Team Members */}
+                    {/* Recent Team Members */}
                     <Card 
-                        title={<span className="text-xs font-extrabold text-white tracking-wide uppercase">Recent Team Members</span>} 
+                        title={<span className="text-xs font-semibold text-text-primary tracking-wide uppercase">Recent Team Members</span>} 
                         bordered={false} 
-                        className="border border-white/[0.04] bg-[#0f172a]/30"
-                        headStyle={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}
-                        extra={<Tag color="green" className="m-0 border-0 font-bold text-[9px]">NEW</Tag>}
+                        className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl"
+                        extra={<Tag color="green" className="m-0 border-0 font-semibold text-[9px] px-2 py-0.5 rounded">NEW</Tag>}
                     >
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 rounded-lg bg-[#0b0f19]/45 border border-white/[0.02]">
-                                <div className="flex items-center space-x-3">
-                                    <Avatar size="small" className="bg-emerald-600 font-bold text-xs">NL</Avatar>
-                                    <div>
-                                        <p className="text-xs font-bold text-white">Nate Logan</p>
-                                        <p className="text-[9px] text-slate-400 mt-0.5">Defender</p>
+                            {recentMembers.length === 0 ? (
+                                <p className="text-[11px] text-text-secondary italic py-2">No active team members.</p>
+                            ) : (
+                                recentMembers.slice(0, 3).map(mem => (
+                                    <div key={mem._id} className="flex items-center justify-between p-3 rounded-lg bg-bg-elevated/40 border border-border-subtle">
+                                        <div className="flex items-center space-x-3 min-w-0">
+                                            <Avatar size="small" className="bg-brand-secondary font-bold text-xs shrink-0 rounded">
+                                                {(mem.athleteId?.userId?.name || "SP").substring(0, 2).toUpperCase()}
+                                            </Avatar>
+                                            <div className="min-w-0">
+                                                <p className="text-xs font-semibold text-text-primary truncate">{mem.athleteId?.userId?.name || "Squad Player"}</p>
+                                                <p className="text-[10px] text-text-secondary mt-0.5 truncate">{mem.athleteId?.primaryRole}</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-[10px] text-brand-secondary font-semibold shrink-0">Approved</span>
                                     </div>
-                                </div>
-                                <span className="text-[9px] text-emerald-400 font-bold">Approved</span>
-                            </div>
-                            <div className="flex items-center justify-between p-3 rounded-lg bg-[#0b0f19]/45 border border-white/[0.02]">
-                                <div className="flex items-center space-x-3">
-                                    <Avatar size="small" className="bg-emerald-600 font-bold text-xs">SK</Avatar>
-                                    <div>
-                                        <p className="text-xs font-bold text-white">Sana Khan</p>
-                                        <p className="text-[9px] text-slate-400 mt-0.5">Goalkeeper</p>
-                                    </div>
-                                </div>
-                                <span className="text-[9px] text-emerald-400 font-bold">Approved</span>
-                            </div>
+                                ))
+                            )}
                             <Button 
                                 type="dashed" 
                                 size="small" 
                                 onClick={() => handleActionClick("Manage Roster")}
-                                className="w-full text-xs hover:border-emerald-500 hover:text-emerald-400"
+                                className="w-full text-xs hover:border-brand-primary hover:text-brand-primary cursor-pointer h-8 rounded-md"
                             >
                                 Manage Roster
                             </Button>
@@ -442,8 +440,7 @@ function TeamDashboard() {
                 </div>
 
             </div>
-
-        </main>
+        </div>
     );
 }
 

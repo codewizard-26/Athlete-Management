@@ -11,7 +11,7 @@ const router = express.Router();
 router.post(
     "/create",
     authMiddleware,
-    roleMiddleware("organization"),
+    roleMiddleware("organization", "team"),
     async (req, res) => {
         try {
 
@@ -85,10 +85,62 @@ router.post(
     }
 );
 
+router.post(
+    "/bulk-create",
+    authMiddleware,
+    roleMiddleware("organization", "team"),
+    async (req, res) => {
+        try {
+            const { performances } = req.body;
+            if (!performances || !Array.isArray(performances)) {
+                return res.status(400).json({
+                    message: "Performances array is required"
+                });
+            }
+
+            const results = [];
+            for (const item of performances) {
+                const { athleteId, matchId, teamId, tournamentId, sport, stats } = item;
+                if (!athleteId || !matchId || !teamId || !tournamentId || !sport) {
+                    continue; // Skip invalid records
+                }
+
+                // Check if already exists, update if so, otherwise create
+                const existing = await Performance.findOne({ athleteId, matchId });
+                if (existing) {
+                    existing.stats = stats;
+                    await existing.save();
+                    results.push(existing);
+                } else {
+                    const newPerf = await Performance.create({
+                        athleteId,
+                        matchId,
+                        teamId,
+                        tournamentId,
+                        sport,
+                        stats
+                    });
+                    results.push(newPerf);
+                }
+            }
+
+            return res.status(201).json({
+                message: "Bulk performances processed successfully",
+                count: results.length,
+                performances: results
+            });
+        } catch (err) {
+            return res.status(500).json({
+                message: err.message
+            });
+        }
+    }
+);
+
 router.put(
     "/:performanceId",
     authMiddleware,
-    roleMiddleware("organization"),
+    roleMiddleware("organization", "team"),
     async (req, res) => {
         try {
 
@@ -155,7 +207,7 @@ router.get(
 router.delete(
     "/:performanceId",
     authMiddleware,
-    roleMiddleware("organization"),
+    roleMiddleware("organization", "team"),
     async (req, res) => {
         try {
 

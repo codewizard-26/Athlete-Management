@@ -36,22 +36,22 @@ function RecruitmentDrives() {
     }, []);
 
     return (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+        <div className="space-y-6 animate-fadeIn">
             
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                 <div>
-                    <h1 className="text-2xl font-black text-white uppercase tracking-wider flex items-center space-x-2">
-                        <NotificationOutlined className="text-blue-500" />
+                    <h1 className="text-lg font-bold text-text-primary tracking-tight flex items-center space-x-2">
+                        <NotificationOutlined className="text-brand-primary" />
                         <span>Recruitment Campaigns</span>
                     </h1>
-                    <p className="text-xs text-slate-400 mt-1">Manage open trials, view applicant counts, and review submissions.</p>
+                    <p className="text-xs text-text-secondary mt-0.5">Manage open trials, view applicant counts, and review submissions.</p>
                 </div>
                 <Button 
                     type="primary" 
-                    icon={<PlusOutlined />} 
+                    icon={<PlusOutlined className="text-xs" />} 
                     onClick={() => navigate("/team/recruitment/create")}
-                    className="shadow-lg shadow-blue-600/10 font-bold text-xs"
+                    className="text-xs font-semibold h-9 rounded-md cursor-pointer"
                 >
                     Launch Campaign
                 </Button>
@@ -60,12 +60,12 @@ function RecruitmentDrives() {
             {/* Content List */}
             {loading ? (
                 <div className="min-h-[40vh] flex flex-col items-center justify-center">
-                    <Spin size="large" />
-                    <p className="text-xs text-slate-400 mt-4">Syncing recruitment database...</p>
+                    <Spin size="middle" />
+                    <p className="text-xs text-text-secondary mt-3">Syncing recruitment database...</p>
                 </div>
             ) : drives.length === 0 ? (
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/25 py-16 text-center">
-                    <Empty description={<span className="text-slate-400 text-xs">No active recruitment drives created by your team.</span>} />
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface py-16 text-center shadow-sm rounded-xl">
+                    <Empty description={<span className="text-text-secondary text-xs">No active recruitment drives created by your team.</span>} />
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -73,46 +73,46 @@ function RecruitmentDrives() {
                         <Card 
                             key={drive._id}
                             bordered={false} 
-                            className="border border-white/[0.04] bg-[#0f172a]/40 backdrop-blur-sm shadow-md hover:border-blue-500/20 transition-all flex flex-col justify-between"
+                            className="border border-border-subtle bg-bg-surface shadow-sm hover:border-brand-primary/25 transition-all duration-150 flex flex-col justify-between rounded-xl group"
                         >
                             <div className="space-y-4 flex-grow">
                                 <div className="flex justify-between items-start">
-                                    <h3 className="text-sm font-black text-white truncate max-w-[70%]">{drive.title}</h3>
-                                    <Tag color={drive.sport?.toLowerCase() === "football" ? "blue" : "gold"} className="m-0 border-0 font-bold uppercase text-[9px]">
+                                    <h3 className="text-xs font-semibold text-text-primary truncate max-w-[70%]">{drive.title}</h3>
+                                    <Tag color={drive.sport?.toLowerCase() === "football" ? "blue" : "gold"} className="m-0 border-0 font-semibold uppercase text-[9px]">
                                         {drive.sport}
                                     </Tag>
                                 </div>
 
-                                <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed">
+                                <p className="text-xs text-text-secondary line-clamp-3 leading-relaxed">
                                     {drive.description}
                                 </p>
 
-                                <div className="bg-[#0b0f19]/40 border border-white/[0.03] p-3 rounded-lg text-[10px] space-y-2.5">
-                                    <div className="flex items-center text-slate-300">
-                                        <EnvironmentOutlined className="mr-2 text-blue-500 shrink-0" />
+                                <div className="bg-bg-elevated/50 border border-border-subtle p-3.5 rounded-lg text-[11px] space-y-2.5">
+                                    <div className="flex items-center text-text-primary">
+                                        <EnvironmentOutlined className="mr-2 text-brand-primary shrink-0 text-[10px]" />
                                         <span className="truncate">{drive.location}</span>
                                     </div>
-                                    <div className="flex items-center text-slate-300">
-                                        <CalendarOutlined className="mr-2 text-emerald-500 shrink-0" />
+                                    <div className="flex items-center text-text-primary">
+                                        <CalendarOutlined className="mr-2 text-brand-secondary shrink-0 text-[10px]" />
                                         <span>Deadline: {new Date(drive.applicationDeadline).toLocaleDateString()}</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-slate-300">
+                                    <div className="flex items-center justify-between text-text-primary">
                                         <span className="flex items-center">
-                                            <TeamOutlined className="mr-2 text-purple-500 shrink-0" />
+                                            <TeamOutlined className="mr-2 text-brand-primary shrink-0 text-[10px]" />
                                             <span>Age Bracket:</span>
                                         </span>
-                                        <span className="font-extrabold text-blue-400">{drive.ageCategory}</span>
+                                        <span className="font-semibold text-brand-primary">{drive.ageCategory}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Card Actions */}
-                            <div className="mt-5 border-t border-white/[0.03] pt-4">
+                            <div className="mt-5 border-t border-border-subtle pt-4">
                                 <Button 
                                     type="primary" 
-                                    icon={<EyeOutlined />}
+                                    icon={<EyeOutlined className="text-xs" />}
                                     onClick={() => navigate(`/team/applications/${drive._id}`)}
-                                    className="w-full text-xs h-9 font-bold tracking-wider"
+                                    className="w-full text-xs h-9 font-semibold cursor-pointer"
                                 >
                                     Review Applications
                                 </Button>
@@ -122,7 +122,7 @@ function RecruitmentDrives() {
                 </div>
             )}
 
-        </main>
+        </div>
     );
 }
 

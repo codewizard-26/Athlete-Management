@@ -51,7 +51,6 @@ function OrganizationDashboard() {
         };
     }, []);
 
-    // Helper to format timestamps dynamically
     const getRelativeTimeString = (dateStr) => {
         if (!dateStr) return "";
         const date = new Date(dateStr);
@@ -70,20 +69,19 @@ function OrganizationDashboard() {
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
     };
 
-    // Dynamic timeline items mapped from DB activity list
     const timelineItems = stats.activities && stats.activities.length > 0 
         ? stats.activities.map((act) => {
-            let color = "blue";
-            if (act.type === "team") color = "green";
-            if (act.type === "recruitment") color = "purple";
-            if (act.type === "tournament") color = "gold";
+            let color = "#4F46E5";
+            if (act.type === "team") color = "#059669";
+            if (act.type === "recruitment") color = "#6366F1";
+            if (act.type === "tournament") color = "#D97706";
 
             return {
                 color: color,
                 children: (
-                    <div key={act.id}>
-                        <span className="font-bold text-white text-xs">{act.title}</span>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
+                    <div key={act.id} className="pb-1">
+                        <span className="font-semibold text-text-primary text-xs">{act.title}</span>
+                        <p className="text-[11px] text-text-secondary mt-0.5">
                             {act.description} • {getRelativeTimeString(act.date)}
                         </p>
                     </div>
@@ -95,86 +93,83 @@ function OrganizationDashboard() {
                 color: "gray",
                 children: (
                     <div key="empty">
-                        <span className="text-slate-400 text-xs">No recent activities. Create teams or schedule tournaments to get started!</span>
+                        <span className="text-text-secondary text-xs">No recent activities. Create teams or schedule tournaments to get started!</span>
                     </div>
                 )
             }
         ];
 
     return (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <div className="space-y-6 animate-fadeIn">
             
-            {/* 1. Welcome Banner */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-blue-900/40 via-indigo-900/20 to-[#0f172a]/60 border border-blue-500/20 p-6 sm:p-8 rounded-2xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
-                <div>
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                        Welcome back, {user?.name || "Organization Manager"}!
+            {/* Welcome Banner */}
+            <div className="bg-bg-surface border border-border-subtle p-6 sm:p-8 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+                <div className="space-y-1.5 relative z-10">
+                    <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">
+                        Welcome back, {user?.name || "Organization Manager"}
                     </h1>
-                    <p className="text-sm text-slate-300 mt-2 max-w-xl leading-relaxed">
+                    <p className="text-xs sm:text-sm text-text-secondary max-w-xl leading-relaxed">
                         Review organizational metrics, coordinate active teams, manage recruitment campaigns, and organize tournaments.
                     </p>
                 </div>
-                <div className="shrink-0 flex gap-3">
+                <div className="shrink-0 flex gap-3 relative z-10">
                     <Button 
                         type="primary" 
-                        icon={<UserOutlined />}
-                        onClick={() => navigate("/organization/profile/create")}
-                        className="shadow-lg shadow-blue-600/10"
+                        icon={<UserOutlined className="text-xs" />}
+                        onClick={() => navigate("/organization/settings")}
+                        className="bg-brand-primary border-brand-primary text-xs font-semibold h-9 rounded-md cursor-pointer"
                     >
-                        Edit Profile
+                        Settings
                     </Button>
                 </div>
             </div>
 
-            {/* 2. Statistics Cards Grid */}
+            {/* Statistics Cards Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/45 backdrop-blur-sm shadow-md">
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                     <Statistic 
-                        title={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Teams Created</span>}
+                        title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Teams Created</span>}
                         value={loading ? "..." : stats.teamsCount} 
-                        valueStyle={{ color: '#60a5fa', fontWeight: 'bold' }}
-                        prefix={<TeamOutlined className="text-blue-400 mr-2 text-lg" />}
+                        valueStyle={{ color: 'var(--color-primary)', fontWeight: '750', fontSize: '24px' }}
+                        prefix={<TeamOutlined className="text-brand-primary mr-2 text-base" />}
                     />
                 </Card>
 
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/45 backdrop-blur-sm shadow-md">
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                     <Statistic 
-                        title={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Drives</span>}
+                        title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Active Drives</span>}
                         value={loading ? "..." : stats.recruitmentCount} 
-                        valueStyle={{ color: '#c084fc', fontWeight: 'bold' }}
-                        prefix={<NotificationOutlined className="text-purple-400 mr-2 text-lg" />}
+                        valueStyle={{ color: 'var(--color-primary)', fontWeight: '750', fontSize: '24px' }}
+                        prefix={<NotificationOutlined className="text-brand-primary mr-2 text-base" />}
                     />
                 </Card>
 
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/45 backdrop-blur-sm shadow-md">
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                     <Statistic 
-                        title={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tournaments</span>}
+                        title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Tournaments</span>}
                         value={loading ? "..." : stats.tournamentsCount} 
-                        valueStyle={{ color: '#34d399', fontWeight: 'bold' }}
-                        prefix={<TrophyOutlined className="text-emerald-400 mr-2 text-lg" />}
+                        valueStyle={{ color: 'var(--color-secondary)', fontWeight: '750', fontSize: '24px' }}
+                        prefix={<TrophyOutlined className="text-brand-secondary mr-2 text-base" />}
                     />
                 </Card>
 
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/45 backdrop-blur-sm shadow-md">
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                     <Statistic 
-                        title={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Matches Scheduled</span>}
+                        title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Matches Scheduled</span>}
                         value={loading ? "..." : stats.matchesCount} 
-                        valueStyle={{ color: '#fbbf24', fontWeight: 'bold' }}
-                        prefix={<CalendarOutlined className="text-amber-400 mr-2 text-lg" />}
+                        valueStyle={{ color: 'var(--color-accent)', fontWeight: '750', fontSize: '24px' }}
+                        prefix={<CalendarOutlined className="text-brand-accent mr-2 text-base" />}
                     />
                 </Card>
-
             </div>
 
-            {/* 3. Quick Actions & 4. Recent Activity split */}
+            {/* Quick Actions & Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 
-                {/* Quick Actions (Col-span 2) */}
+                {/* Quick Actions */}
                 <div className="lg:col-span-2 space-y-4">
-                    <h2 className="text-base font-bold text-white tracking-wide uppercase border-b border-white/[0.04] pb-2 flex items-center space-x-2">
-                        <PlusCircleOutlined className="text-blue-500" />
+                    <h2 className="text-xs font-bold text-text-secondary tracking-wider uppercase border-b border-border-subtle pb-2 flex items-center space-x-1.5">
+                        <PlusCircleOutlined className="text-brand-primary text-xs" />
                         <span>Quick Actions</span>
                     </h2>
 
@@ -182,51 +177,51 @@ function OrganizationDashboard() {
                         {/* Action 1 */}
                         <div 
                             onClick={() => navigate("/organization/teams/create")}
-                            className="p-5 bg-[#0f172a]/40 border border-white/[0.04] rounded-xl hover:border-blue-500/35 hover:bg-[#0c1428]/30 transition-all duration-300 shadow-md cursor-pointer flex flex-col space-y-3 group"
+                            className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
                         >
-                            <div className="h-10 w-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                                <TeamOutlined className="text-lg text-blue-400" />
+                            <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
+                                <TeamOutlined className="text-sm text-brand-primary" />
                             </div>
-                            <div>
-                                <h3 className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors flex items-center justify-between">
+                            <div className="space-y-1">
+                                <h3 className="text-xs font-semibold text-text-primary group-hover:text-brand-primary transition-colors flex items-center justify-between">
                                     <span>Create Team</span>
-                                    <ArrowRightOutlined className="text-xs opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                                    <ArrowRightOutlined className="text-[9px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                                 </h3>
-                                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">Initialize a new team roster, add age filters, and configure colors.</p>
+                                <p className="text-[11px] text-text-secondary leading-relaxed">Initialize a new team roster, add age filters, and configure colors.</p>
                             </div>
                         </div>
 
                         {/* Action 2 */}
                         <div 
                             onClick={() => navigate("/organization/teams")}
-                            className="p-5 bg-[#0f172a]/40 border border-white/[0.04] rounded-xl hover:border-purple-500/35 hover:bg-[#0c1428]/30 transition-all duration-300 shadow-md cursor-pointer flex flex-col space-y-3 group"
+                            className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
                         >
-                            <div className="h-10 w-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                                <NotificationOutlined className="text-lg text-purple-400" />
+                            <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
+                                <NotificationOutlined className="text-sm text-brand-primary" />
                             </div>
-                            <div>
-                                <h3 className="text-sm font-bold text-white group-hover:text-purple-400 transition-colors flex items-center justify-between">
-                                    <span>Manage Teams Recruitment</span>
-                                    <ArrowRightOutlined className="text-xs opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                            <div className="space-y-1">
+                                <h3 className="text-xs font-semibold text-text-primary group-hover:text-brand-primary transition-colors flex items-center justify-between">
+                                    <span>Manage Teams</span>
+                                    <ArrowRightOutlined className="text-[9px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                                 </h3>
-                                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">Check team roster structures, positions, and active recruitment calls.</p>
+                                <p className="text-[11px] text-text-secondary leading-relaxed">Check team roster structures, positions, and active recruitment calls.</p>
                             </div>
                         </div>
 
                         {/* Action 3 */}
                         <div 
                             onClick={() => navigate("/organization/tournaments/create")}
-                            className="p-5 bg-[#0f172a]/40 border border-white/[0.04] rounded-xl hover:border-emerald-500/35 hover:bg-[#0c1428]/30 transition-all duration-300 shadow-md cursor-pointer flex flex-col space-y-3 group"
+                            className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
                         >
-                            <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                                <TrophyOutlined className="text-lg text-emerald-400" />
+                            <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
+                                <TrophyOutlined className="text-sm text-brand-secondary" />
                             </div>
-                            <div>
-                                <h3 className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center justify-between">
+                            <div className="space-y-1">
+                                <h3 className="text-xs font-semibold text-text-primary group-hover:text-brand-primary transition-colors flex items-center justify-between">
                                     <span>Create Tournament</span>
-                                    <ArrowRightOutlined className="text-xs opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                                    <ArrowRightOutlined className="text-[9px] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                                 </h3>
-                                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">Schedule a sports championship, invite team registries, and set fixture limits.</p>
+                                <p className="text-[11px] text-text-secondary leading-relaxed">Schedule a sports championship, invite team registries, and set fixtures.</p>
                             </div>
                         </div>
                     </div>
@@ -234,19 +229,18 @@ function OrganizationDashboard() {
 
                 {/* Recent Activity Timeline */}
                 <div className="space-y-4">
-                    <h2 className="text-base font-bold text-white tracking-wide uppercase border-b border-white/[0.04] pb-2 flex items-center space-x-2">
-                        <CalendarOutlined className="text-blue-500" />
+                    <h2 className="text-xs font-bold text-text-secondary tracking-wider uppercase border-b border-border-subtle pb-2 flex items-center space-x-1.5">
+                        <CalendarOutlined className="text-brand-primary text-xs" />
                         <span>Recent Activity</span>
                     </h2>
 
-                    <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/25 backdrop-blur-sm p-4 sm:p-6 shadow-md">
-                        <Timeline items={timelineItems} className="custom-timeline mt-2" />
+                    <Card bordered={false} className="border border-border-subtle bg-bg-surface p-5 shadow-sm rounded-xl">
+                        <Timeline items={timelineItems} className="custom-timeline mt-2 text-xs" />
                     </Card>
                 </div>
 
             </div>
-
-        </main>
+        </div>
     );
 }
 

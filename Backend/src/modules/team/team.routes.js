@@ -100,7 +100,7 @@ router.get("/myTeams",authMiddleware,roleMiddleware("organization"),async(req,re
 }
         const teams = await Team.find({
             organizationId: organization._id
-        });
+        }).populate("userId");
        
         return res.status(200).json(teams)
     } catch (err) {
@@ -129,7 +129,10 @@ router.get(
                     teamId: team._id,
                     status: "pending"
                 })
-                .populate("athleteId")
+                .populate({
+                    path: "athleteId",
+                    populate: { path: "userId" }
+                })
                 .populate("teamId");
 
             return res.status(200).json(
@@ -343,7 +346,10 @@ router.get(
             const members = await TeamMembership.find({
                 teamId: team._id,
                 status: "active"
-            }).populate("athleteId");
+            }).populate({
+                path: "athleteId",
+                populate: { path: "userId" }
+            });
             return res.status(200).json(members);
         } catch (err) {
             return res.status(500).json({ message: err.message });
@@ -360,7 +366,10 @@ router.get(
             const members = await TeamMembership.find({
                 teamId,
                 status: "active"
-            }).populate("athleteId");
+            }).populate({
+                path: "athleteId",
+                populate: { path: "userId" }
+            });
             return res.status(200).json(members);
         } catch (err) {
             return res.status(500).json({ message: err.message });

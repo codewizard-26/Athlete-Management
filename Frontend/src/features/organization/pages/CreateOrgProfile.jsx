@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Form, Input, Select, Button, ConfigProvider, theme, message, Avatar, Card } from "antd";
+import { Form, Input, Select, Button, message, Avatar, Card } from "antd";
 import {
     GlobalOutlined,
     TrophyOutlined,
@@ -48,43 +48,11 @@ function CreateOrgProfile() {
         }
     }, [user, form]);
 
-    // Custom Ant Design theme matching the dark sports-tech portal aesthetic
-    const darkTheme = {
-        algorithm: theme.darkAlgorithm,
-        token: {
-            colorPrimary: "#2563eb", // Sports corporate blue
-            colorBgContainer: "#0f172a", // Slate-900
-            colorBorder: "rgba(255, 255, 255, 0.08)",
-            colorText: "#f3f4f6",
-            colorTextSecondary: "#9ca3af",
-            borderRadius: 8,
-            fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-        },
-        components: {
-            Button: {
-                colorPrimary: "#2563eb",
-                colorPrimaryHover: "#1d4ed8",
-                colorPrimaryActive: "#1e40af",
-                borderRadius: 8,
-                controlHeight: 44,
-                fontWeight: 600,
-            },
-            Input: {
-                colorBgContainer: "#0b0f19",
-                colorBorder: "rgba(255, 255, 255, 0.08)",
-            },
-            TextArea: {
-                colorBgContainer: "#0b0f19",
-                colorBorder: "rgba(255, 255, 255, 0.08)",
-            }
-        }
-    };
-
     const handleFormSubmit = async (values) => {
         try {
             setLoading(true);
 
-            // Structure request body for the backend (description is required by the route)
+            // Structure request body for the backend
             const payload = {
                 organizationName: values.organizationName.trim(),
                 description: values.description.trim(),
@@ -101,7 +69,6 @@ function CreateOrgProfile() {
                 setIsEditing(false);
             } else {
                 await api.post("/organization/profile", payload);
-                // Update Redux state with profile status
                 dispatch(loginSuccess({
                     user: { ...user, isProfileCompleted: true },
                     token
@@ -110,7 +77,6 @@ function CreateOrgProfile() {
                 setIsEditing(false);
             }
 
-            // Redirect to Organization Dashboard
             navigate("/dashboard");
 
         } catch (err) {
@@ -131,312 +97,291 @@ function CreateOrgProfile() {
 
     if (!isEditing) {
         return (
-            <ConfigProvider theme={darkTheme}>
-                <div className="min-h-screen w-full bg-[#080b11] text-slate-100 font-sans selection:bg-blue-600 selection:text-white py-12 px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-4xl mx-auto space-y-6">
-                        {/* Return to Dashboard */}
-                        <div className="flex items-center justify-between">
-                            <Button 
-                                type="text" 
-                                icon={<ArrowLeftOutlined />} 
-                                onClick={() => navigate("/dashboard")}
-                                className="text-slate-400 hover:text-white flex items-center p-0 h-auto"
-                            >
-                                Back to Dashboard
-                            </Button>
-                            <Button 
-                                type="primary" 
-                                icon={<EditOutlined />}
-                                onClick={() => setIsEditing(true)}
-                                className="shadow-md"
-                            >
-                                Edit Profile
-                            </Button>
+            <div className="max-w-4xl w-full mx-auto space-y-6 animate-fadeIn">
+                {/* Return to Dashboard */}
+                <div className="flex items-center justify-between border-b border-border-subtle pb-4">
+                    <Button 
+                        type="text" 
+                        icon={<ArrowLeftOutlined className="text-xs" />} 
+                        onClick={() => navigate("/dashboard")}
+                        className="text-text-secondary hover:text-text-primary flex items-center p-0 h-auto cursor-pointer"
+                    >
+                        Back to Dashboard
+                    </Button>
+                    <Button 
+                        type="primary" 
+                        icon={<EditOutlined className="text-xs" />}
+                        onClick={() => setIsEditing(true)}
+                        className="text-xs font-semibold h-9 rounded-md cursor-pointer"
+                    >
+                        Edit Profile
+                    </Button>
+                </div>
+
+                {/* Profile Card */}
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface p-4 sm:p-6 shadow-sm rounded-xl">
+                    {/* Org Header */}
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-border-subtle pb-5">
+                        <Avatar size={64} src={form.getFieldValue("logo") || undefined} icon={!form.getFieldValue("logo") && <TrophyOutlined />} className="bg-brand-primary rounded shadow-sm shrink-0" />
+                        <div className="text-center sm:text-left space-y-2 min-w-0">
+                            <h2 className="text-base font-bold text-text-primary leading-tight m-0">{form.getFieldValue("organizationName")}</h2>
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                <span className="text-[10px] bg-brand-primary/10 text-brand-primary font-semibold uppercase px-2 py-0.5 rounded border border-brand-primary/15 tracking-wider">{user?.role}</span>
+                                {form.getFieldValue("website") && (
+                                    <>
+                                        <span className="text-text-secondary/30">•</span>
+                                        <a href={form.getFieldValue("website")} target="_blank" rel="noreferrer" className="text-xs text-brand-primary hover:underline flex items-center gap-1">
+                                            <LinkOutlined className="text-[10px]" />
+                                            <span>{form.getFieldValue("website")}</span>
+                                        </a>
+                                    </>
+                                )}
+                            </div>
+                            <p className="text-xs text-text-secondary font-mono m-0">{user?.email}</p>
+                        </div>
+                    </div>
+
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-5">
+                        {/* Location */}
+                        <div className="space-y-3">
+                            <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                                <GlobalOutlined className="text-brand-primary" />
+                                <span>Registered Location</span>
+                            </h3>
+                            <div className="bg-bg-elevated/40 border border-border-subtle rounded-xl p-4 space-y-3">
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-text-secondary">City</span>
+                                    <span className="font-semibold text-text-primary">{form.getFieldValue("city")}</span>
+                                </div>
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-text-secondary">State</span>
+                                    <span className="font-semibold text-text-primary">{form.getFieldValue("state")}</span>
+                                </div>
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-text-secondary">Country</span>
+                                    <span className="font-semibold text-text-primary">{form.getFieldValue("country")}</span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Profile Card */}
-                        <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/40 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-2xl">
-                            {/* Org Header */}
-                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-white/[0.04] pb-6">
-                                <Avatar size={80} src={form.getFieldValue("logo") || undefined} icon={!form.getFieldValue("logo") && <TrophyOutlined />} className="bg-blue-600 shadow-lg shrink-0" />
-                                <div className="text-center sm:text-left space-y-1.5 min-w-0">
-                                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">{form.getFieldValue("organizationName")}</h1>
-                                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                                        <span className="text-xs text-blue-400 font-semibold uppercase tracking-wider">{user?.role}</span>
-                                        {form.getFieldValue("website") && (
-                                            <>
-                                                <span className="text-slate-500">•</span>
-                                                <a href={form.getFieldValue("website")} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline flex items-center gap-1">
-                                                    <LinkOutlined />
-                                                    <span>{form.getFieldValue("website")}</span>
-                                                </a>
-                                            </>
-                                        )}
-                                    </div>
-                                    <p className="text-xs text-slate-500 font-mono">{user?.email}</p>
-                                </div>
-                            </div>
-
-                            {/* Details Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 pt-6">
-                                {/* Location */}
-                                <div className="space-y-4">
-                                    <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
-                                        <GlobalOutlined />
-                                        <span>Registered Location</span>
-                                    </h3>
-                                    <div className="bg-[#080b11]/30 border border-white/[0.02] rounded-xl p-4 space-y-3">
-                                        <div className="flex justify-between text-xs">
-                                            <span className="text-slate-400">City</span>
-                                            <span className="font-bold text-white">{form.getFieldValue("city")}</span>
-                                        </div>
-                                        <div className="flex justify-between text-xs">
-                                            <span className="text-slate-400">State</span>
-                                            <span className="font-bold text-white">{form.getFieldValue("state")}</span>
-                                        </div>
-                                        <div className="flex justify-between text-xs">
-                                            <span className="text-slate-400">Country</span>
-                                            <span className="font-bold text-white">{form.getFieldValue("country")}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Description */}
-                                <div className="space-y-4">
-                                    <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
-                                        <InfoCircleOutlined />
-                                        <span>Mission & Description</span>
-                                    </h3>
-                                    <p className="text-xs text-slate-300 leading-relaxed bg-[#080b11]/20 border border-white/[0.02] rounded-xl p-4 m-0 min-h-[110px]">
-                                        {form.getFieldValue("description") || "No description configured yet."}
-                                    </p>
-                                </div>
-                            </div>
-                        </Card>
+                        {/* Description */}
+                        <div className="space-y-3">
+                            <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                                <InfoCircleOutlined className="text-brand-primary" />
+                                <span>Mission & Description</span>
+                            </h3>
+                            <p className="text-xs text-text-secondary leading-relaxed bg-bg-elevated/20 border border-border-subtle rounded-xl p-4 m-0 min-h-[105px]">
+                                {form.getFieldValue("description") || "No description configured yet."}
+                            </p>
+                        </div>
                     </div>
-                </div>
-            </ConfigProvider>
+                </Card>
+            </div>
         );
     }
 
     return (
-        <ConfigProvider theme={darkTheme}>
-            <div className="min-h-screen w-full bg-[#080b11] text-slate-100 font-sans selection:bg-blue-600 selection:text-white py-12 px-4 sm:px-6 lg:px-8">
-
-                <div className="max-w-4xl mx-auto">
-                    {/* Return Navigation */}
-                    {user?.isProfileCompleted && (
-                        <div className="mb-6 flex items-center justify-between">
-                            <Button 
-                                type="text" 
-                                icon={<ArrowLeftOutlined />} 
-                                onClick={() => navigate("/dashboard")}
-                                className="text-slate-400 hover:text-white flex items-center p-0 h-auto"
-                            >
-                                Back to Dashboard
-                            </Button>
-                        </div>
-                    )}
-
-                    {/* Header */}
-                    <div className="text-center mb-10">
-                        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-600/10 border border-blue-500/20 mb-4">
-                            <TrophyOutlined className="text-xs text-blue-400" />
-                            <span className="text-[10px] font-bold tracking-wider text-blue-400 uppercase">ORGANIZATION REGISTRY PORTAL</span>
-                        </div>
-                        <h1 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
-                            {user?.isProfileCompleted ? "Edit Your Organization Profile" : "Complete Your Organization Profile"}
-                        </h1>
-                        <p className="mt-3 text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                            {user?.isProfileCompleted 
-                                ? "Update your organization name, description, location details, branding logo and official website below."
-                                : "Set up your organization to create teams, manage tournaments, organize matches, and track athlete development."
-                            }
-                        </p>
-                    </div>
-
-                    {/* Form Card Container */}
-                    <div className="bg-[#0f172a]/40 border border-white/[0.04] p-6 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-md relative">
-                        {pageLoading && (
-                            <div className="absolute inset-0 bg-[#080b11]/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-2xl">
-                                <span className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4" />
-                                <p className="text-xs text-slate-400 font-semibold">Loading organization data...</p>
-                            </div>
-                        )}
-                        <Form
-                            form={form}
-                            layout="vertical"
-                            onFinish={handleFormSubmit}
-                            requiredMark={false}
-                        >
-                            {/* Responsive two-column layout */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-
-                                {/* Column 1: Organization details & Branding */}
-                                <div className="space-y-6">
-                                    {/* Section 1 Header */}
-                                    <div className="border-b border-white/[0.04] pb-2 flex items-center space-x-2">
-                                        <TrophyOutlined className="text-blue-500 text-base" />
-                                        <h2 className="text-base font-bold text-white tracking-wide uppercase">1. Organization Information</h2>
-                                    </div>
-
-                                    {/* Organization Name */}
-                                    <Form.Item
-                                        name="organizationName"
-                                        label={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Organization Name</span>}
-                                        rules={[
-                                            { required: true, message: "Organization name is required" },
-                                            { min: 2, message: "Name must be at least 2 characters" }
-                                        ]}
-                                    >
-                                        <Input placeholder="E.g. Apex Football Academy, Golden Bat Association" />
-                                    </Form.Item>
-
-                                    {/* Description */}
-                                    <Form.Item
-                                        name="description"
-                                        label={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Description</span>}
-                                        rules={[
-                                            { required: true, message: "A brief description of your organization is required" },
-                                            { min: 10, message: "Description must be at least 10 characters" }
-                                        ]}
-                                    >
-                                        <TextArea
-                                            rows={5}
-                                            placeholder="Tell us about your organization's mission, sports offered, facilities, or history."
-                                            className="w-full"
-                                        />
-                                    </Form.Item>
-
-                                    {/* Section 2 Header */}
-                                    <div className="border-b border-white/[0.04] pb-2 flex items-center space-x-2 pt-2">
-                                        <PictureOutlined className="text-blue-500 text-base" />
-                                        <h2 className="text-base font-bold text-white tracking-wide uppercase">2. Branding</h2>
-                                    </div>
-
-                                    {/* Logo URL */}
-                                    <Form.Item
-                                        name="logo"
-                                        label={
-                                            <div className="flex items-center space-x-1.5">
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Logo Image URL</span>
-                                                <span className="text-[9px] text-slate-500 font-semibold uppercase tracking-wide">(Optional)</span>
-                                            </div>
-                                        }
-                                        rules={[{ type: "url", message: "Please enter a valid image URL" }]}
-                                    >
-                                        <Input placeholder="E.g. https://domain.com/logo.png" />
-                                    </Form.Item>
-                                </div>
-
-                                {/* Column 2: Location & Online Presence */}
-                                <div className="space-y-6">
-                                    {/* Section 3 Header */}
-                                    <div className="border-b border-white/[0.04] pb-2 flex items-center space-x-2">
-                                        <GlobalOutlined className="text-blue-500 text-base" />
-                                        <h2 className="text-base font-bold text-white tracking-wide uppercase">3. Location</h2>
-                                    </div>
-
-                                    {/* Country */}
-                                    <Form.Item
-                                        name="country"
-                                        label={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Country</span>}
-                                        rules={[{ required: true, message: "Country is required" }]}
-                                    >
-                                        <Select 
-                                            showSearch 
-                                            placeholder="Search and select country"
-                                            optionFilterProp="children"
-                                            filterOption={(input, option) =>
-                                                (option?.value ?? "").toLowerCase().includes(input.toLowerCase())
-                                            }
-                                        >
-                                            {COUNTRIES.map((c) => (
-                                                <Select.Option key={c} value={c}>{c}</Select.Option>
-                                            ))}
-                                        </Select>
-                                    </Form.Item>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {/* City */}
-                                        <Form.Item
-                                            name="city"
-                                            label={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">City</span>}
-                                            rules={[{ required: true, message: "City is required" }]}
-                                        >
-                                            <Input placeholder="E.g. London" />
-                                        </Form.Item>
-
-                                        {/* State */}
-                                        <Form.Item
-                                            name="state"
-                                            label={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">State</span>}
-                                            rules={[{ required: true, message: "State is required" }]}
-                                        >
-                                            <Input placeholder="E.g. England" />
-                                        </Form.Item>
-                                    </div>
-
-                                    {/* Section 4 Header */}
-                                    <div className="border-b border-white/[0.04] pb-2 flex items-center space-x-2 pt-2">
-                                        <LinkOutlined className="text-blue-500 text-base" />
-                                        <h2 className="text-base font-bold text-white tracking-wide uppercase">4. Online Presence</h2>
-                                    </div>
-
-                                    {/* Website */}
-                                    <Form.Item
-                                        name="website"
-                                        label={
-                                            <div className="flex items-center space-x-1.5">
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Official Website</span>
-                                                <span className="text-[9px] text-slate-500 font-semibold uppercase tracking-wide">(Optional)</span>
-                                            </div>
-                                        }
-                                        rules={[{ type: "url", message: "Please enter a valid URL (E.g. https://domain.com)" }]}
-                                    >
-                                        <Input placeholder="E.g. https://apexacademy.com" />
-                                    </Form.Item>
-                                </div>
-
-                            </div>
-
-                            {/* Form Actions Footer */}
-                            <div className="mt-8 pt-6 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-end gap-4">
-                                {user?.isProfileCompleted ? (
-                                    <Button
-                                        onClick={() => setIsEditing(false)}
-                                        className="w-full sm:w-auto border border-white/[0.08] hover:border-white/[0.16] bg-white/[0.02] text-slate-300 font-semibold hover:text-white"
-                                    >
-                                        Cancel
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        onClick={handleSaveDraft}
-                                        loading={draftLoading}
-                                        className="w-full sm:w-auto border border-white/[0.08] hover:border-white/[0.16] bg-white/[0.02] text-slate-300 font-semibold hover:text-white"
-                                    >
-                                        Save Draft
-                                    </Button>
-                                )}
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    loading={loading}
-                                    icon={!loading && <CheckOutlined />}
-                                    className="w-full sm:w-auto uppercase tracking-wider shadow-lg shadow-blue-600/20"
-                                >
-                                    {loading 
-                                        ? (user?.isProfileCompleted ? "Updating Profile..." : "Completing Profile...") 
-                                        : (user?.isProfileCompleted ? "Update Profile" : "Complete Profile")
-                                    }
-                                </Button>
-                            </div>
-                        </Form>
-                    </div>
-
+        <div className="max-w-4xl w-full mx-auto space-y-6 animate-fadeIn">
+            {/* Return Navigation */}
+            {user?.isProfileCompleted && (
+                <div className="flex items-center justify-between border-b border-border-subtle pb-4">
+                    <Button 
+                        type="text" 
+                        icon={<ArrowLeftOutlined className="text-xs" />} 
+                        onClick={() => navigate("/dashboard")}
+                        className="text-text-secondary hover:text-text-primary flex items-center p-0 h-auto cursor-pointer"
+                    >
+                        Back to Dashboard
+                    </Button>
                 </div>
+            )}
+
+            {/* Header */}
+            <div className="text-center space-y-3 py-4">
+                <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-brand-primary/10 border border-brand-primary/15">
+                    <TrophyOutlined className="text-xs text-brand-primary" />
+                    <span className="text-[10px] font-bold tracking-wider text-brand-primary uppercase">ORGANIZATION REGISTRY PORTAL</span>
+                </div>
+                <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+                    {user?.isProfileCompleted ? "Edit Your Organization Profile" : "Complete Your Organization Profile"}
+                </h1>
+                <p className="text-xs text-text-secondary max-w-xl mx-auto leading-relaxed">
+                    {user?.isProfileCompleted 
+                        ? "Update your organization name, description, location details, branding logo and official website below."
+                        : "Set up your organization to create teams, manage tournaments, organize matches, and track athlete development."
+                    }
+                </p>
             </div>
-        </ConfigProvider>
+
+            {/* Form Card Container */}
+            <div className="bg-bg-surface border border-border-subtle p-6 sm:p-8 rounded-xl shadow-sm relative">
+                {pageLoading && (
+                    <div className="absolute inset-0 bg-bg-base/75 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl">
+                        <span className="animate-spin h-8 w-8 border-4 border-brand-primary border-t-transparent rounded-full mb-4" />
+                        <p className="text-xs text-text-secondary font-semibold">Loading organization data...</p>
+                    </div>
+                )}
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={handleFormSubmit}
+                    requiredMark={false}
+                >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                        {/* Column 1: Organization details & Branding */}
+                        <div className="space-y-5">
+                            <div className="border-b border-border-subtle pb-2 flex items-center space-x-2">
+                                <TrophyOutlined className="text-brand-primary text-xs" />
+                                <h2 className="text-xs font-bold text-text-primary uppercase tracking-wider">1. Organization Information</h2>
+                            </div>
+
+                            <Form.Item
+                                name="organizationName"
+                                label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Organization Name</span>}
+                                rules={[
+                                    { required: true, message: "Organization name is required" },
+                                    { min: 2, message: "Name must be at least 2 characters" }
+                                ]}
+                            >
+                                <Input placeholder="E.g. Apex Football Academy, Golden Bat Association" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="description"
+                                label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Description</span>}
+                                rules={[
+                                    { required: true, message: "A brief description of your organization is required" },
+                                    { min: 10, message: "Description must be at least 10 characters" }
+                                ]}
+                            >
+                                <TextArea
+                                    rows={5}
+                                    placeholder="Tell us about your organization's mission, sports offered, facilities, or history."
+                                    className="w-full rounded-lg"
+                                />
+                            </Form.Item>
+
+                            <div className="border-b border-border-subtle pb-2 flex items-center space-x-2 pt-2">
+                                <PictureOutlined className="text-brand-primary text-xs" />
+                                <h2 className="text-xs font-bold text-text-primary uppercase tracking-wider">2. Branding</h2>
+                            </div>
+
+                            <Form.Item
+                                name="logo"
+                                label={
+                                    <div className="flex items-center space-x-1">
+                                        <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Logo Image URL</span>
+                                        <span className="text-[9px] text-text-secondary/50 font-semibold uppercase tracking-wide">(Optional)</span>
+                                    </div>
+                                }
+                                rules={[{ type: "url", message: "Please enter a valid image URL" }]}
+                            >
+                                <Input placeholder="E.g. https://domain.com/logo.png" prefix={<PictureOutlined className="text-text-secondary mr-1" />} />
+                            </Form.Item>
+                        </div>
+
+                        {/* Column 2: Location & Online Presence */}
+                        <div className="space-y-5">
+                            <div className="border-b border-border-subtle pb-2 flex items-center space-x-2">
+                                <GlobalOutlined className="text-brand-primary text-xs" />
+                                <h2 className="text-xs font-bold text-text-primary uppercase tracking-wider">3. Location</h2>
+                            </div>
+
+                            <Form.Item
+                                name="country"
+                                label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Country</span>}
+                                rules={[{ required: true, message: "Country is required" }]}
+                            >
+                                <Select 
+                                    showSearch 
+                                    placeholder="Search and select country"
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) =>
+                                        (option?.value ?? "").toLowerCase().includes(input.toLowerCase())
+                                    }
+                                >
+                                    {COUNTRIES.map((c) => (
+                                        <Select.Option key={c} value={c}>{c}</Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <Form.Item
+                                    name="city"
+                                    label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">City</span>}
+                                    rules={[{ required: true, message: "City is required" }]}
+                                >
+                                    <Input placeholder="E.g. London" />
+                                </Form.Item>
+
+                                <Form.Item
+                                    name="state"
+                                    label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">State</span>}
+                                    rules={[{ required: true, message: "State is required" }]}
+                                >
+                                    <Input placeholder="E.g. England" />
+                                </Form.Item>
+                            </div>
+
+                            <div className="border-b border-border-subtle pb-2 flex items-center space-x-2 pt-2">
+                                <LinkOutlined className="text-brand-primary text-xs" />
+                                <h2 className="text-xs font-bold text-text-primary uppercase tracking-wider">4. Online Presence</h2>
+                            </div>
+
+                            <Form.Item
+                                name="website"
+                                label={
+                                    <div className="flex items-center space-x-1">
+                                        <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Official Website</span>
+                                        <span className="text-[9px] text-text-secondary/50 font-semibold uppercase tracking-wide">(Optional)</span>
+                                    </div>
+                                }
+                                rules={[{ type: "url", message: "Please enter a valid URL (E.g. https://domain.com)" }]}
+                            >
+                                <Input placeholder="E.g. https://apexacademy.com" prefix={<LinkOutlined className="text-text-secondary mr-1" />} />
+                            </Form.Item>
+                        </div>
+
+                    </div>
+
+                    {/* Form Actions Footer */}
+                    <div className="mt-6 pt-5 border-t border-border-subtle flex flex-col sm:flex-row items-center justify-end gap-3">
+                        {user?.isProfileCompleted ? (
+                            <Button
+                                onClick={() => setIsEditing(false)}
+                                className="w-full sm:w-auto text-xs"
+                            >
+                                Cancel
+                            </Button>
+                        ) : (
+                            <Button
+                                onClick={handleSaveDraft}
+                                loading={draftLoading}
+                                className="w-full sm:w-auto text-xs"
+                            >
+                                Save Draft
+                            </Button>
+                        )}
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            loading={loading}
+                            icon={!loading && <CheckOutlined className="text-xs" />}
+                            className="w-full sm:w-auto font-semibold text-xs h-9 rounded-md cursor-pointer"
+                        >
+                            {loading 
+                                ? (user?.isProfileCompleted ? "Updating Profile..." : "Completing Profile...") 
+                                : (user?.isProfileCompleted ? "Update Profile" : "Complete Profile")
+                            }
+                        </Button>
+                    </div>
+                </Form>
+            </div>
+
+        </div>
     );
 }
 

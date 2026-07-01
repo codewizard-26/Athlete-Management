@@ -88,72 +88,73 @@ function TeamApplications() {
     const getStatusTag = (status) => {
         switch (status?.toLowerCase()) {
             case "accepted":
-                return <Tag color="success" className="m-0 border-0 font-bold text-[9px]">ACCEPTED</Tag>;
+                return <Tag color="success" className="m-0 border-0 font-semibold text-[9px] px-2 py-0.5 rounded">ACCEPTED</Tag>;
             case "rejected":
-                return <Tag color="error" className="m-0 border-0 font-bold text-[9px]">REJECTED</Tag>;
+                return <Tag color="error" className="m-0 border-0 font-semibold text-[9px] px-2 py-0.5 rounded">REJECTED</Tag>;
             default:
-                return <Tag color="warning" className="m-0 border-0 font-bold text-[9px]">PENDING</Tag>;
+                return <Tag color="warning" className="m-0 border-0 font-semibold text-[9px] px-2 py-0.5 rounded">PENDING</Tag>;
         }
     };
 
     const columns = [
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Athlete Name</span>,
+            title: "ATHLETE NAME",
             dataIndex: "athleteId",
             key: "athlete",
             render: (athlete) => (
                 <div className="flex items-center space-x-2.5">
-                    <Avatar size="small" icon={<UserOutlined />} className="bg-blue-600 shrink-0" />
+                    <Avatar size={24} icon={<UserOutlined />} className="bg-brand-primary shrink-0" />
                     <div>
-                        <span className="text-xs font-bold text-white block">{athlete?.userId?.name || "Athlete Candidate"}</span>
-                        <span className="text-[10px] text-slate-400 capitalize">{athlete?.gender} • DOB: {athlete?.dob ? new Date(athlete.dob).toLocaleDateString() : "N/A"}</span>
+                        <span className="text-xs font-semibold text-text-primary block">{athlete?.userId?.name || "Athlete Candidate"}</span>
+                        <span className="text-[10px] text-text-secondary capitalize">{athlete?.gender} • DOB: {athlete?.dob ? new Date(athlete.dob).toLocaleDateString() : "N/A"}</span>
                     </div>
                 </div>
             )
         },
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Sport Category</span>,
+            title: "SPORT CATEGORY",
             dataIndex: "athleteId",
             key: "sport",
             render: (athlete) => (
-                <Tag color={athlete?.sport?.toLowerCase() === "football" ? "blue" : "gold"} className="m-0 border-0 font-bold uppercase text-[9px]">
+                <Tag color={athlete?.sport?.toLowerCase() === "football" ? "blue" : "gold"} className="m-0 border-0 font-semibold uppercase text-[9px]">
                     {athlete?.sport || "N/A"}
                 </Tag>
             )
         },
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Primary Role</span>,
+            title: "PRIMARY ROLE",
             dataIndex: "athleteId",
             key: "role",
-            render: (athlete) => <span className="text-xs font-semibold text-slate-300 capitalize">{athlete?.primaryRole || "N/A"}</span>
+            render: (athlete) => <span className="text-xs font-medium text-text-secondary capitalize">{athlete?.primaryRole || "N/A"}</span>
         },
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Status</span>,
+            title: "STATUS",
             dataIndex: "status",
             key: "status",
             render: (status) => getStatusTag(status)
         },
         {
-            title: <span className="text-xs uppercase font-bold text-slate-400">Actions</span>,
+            title: "ACTIONS",
             key: "actions",
             render: (_, record) => {
-                if (record.status !== "pending") return <span className="text-[10px] text-slate-500 italic">Decision Made</span>;
+                if (record.status !== "pending") return <span className="text-xs text-text-secondary italic font-medium">Decision Made</span>;
                 return (
                     <div className="flex space-x-2">
                         <Button 
                             type="primary" 
                             size="small" 
-                            icon={<CheckOutlined />} 
+                            icon={<CheckOutlined className="text-xs" />} 
                             onClick={() => handleAction(record._id, "accept")}
                             loading={actionLoading[record._id]}
-                            className="bg-emerald-600 border-0 hover:bg-emerald-500"
+                            className="bg-status-success border-0 hover:bg-status-success/80 h-7 w-7 cursor-pointer flex items-center justify-center"
                         />
                         <Button 
                             danger 
                             size="small" 
-                            icon={<CloseOutlined />} 
+                            icon={<CloseOutlined className="text-xs" />} 
                             onClick={() => handleAction(record._id, "reject")}
                             loading={actionLoading[record._id]}
+                            className="h-7 w-7 cursor-pointer flex items-center justify-center"
                         />
                     </div>
                 );
@@ -164,26 +165,26 @@ function TeamApplications() {
     const currentDrive = drives.find(d => d._id === selectedDriveId);
 
     return (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+        <div className="space-y-6 animate-fadeIn">
             
             {/* Header / Nav */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border-subtle pb-4">
                 <div className="space-y-1">
                     <div className="flex items-center space-x-2">
                         {driveId && (
                             <Button 
                                 type="text" 
-                                icon={<ArrowLeftOutlined />} 
+                                icon={<ArrowLeftOutlined className="text-xs" />} 
                                 onClick={() => navigate("/team/recruitment")}
-                                className="text-slate-400 hover:text-white mr-1"
+                                className="text-text-secondary hover:text-text-primary mr-1 p-0 h-auto cursor-pointer"
                             />
                         )}
-                        <h1 className="text-2xl font-black text-white uppercase tracking-wider flex items-center space-x-2">
-                            <NotificationOutlined className="text-blue-500" />
+                        <h1 className="text-lg font-bold text-text-primary tracking-tight flex items-center space-x-2">
+                            <NotificationOutlined className="text-brand-primary" />
                             <span>Applicant Review</span>
                         </h1>
                     </div>
-                    <p className="text-xs text-slate-400">Evaluate trials performance, review bio metrics, and accept roster entries.</p>
+                    <p className="text-xs text-text-secondary">Evaluate trials performance, review bio metrics, and accept roster entries.</p>
                 </div>
 
                 {/* Drive Selector if direct access */}
@@ -205,24 +206,24 @@ function TeamApplications() {
 
             {/* Campaign Summary Sub-card */}
             {currentDrive && (
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0b0f19]/30 p-4">
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface p-4 rounded-xl shadow-sm">
                     <div className="flex flex-wrap items-center justify-between gap-4">
                         <div>
-                            <span className="text-[9px] text-slate-500 uppercase font-black tracking-wider block">Selected Campaign</span>
-                            <span className="text-xs font-bold text-white mt-1 block">{currentDrive.title}</span>
+                            <span className="text-[9px] text-text-secondary uppercase font-semibold tracking-wider block">Selected Campaign</span>
+                            <span className="text-xs font-bold text-text-primary mt-1 block">{currentDrive.title}</span>
                         </div>
-                        <div className="flex gap-6 text-[10px]">
+                        <div className="flex gap-6 text-xs">
                             <div>
-                                <span className="text-slate-500 font-bold block uppercase tracking-wider">Sport</span>
-                                <span className="text-slate-300 font-semibold block capitalize mt-0.5">{currentDrive.sport}</span>
+                                <span className="text-text-secondary font-semibold block uppercase tracking-wider text-[9px]">Sport</span>
+                                <span className="text-text-primary font-medium block capitalize mt-0.5">{currentDrive.sport}</span>
                             </div>
                             <div>
-                                <span className="text-slate-500 font-bold block uppercase tracking-wider">Bracket</span>
-                                <span className="text-slate-300 font-semibold block mt-0.5">{currentDrive.ageCategory}</span>
+                                <span className="text-text-secondary font-semibold block uppercase tracking-wider text-[9px]">Bracket</span>
+                                <span className="text-text-primary font-medium block mt-0.5">{currentDrive.ageCategory}</span>
                             </div>
                             <div>
-                                <span className="text-slate-500 font-bold block uppercase tracking-wider">Vacancies</span>
-                                <span className="text-blue-400 font-bold block mt-0.5">{currentDrive.vacancies} Left</span>
+                                <span className="text-text-secondary font-semibold block uppercase tracking-wider text-[9px]">Vacancies</span>
+                                <span className="text-brand-primary font-semibold block mt-0.5">{currentDrive.vacancies} Left</span>
                             </div>
                         </div>
                     </div>
@@ -231,20 +232,22 @@ function TeamApplications() {
 
             {/* Applicants Table */}
             {loadingApps ? (
-                <div className="py-16 flex justify-center"><Spin size="large" /></div>
+                <div className="py-16 flex justify-center"><Spin size="middle" /></div>
             ) : applications.length === 0 ? (
-                <Card bordered={false} className="border border-white/[0.04] bg-[#0f172a]/25 py-16 text-center">
-                    <Empty description={<span className="text-slate-400 text-xs">No applications submitted for this campaign yet.</span>} />
+                <Card bordered={false} className="border border-border-subtle bg-bg-surface py-16 text-center shadow-sm rounded-xl">
+                    <Empty description={<span className="text-text-secondary text-xs">No applications submitted for this campaign yet.</span>} />
                 </Card>
             ) : (
                 <Table 
                     columns={columns} 
                     dataSource={applications.map(a => ({ ...a, key: a._id }))} 
-                    className="custom-table border border-white/[0.04] bg-[#0f172a]/30 rounded-xl overflow-hidden shadow-md"
+                    className="custom-table border border-border-subtle bg-bg-surface rounded-xl overflow-hidden shadow-sm"
+                    pagination={{ pageSize: 8 }}
+                    size="small"
                 />
             )}
 
-        </main>
+        </div>
     );
 }
 

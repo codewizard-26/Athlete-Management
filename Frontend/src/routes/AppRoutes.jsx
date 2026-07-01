@@ -23,6 +23,7 @@ import MyTeams from "../features/athlete/pages/MyTeams";
 import AthleteRecruitmentDrives from "../features/athlete/pages/RecruitmentDrives";
 import MyApplications from "../features/athlete/pages/MyApplications";
 import AthletePerformance from "../features/athlete/pages/AthletePerformance";
+import AthleteSettings from "../features/athlete/pages/AthleteSettings";
 
 // Organization Pages & Layout
 import OrganizationLayout from "../layouts/OrganizationLayout";
@@ -33,6 +34,11 @@ import CreateTeam from "../features/organization/pages/CreateTeam";
 import TournamentManagement from "../features/organization/pages/TournamentManagement";
 import CreateTournament from "../features/organization/pages/CreateTournament";
 import MatchManagement from "../features/organization/pages/MatchManagement";
+import OrgRecruitmentList from "../features/organization/pages/OrgRecruitmentList";
+import OrgAnalytics from "../features/organization/pages/OrgAnalytics";
+import OrgSettings from "../features/organization/pages/OrgSettings";
+import PerformanceEntry from "../features/organization/pages/PerformanceEntry";
+import BulkPerformanceEntry from "../features/organization/pages/BulkPerformanceEntry";
 
 // Team Pages & Layout
 import TeamLayout from "../layouts/TeamLayout";
@@ -43,6 +49,7 @@ import TeamRecruitmentDrives from "../features/team/pages/RecruitmentDrives";
 import TeamApplications from "../features/team/pages/TeamApplications";
 import TeamRoster from "../features/team/pages/TeamRoster";
 import TeamPerformance from "../features/team/pages/TeamPerformance";
+import TeamSettings from "../features/team/pages/TeamSettings";
 
 // Dashboard Redirector Component (centralized role-based routing)
 const DashboardRedirector = () => {
@@ -144,6 +151,7 @@ function AppRoutes() {
                 <Route path="recruitment" element={<AthleteRecruitmentDrives />} />
                 <Route path="applications" element={<MyApplications />} />
                 <Route path="performance" element={<AthletePerformance />} />
+                <Route path="settings" element={<AthleteSettings />} />
             </Route>
 
             {/* Organization Role Routes */}
@@ -171,6 +179,11 @@ function AppRoutes() {
                 <Route path="tournaments" element={<TournamentManagement />} />
                 <Route path="tournaments/create" element={<CreateTournament />} />
                 <Route path="matches" element={<MatchManagement />} />
+                <Route path="recruitment" element={<OrgRecruitmentList />} />
+                <Route path="analytics" element={<OrgAnalytics />} />
+                <Route path="settings" element={<OrgSettings />} />
+                <Route path="performance/single" element={<PerformanceEntry />} />
+                <Route path="performance/bulk" element={<BulkPerformanceEntry />} />
             </Route>
 
             {/* Team Role Routes */}
@@ -190,6 +203,7 @@ function AppRoutes() {
                 <Route path="applications" element={<TeamApplications />} />
                 <Route path="roster" element={<TeamRoster />} />
                 <Route path="performance" element={<TeamPerformance />} />
+                <Route path="settings" element={<TeamSettings />} />
             </Route>
         </Routes>
     );
