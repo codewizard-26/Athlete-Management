@@ -1,7 +1,7 @@
 import express from 'express';
 import uploadMiddleware from '../../middleware/upload.middleware.js';
 import { uploadImageToCloudinary } from '../../utils/cloudinaryUpload.js';
-import { protect } from '../../middleware/auth.middleware.js';
+import authMiddleware from '../../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -10,7 +10,11 @@ const router = express.Router();
  * @desc Uploads a single image to Cloudinary and returns { url, public_id }
  * @access Private
  */
-router.post('/image', protect, uploadMiddleware.single('image'), async (req, res) => {
+router.post(
+    '/image',
+    authMiddleware,
+    uploadMiddleware.single('image'),
+    async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'No image file provided.' });
