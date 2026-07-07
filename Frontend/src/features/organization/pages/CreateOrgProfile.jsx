@@ -118,8 +118,8 @@ function CreateOrgProfile() {
                     </Button>
                 </div>
 
-                {/* Profile Card */}
-                <Card bordered={false} className="border border-border-subtle bg-bg-surface p-4 sm:p-6 shadow-sm rounded-xl">
+                {/* Profile Container */}
+                <div className="pt-2 sm:pt-4">
                     {/* Org Header */}
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-border-subtle pb-5">
                         <Avatar size={64} src={form.getFieldValue("logo") || undefined} icon={!form.getFieldValue("logo") && <TrophyOutlined />} className="bg-brand-primary rounded shadow-sm shrink-0" />
@@ -176,7 +176,7 @@ function CreateOrgProfile() {
                             </p>
                         </div>
                     </div>
-                </Card>
+                </div>
             </div>
         );
     }
@@ -214,8 +214,8 @@ function CreateOrgProfile() {
                 </p>
             </div>
 
-            {/* Form Card Container */}
-            <div className="bg-bg-surface border border-border-subtle p-6 sm:p-8 rounded-xl shadow-sm relative">
+            {/* Form Container */}
+            <div className="pt-2 sm:pt-4 relative">
                 {pageLoading && (
                     <div className="absolute inset-0 bg-bg-base/75 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl">
                         <span className="animate-spin h-8 w-8 border-4 border-brand-primary border-t-transparent rounded-full mb-4" />

@@ -49,6 +49,21 @@ const matchSchema = new mongoose.Schema(
     awayScore:{
         type:Number,
         default:0
+    },
+
+    winner:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Team"
+    },
+
+    hasReport:{
+        type:Boolean,
+        default:false
+    },
+
+    matchStats:{
+        type:mongoose.Schema.Types.Mixed,
+        default:{}
     }
 },
 {timestamps:true}

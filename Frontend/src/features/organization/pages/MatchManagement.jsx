@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Button, Table, Modal, Form, Input, Select, DatePicker, Tag, message, Spin, Empty, InputNumber } from "antd";
+import { Card, Button, Table, Modal, Form, Input, Select, DatePicker, Tag, message, Spin, Empty, InputNumber, Upload } from "antd";
 import { 
     CalendarOutlined, 
     EnvironmentOutlined, 
     PlusOutlined, 
     EditOutlined,
     CheckOutlined,
-    EyeOutlined
+    EyeOutlined,
+    CloudUploadOutlined
 } from "@ant-design/icons";
 import api from "../../../api/axios";
 
@@ -25,12 +26,11 @@ function MatchManagement() {
     const [createForm] = Form.useForm();
     const [createLoading, setCreateLoading] = useState(false);
 
-    // Score Modal
-    const [scoreModalOpen, setScoreModalOpen] = useState(false);
-    const [scoreForm] = Form.useForm();
-    const [selectedMatch, setSelectedMatch] = useState(null);
-    const [scoreLoading, setScoreLoading] = useState(false);
-    const [completeLoading, setCompleteLoading] = useState({});
+    // Bulk Upload Modal
+    const [bulkUploadModalOpen, setBulkUploadModalOpen] = useState(false);
+    const [bulkUploadForm] = Form.useForm();
+    const [bulkUploadLoading, setBulkUploadLoading] = useState(false);
+    const [fileList, setFileList] = useState([]);
 
     const fetchData = async () => {
         try {
@@ -78,42 +78,34 @@ function MatchManagement() {
         }
     };
 
-    const handleOpenScoreModal = (match) => {
-        setSelectedMatch(match);
-        scoreForm.setFieldsValue({
-            homeScore: match.homeScore || 0,
-            awayScore: match.awayScore || 0
-        });
-        setScoreModalOpen(true);
-    };
-
-    const handleUpdateScore = async (values) => {
-        if (!selectedMatch) return;
-        try {
-            setScoreLoading(true);
-            await api.put(`/match/score/${selectedMatch._id}`, values);
-            message.success("Score updated successfully!");
-            setScoreModalOpen(false);
-            fetchData();
-        } catch (err) {
-            console.error("Error updating score:", err);
-            message.error("Failed to update score");
-        } finally {
-            setScoreLoading(false);
+    const handleBulkUpload = async (values) => {
+        if (fileList.length === 0) {
+            message.warning("Please select a CSV file to upload.");
+            return;
         }
-    };
-
-    const handleCompleteMatch = async (matchId) => {
+        const formData = new FormData();
+        formData.append("file", fileList[0].originFileObj || fileList[0]);
+        
         try {
-            setCompleteLoading(prev => ({ ...prev, [matchId]: true }));
-            await api.put(`/match/complete/${matchId}`);
-            message.success("Match marked as completed!");
+            setBulkUploadLoading(true);
+            const res = await api.post(`/tournament/${values.tournamentId}/upload-schedule`, formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+            
+            message.success(`Successfully scheduled ${res.data.createdMatches?.length || 0} matches.`);
+            if (res.data.errors?.length > 0) {
+                 message.warning(`${res.data.errors.length} rows could not be parsed or matched.`);
+            }
+            
+            setBulkUploadModalOpen(false);
+            bulkUploadForm.resetFields();
+            setFileList([]);
             fetchData();
         } catch (err) {
-            console.error("Error completing match:", err);
-            message.error("Failed to complete match");
+            console.error("Upload error:", err);
+            message.error(err.response?.data?.message || "Failed to upload bulk matches.");
         } finally {
-            setCompleteLoading(prev => ({ ...prev, [matchId]: false }));
+            setBulkUploadLoading(false);
         }
     };
 
@@ -174,27 +166,24 @@ function MatchManagement() {
                     >
                         View
                     </Button>
-                    {record.status !== "completed" && (
-                        <>
-                            <Button 
-                                size="small"
-                                icon={<EditOutlined className="text-xs" />}
-                                onClick={() => handleOpenScoreModal(record)}
-                                className="text-xs h-7 hover:border-brand-primary hover:text-brand-primary cursor-pointer"
-                            >
-                                Score
-                            </Button>
-                            <Button 
-                                type="primary"
-                                size="small"
-                                icon={<CheckOutlined className="text-xs" />}
-                                onClick={() => handleCompleteMatch(record._id)}
-                                loading={completeLoading[record._id]}
-                                className="bg-status-success border-0 hover:bg-status-success/80 text-xs h-7 cursor-pointer"
-                            >
-                                End
-                            </Button>
-                        </>
+                    {record.hasReport ? (
+                        <Button 
+                            type="primary"
+                            size="small"
+                            onClick={() => navigate(`/match/${record._id}/report`)}
+                            className="text-xs h-7 cursor-pointer bg-brand-primary"
+                        >
+                            View Report
+                        </Button>
+                    ) : (
+                        <Button 
+                            type="primary"
+                            size="small"
+                            onClick={() => navigate(`/match/${record._id}/report`)}
+                            className="text-xs h-7 cursor-pointer bg-status-success hover:bg-status-success/80 border-0"
+                        >
+                            Match Report
+                        </Button>
                     )}
                 </div>
             )
@@ -213,14 +202,23 @@ function MatchManagement() {
                     </h1>
                     <p className="text-xs text-text-secondary mt-0.5">Organize match events, update live scores, and complete scheduled fixtures.</p>
                 </div>
-                <Button 
-                    type="primary" 
-                    icon={<PlusOutlined className="text-xs" />} 
-                    onClick={() => setCreateModalOpen(true)}
-                    className="text-xs font-semibold h-9 rounded-md cursor-pointer"
-                >
-                    Schedule Match
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button 
+                        icon={<CloudUploadOutlined className="text-xs" />} 
+                        onClick={() => setBulkUploadModalOpen(true)}
+                        className="text-xs font-semibold h-9 rounded-md cursor-pointer"
+                    >
+                        Bulk Upload
+                    </Button>
+                    <Button 
+                        type="primary" 
+                        icon={<PlusOutlined className="text-xs" />} 
+                        onClick={() => setCreateModalOpen(true)}
+                        className="text-xs font-semibold h-9 rounded-md cursor-pointer"
+                    >
+                        Schedule Match
+                    </Button>
+                </div>
             </div>
 
             {/* Content List */}
@@ -331,43 +329,72 @@ function MatchManagement() {
                 </Form>
             </Modal>
 
-            {/* UPDATE SCORE MODAL */}
+            {/* BULK UPLOAD MODAL */}
             <Modal
-                title={<span className="text-xs font-bold uppercase text-text-primary tracking-wider">Update Match Score</span>}
-                open={scoreModalOpen}
-                onCancel={() => setScoreModalOpen(false)}
+                title={<span className="text-xs font-bold uppercase text-text-primary tracking-wider">Bulk Upload Match Schedule</span>}
+                open={bulkUploadModalOpen}
+                onCancel={() => {
+                    setBulkUploadModalOpen(false);
+                    setFileList([]);
+                    bulkUploadForm.resetFields();
+                }}
                 footer={null}
-                width={400}
+                width={500}
                 centered
             >
                 <Form
-                    form={scoreForm}
+                    form={bulkUploadForm}
                     layout="vertical"
-                    onFinish={handleUpdateScore}
+                    onFinish={handleBulkUpload}
                     requiredMark={false}
                     className="mt-4"
                 >
-                    <div className="grid grid-cols-2 gap-4 py-2">
-                        <Form.Item
-                            name="homeScore"
-                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{selectedMatch?.homeTeamId?.teamName || "Home"} Score</span>}
-                            rules={[{ required: true, message: "Score is required" }]}
-                        >
-                            <InputNumber min={0} className="w-full" />
-                        </Form.Item>
+                    <p className="text-xs text-text-secondary mb-4">
+                        Upload a CSV file to automatically schedule matches for a specific tournament. The CSV should have columns: <strong>homeTeam</strong>, <strong>awayTeam</strong>, <strong>matchDate</strong> (YYYY-MM-DD HH:mm), and <strong>venue</strong>.
+                    </p>
 
-                        <Form.Item
-                            name="awayScore"
-                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{selectedMatch?.awayTeamId?.teamName || "Away"} Score</span>}
-                            rules={[{ required: true, message: "Score is required" }]}
+                    <Form.Item
+                        name="tournamentId"
+                        label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Target Tournament</span>}
+                        rules={[{ required: true, message: "Please select a tournament for the matches" }]}
+                    >
+                        <Select placeholder="Select tournament championship">
+                            {tournaments.map(t => (
+                                <Option key={t._id} value={t._id}>{t.name}</Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+
+                    <Form.Item
+                        label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Schedule CSV File</span>}
+                        required
+                    >
+                        <Upload.Dragger
+                            accept=".csv"
+                            maxCount={1}
+                            fileList={fileList}
+                            beforeUpload={(file) => {
+                                setFileList([file]);
+                                return false; // Prevent auto upload
+                            }}
+                            onRemove={() => setFileList([])}
+                            className="bg-bg-surface/50 border-border-subtle hover:border-brand-primary/50 transition-colors"
                         >
-                            <InputNumber min={0} className="w-full" />
-                        </Form.Item>
-                    </div>
+                            <p className="ant-upload-drag-icon text-brand-primary/80">
+                                <CloudUploadOutlined />
+                            </p>
+                            <p className="text-xs font-semibold text-text-primary">Click or drag CSV file to this area to upload</p>
+                            <p className="text-[10px] text-text-secondary mt-1">Strictly accepts .csv templates</p>
+                        </Upload.Dragger>
+                    </Form.Item>
 
                     <div className="pt-4 border-t border-border-subtle flex justify-end space-x-2">
-                        <Button onClick={() => setScoreModalOpen(false)} className="text-xs">Cancel</Button>
-                        <Button type="primary" htmlType="submit" loading={scoreLoading} className="text-xs font-semibold h-9 rounded-md">Update Score</Button>
+                        <Button onClick={() => {
+                            setBulkUploadModalOpen(false);
+                            setFileList([]);
+                            bulkUploadForm.resetFields();
+                        }} className="text-xs">Cancel</Button>
+                        <Button type="primary" htmlType="submit" loading={bulkUploadLoading} disabled={fileList.length === 0} className="text-xs font-semibold h-9 rounded-md">Upload & Schedule</Button>
                     </div>
                 </Form>
             </Modal>

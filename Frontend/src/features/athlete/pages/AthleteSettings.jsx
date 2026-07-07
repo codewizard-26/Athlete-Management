@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Select, DatePicker, InputNumber, Button, Card, message, Tabs } from "antd";
+import { Form, Input, Select, DatePicker, InputNumber, Button, Card, message, Tabs, Spin } from "antd";
 import { SettingOutlined, TrophyOutlined, GlobalOutlined, CheckOutlined, CalendarOutlined } from "@ant-design/icons";
 import api from "../../../api/axios";
 import { COUNTRIES } from "../../../utils/countries";
@@ -232,7 +232,7 @@ function AthleteSettings() {
             {pageLoading ? (
                 <div className="py-16 flex justify-center"><Spin size="middle" /></div>
             ) : (
-                <Card bordered={false} className="border border-border-subtle bg-bg-surface p-2 sm:p-4 shadow-sm rounded-xl">
+                <Card bordered={false} className="premium-card p-2 sm:p-4">
                     <Tabs defaultActiveKey="profile" items={tabItems} className="custom-tabs" />
                 </Card>
             )}

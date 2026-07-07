@@ -145,7 +145,7 @@ function TeamLayout() {
 
     return (
         <ConfigProvider theme={antdTheme}>
-            <div className="h-screen w-full bg-bg-base text-text-primary font-sans flex overflow-hidden">
+            <div className="h-screen w-full bg-transparent text-text-primary font-sans flex overflow-hidden">
                 
                 {/* Left Sidebar Navigation */}
                 <aside className={`${collapsed ? "w-16" : "w-60"} bg-bg-surface border-r border-border-subtle hidden md:flex flex-col shrink-0 transition-all duration-200`}>
@@ -221,7 +221,7 @@ function TeamLayout() {
                                 type="text"
                                 icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                                 onClick={() => setCollapsed(!collapsed)}
-                                className="hidden md:inline-flex text-text-secondary hover:text-text-primary"
+                                className="!hidden md:!inline-flex text-text-secondary hover:text-text-primary"
                             />
                             
                             <div className="flex items-center space-x-2 md:hidden">

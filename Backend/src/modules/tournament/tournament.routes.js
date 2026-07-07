@@ -5,6 +5,12 @@ import Tournament from "./tournament.model.js";
 import TournamentRegistration from "./tournamentRegistration.model.js";
 import Organization from "../organization/organization.model.js";
 import Team from "../team/team.model.js";
+import Match from "../match/match.model.js";
+import multer from "multer";
+import csvParser from "csv-parser";
+import fs from "fs";
+
+const upload = multer({ dest: "uploads/" });
 const router = express.Router()
 router.post(
     "/create",
@@ -324,5 +330,65 @@ router.get(
         }
     }
 );
+
+router.post("/:tournamentId/upload-schedule", authMiddleware, roleMiddleware("organization"), upload.single("file"), async (req, res) => {
+    try {
+        const { tournamentId } = req.params;
+        const tournament = await Tournament.findById(tournamentId);
+        if (!tournament) return res.status(404).json({ message: "Tournament not found" });
+
+        if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
+        const results = [];
+        fs.createReadStream(req.file.path)
+            .pipe(csvParser())
+            .on("data", (data) => results.push(data))
+            .on("end", async () => {
+                fs.unlinkSync(req.file.path);
+
+                const createdMatches = [];
+                const errors = [];
+
+                for (const row of results) {
+                    const homeTeamName = row.homeTeam || row.HomeTeam || row["Home Team"];
+                    const awayTeamName = row.awayTeam || row.AwayTeam || row["Away Team"];
+                    const matchDate = row.matchDate || row.Date || row.date;
+                    const venue = row.venue || row.Venue || row.Location;
+
+                    if (!homeTeamName || !awayTeamName || !matchDate || !venue) {
+                        errors.push({ row, reason: "Missing required columns (homeTeam, awayTeam, matchDate, venue)" });
+                        continue;
+                    }
+
+                    const homeTeam = await Team.findOne({ teamName: new RegExp('^' + homeTeamName.trim() + '$', "i") });
+                    const awayTeam = await Team.findOne({ teamName: new RegExp('^' + awayTeamName.trim() + '$', "i") });
+
+                    if (!homeTeam) {
+                        errors.push({ row, reason: `Home team '${homeTeamName}' not found` });
+                        continue;
+                    }
+                    if (!awayTeam) {
+                        errors.push({ row, reason: `Away team '${awayTeamName}' not found` });
+                        continue;
+                    }
+
+                    const match = await Match.create({
+                        tournamentId,
+                        homeTeamId: homeTeam._id,
+                        awayTeamId: awayTeam._id,
+                        matchDate: new Date(matchDate),
+                        venue: venue.trim(),
+                        status: "scheduled"
+                    });
+                    
+                    createdMatches.push(match);
+                }
+
+                return res.status(200).json({ message: `Successfully created ${createdMatches.length} matches`, errors, createdMatches });
+            });
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
 
 export default router

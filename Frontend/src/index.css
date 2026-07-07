@@ -189,8 +189,7 @@ body::after {
   transform: translateY(-2px);
 }
 
-/* Apply backdrop-blur globally to sidebars, headers, modals, drawers, and select dropdowns */
-aside, 
+/* Apply backdrop-blur globally to headers, modals, drawers, and select dropdowns */
 header, 
 .ant-modal-content, 
 .ant-drawer-content,
@@ -199,6 +198,13 @@ header,
   -webkit-backdrop-filter: blur(20px) !important;
   background-color: var(--color-bg-surface) !important;
   border-color: var(--color-border-glass) !important;
+}
+
+aside {
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  background: linear-gradient(135deg, rgba(var(--color-bg-surface-rgb), 0.3) 0%, rgba(255, 255, 255, 0.06) 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Tables */
@@ -295,7 +301,6 @@ input,
 select, 
 textarea {
   background-color: rgba(var(--color-bg-surface-rgb), 0.25) !important;
-  backdrop-filter: blur(4px);
   border: 1px solid var(--color-border-subtle) !important;
   color: var(--color-text-primary) !important;
   border-radius: 8px !important;
@@ -335,10 +340,9 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active,
 .ant-input:-webkit-autofill,
 .ant-input-affix-wrapper input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 1000px rgba(var(--color-bg-surface-rgb), 0.3) inset !important;
+  transition: background-color 5000s ease-in-out 0s !important;
   -webkit-text-fill-color: var(--color-text-primary) !important;
-  transition: background-color 5000s ease-in-out 0s;
-  border: 1px solid var(--color-border-subtle) !important;
+  background-color: transparent !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -355,9 +359,64 @@ input:-webkit-autofill:active,
   }
 }
 
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+.animate-slideUp {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+/* Stagger Utilities */
+.stagger-1 { animation-delay: 100ms; }
+.stagger-2 { animation-delay: 200ms; }
+.stagger-3 { animation-delay: 300ms; }
+.stagger-4 { animation-delay: 400ms; }
+.stagger-5 { animation-delay: 500ms; }
 
 /* Ensure menu items in sidebar animate nicely */
 .ant-menu-item {

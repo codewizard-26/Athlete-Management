@@ -69,8 +69,8 @@ function TeamProfile() {
                     </Button>
                 </div>
 
-                {/* Profile Card */}
-                <Card bordered={false} className="border border-border-subtle bg-bg-surface p-4 sm:p-6 shadow-sm rounded-xl">
+                {/* Profile Container */}
+                <div className="border border-border-subtle bg-bg-surface p-4 sm:p-6 shadow-sm rounded-xl">
                     
                     {/* Team Identity Banner */}
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-border-subtle pb-5">
@@ -132,7 +132,7 @@ function TeamProfile() {
                             </p>
                         </div>
                     </div>
-                </Card>
+                </div>
             </div>
         );
     }
@@ -149,8 +149,8 @@ function TeamProfile() {
                 <p className="text-xs text-text-secondary mt-0.5">Modify team description and squad logos.</p>
             </div>
 
-            {/* Form Card */}
-            <Card bordered={false} className="border border-border-subtle bg-bg-surface p-2 sm:p-4 shadow-sm rounded-xl">
+            {/* Form Container */}
+            <div className="border border-border-subtle bg-bg-surface p-4 sm:p-6 shadow-sm rounded-xl">
                 <Form
                     form={form}
                     layout="vertical"
@@ -217,7 +217,7 @@ function TeamProfile() {
                         </Button>
                     </div>
                 </Form>
-            </Card>
+            </div>
         </div>
     );
 }

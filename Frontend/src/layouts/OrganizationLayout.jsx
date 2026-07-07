@@ -123,7 +123,7 @@ function OrganizationLayout() {
 
     return (
         <ConfigProvider theme={antdTheme}>
-            <div className="h-screen w-full bg-bg-base text-text-primary font-sans flex overflow-hidden">
+            <div className="h-screen w-full bg-transparent text-text-primary font-sans flex overflow-hidden">
                 
                 {/* Left Sidebar Navigation */}
                 <aside className="w-60 bg-bg-surface border-r border-border-subtle hidden md:flex flex-col shrink-0">

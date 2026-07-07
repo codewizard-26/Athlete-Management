@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Form, Input, Select, DatePicker, InputNumber, Button, ConfigProvider, theme, message, Avatar, Badge } from "antd";
+import { Form, Input, Select, DatePicker, InputNumber, Button, ConfigProvider, theme, message, Avatar, Badge, Card } from "antd";
 import {
     UserOutlined,
     GlobalOutlined,
@@ -152,9 +152,8 @@ function CreateProfile() {
 
     if (!isEditing) {
         return (
-            <ConfigProvider theme={darkTheme}>
-                <div className="min-h-screen w-full bg-[#080b11] text-slate-100 font-sans selection:bg-blue-600 selection:text-white py-12 px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-4xl mx-auto space-y-6">
+            <div className="w-full">
+                <div className="max-w-4xl mx-auto space-y-6">
                         {/* Return to Dashboard */}
                         <div className="flex items-center justify-between">
                             <Button
@@ -262,15 +261,12 @@ function CreateProfile() {
                         </Card>
                     </div>
                 </div>
-            </ConfigProvider>
         );
     }
 
     return (
-        <ConfigProvider theme={darkTheme}>
-            <div className="min-h-screen w-full bg-[#080b11] text-slate-100 font-sans selection:bg-blue-600 selection:text-white py-12 px-4 sm:px-6 lg:px-8">
-
-                <div className="max-w-4xl mx-auto">
+        <div className="w-full">
+            <div className="max-w-4xl mx-auto">
                     {/* Return Navigation */}
                     {user?.isProfileCompleted && (
                         <div className="mb-6 flex items-center justify-between">
@@ -528,10 +524,8 @@ function CreateProfile() {
                             </div>
                         </Form>
                     </div>
-
-                </div>
             </div>
-        </ConfigProvider>
+        </div>
     );
 }
 

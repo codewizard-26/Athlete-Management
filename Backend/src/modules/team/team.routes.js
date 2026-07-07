@@ -7,7 +7,11 @@ import Athlete from "../athlete/athlete.model.js"
 import TeamMembership from "./teamMembership.model.js"
 import bcrypt from "bcryptjs";
 import User from "../user/user.model.js";
+import multer from "multer";
+import csvParser from "csv-parser";
+import fs from "fs";
 
+const upload = multer({ dest: "uploads/" });
 
 const router = express.Router()
 router.post("/create",authMiddleware,roleMiddleware("organization"),async(req,res)=>{
@@ -376,5 +380,100 @@ router.get(
         }
     }
 );
+
+router.post("/:teamId/upload-roster", authMiddleware, roleMiddleware("team"), upload.single("file"), async (req, res) => {
+    try {
+        const { teamId } = req.params;
+        const team = await Team.findById(teamId);
+        if (!team) {
+            return res.status(404).json({ message: "Team not found" });
+        }
+        
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+
+        const results = [];
+        fs.createReadStream(req.file.path)
+            .pipe(csvParser())
+            .on("data", (data) => results.push(data))
+            .on("end", async () => {
+                fs.unlinkSync(req.file.path);
+
+                const matches = [];
+                const unmatched = [];
+
+                for (const row of results) {
+                    const name = row.name || row.Name || row.NAME;
+                    const sport = row.sport || row.Sport || row.SPORT;
+                    
+                    if (!name) {
+                        unmatched.push({ rowData: row, reason: "Missing name column" });
+                        continue;
+                    }
+
+                    const user = await User.findOne({ name: new RegExp('^' + name.trim() + '$', "i"), role: "athlete" });
+                    
+                    if (user) {
+                        const athlete = await Athlete.findOne({ userId: user._id });
+                        if (athlete) {
+                            const existingMember = await TeamMembership.findOne({ teamId, athleteId: athlete._id });
+                            matches.push({
+                                rowData: row,
+                                athleteId: athlete._id,
+                                userId: user._id,
+                                name: user.name,
+                                sport: athlete.sport,
+                                primaryRole: athlete.primaryRole,
+                                alreadyInTeam: !!existingMember
+                            });
+                        } else {
+                            unmatched.push({ rowData: row, reason: "Athlete profile incomplete" });
+                        }
+                    } else {
+                        unmatched.push({ rowData: row, reason: "Unregistered or wrong name" });
+                    }
+                }
+
+                return res.status(200).json({ message: "CSV parsed", matches, unmatched });
+            });
+
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
+
+router.post("/:teamId/confirm-roster", authMiddleware, roleMiddleware("team"), async (req, res) => {
+    try {
+        const { teamId } = req.params;
+        const { athleteIds } = req.body;
+
+        const team = await Team.findById(teamId);
+        if (!team) return res.status(404).json({ message: "Team not found" });
+
+        let addedCount = 0;
+        for (const athleteId of athleteIds) {
+            const existing = await TeamMembership.findOne({ teamId, athleteId });
+            if (!existing) {
+                await TeamMembership.create({
+                    athleteId,
+                    teamId,
+                    status: "active",
+                    joinedAt: new Date()
+                });
+                addedCount++;
+            } else if (existing.status !== "active") {
+                existing.status = "active";
+                existing.joinedAt = new Date();
+                await existing.save();
+                addedCount++;
+            }
+        }
+        
+        return res.status(200).json({ message: `Successfully added ${addedCount} players` });
+    } catch(err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
 
 export default router

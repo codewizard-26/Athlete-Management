@@ -34,6 +34,7 @@ import CreateTeam from "../features/organization/pages/CreateTeam";
 import TournamentManagement from "../features/organization/pages/TournamentManagement";
 import CreateTournament from "../features/organization/pages/CreateTournament";
 import MatchManagement from "../features/organization/pages/MatchManagement";
+import MatchReportEntry from "../features/organization/pages/MatchReportEntry";
 import OrgRecruitmentList from "../features/organization/pages/OrgRecruitmentList";
 import OrgAnalytics from "../features/organization/pages/OrgAnalytics";
 import OrgSettings from "../features/organization/pages/OrgSettings";
@@ -126,14 +127,12 @@ function AppRoutes() {
                     </ProtectedRoute>
                 }
             />
-
-            {/* Athlete Role Routes */}
             <Route
-                path="/athlete/profile"
+                path="/match/:matchId/report"
                 element={
-                    <RoleProtectedRoute allowedRole="athlete">
-                        <CreateProfile />
-                    </RoleProtectedRoute>
+                    <ProtectedRoute>
+                        <MatchReportEntry />
+                    </ProtectedRoute>
                 }
             />
 
@@ -147,6 +146,7 @@ function AppRoutes() {
             >
                 <Route index element={<AthleteDashboard />} />
                 <Route path="dashboard" element={<AthleteDashboard />} />
+                <Route path="profile" element={<CreateProfile />} />
                 <Route path="teams" element={<MyTeams />} />
                 <Route path="recruitment" element={<AthleteRecruitmentDrives />} />
                 <Route path="applications" element={<MyApplications />} />
@@ -155,15 +155,6 @@ function AppRoutes() {
             </Route>
 
             {/* Organization Role Routes */}
-            <Route
-                path="/organization/profile"
-                element={
-                    <RoleProtectedRoute allowedRole="organization">
-                        <CreateOrgProfile />
-                    </RoleProtectedRoute>
-                }
-            />
-
             <Route
                 path="/organization"
                 element={
@@ -174,6 +165,7 @@ function AppRoutes() {
             >
                 <Route index element={<OrganizationDashboard />} />
                 <Route path="dashboard" element={<OrganizationDashboard />} />
+                <Route path="profile" element={<CreateOrgProfile />} />
                 <Route path="teams" element={<TeamsList />} />
                 <Route path="teams/create" element={<CreateTeam />} />
                 <Route path="tournaments" element={<TournamentManagement />} />

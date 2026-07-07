@@ -139,7 +139,7 @@ function TeamDashboard() {
     return (
         <div className="space-y-6 animate-fadeIn">
             {/* Welcome Banner */}
-            <div className="bg-bg-surface border border-border-subtle p-6 sm:p-8 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+            <div className="bg-bg-surface border border-border-subtle p-6 sm:p-8 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden animate-slideUp stagger-1">
                 <div className="space-y-1.5 relative z-10">
                     <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">
                         Welcome Back, {teamData?.teamName || "Coach"}
@@ -160,7 +160,7 @@ function TeamDashboard() {
             </div>
 
             {/* Statistics Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 animate-slideUp stagger-2">
                 <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                     <Statistic 
                         title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Active Players</span>}
@@ -199,16 +199,16 @@ function TeamDashboard() {
             </div>
 
             {/* Quick Actions */}
-            <div className="space-y-4">
+            <div className="space-y-4 animate-slideUp stagger-3">
                 <h2 className="text-xs font-bold text-text-secondary tracking-wider uppercase border-b border-border-subtle pb-2 flex items-center space-x-1.5">
                     <PlayCircleOutlined className="text-brand-primary text-xs" />
                     <span>Quick Actions</span>
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     {/* Action 1 */}
                     <div 
                         onClick={() => handleActionClick("Create Recruitment Drive")}
-                        className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
+                        className="p-3 sm:p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-2 sm:space-y-3 group"
                     >
                         <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
                             <NotificationOutlined className="text-sm text-brand-primary" />
@@ -225,7 +225,7 @@ function TeamDashboard() {
                     {/* Action 2 */}
                     <div 
                         onClick={() => handleActionClick("View Applications")}
-                        className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
+                        className="p-3 sm:p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-2 sm:space-y-3 group"
                     >
                         <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
                             <SolutionOutlined className="text-sm text-brand-primary" />
@@ -242,7 +242,7 @@ function TeamDashboard() {
                     {/* Action 3 */}
                     <div 
                         onClick={() => handleActionClick("Manage Roster")}
-                        className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
+                        className="p-3 sm:p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-2 sm:space-y-3 group"
                     >
                         <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
                             <TeamOutlined className="text-sm text-brand-primary" />
@@ -259,7 +259,7 @@ function TeamDashboard() {
                     {/* Action 4 */}
                     <div 
                         onClick={() => handleActionClick("View Team Performance")}
-                        className="p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-3 group"
+                        className="p-3 sm:p-4 bg-bg-surface border border-border-subtle rounded-xl hover:border-brand-primary/30 transition-all duration-150 shadow-sm cursor-pointer flex flex-col space-y-2 sm:space-y-3 group"
                     >
                         <div className="h-8 w-8 rounded bg-bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
                             <CalendarOutlined className="text-sm text-brand-secondary" />
@@ -275,7 +275,7 @@ function TeamDashboard() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 animate-slideUp stagger-4">
                 
                 {/* Team Info & Recent Activity */}
                 <div className="lg:col-span-2 space-y-6">

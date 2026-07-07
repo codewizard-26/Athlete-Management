@@ -123,7 +123,7 @@ function TeamSettings() {
                 </div>
             </div>
 
-            <Card bordered={false} className="border border-border-subtle bg-bg-surface p-2 sm:p-4 shadow-sm rounded-xl">
+            <Card bordered={false} className="premium-card p-2 sm:p-4">
                 <Tabs defaultActiveKey="profile" items={tabItems} className="custom-tabs" />
             </Card>
 

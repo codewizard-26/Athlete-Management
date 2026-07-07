@@ -103,7 +103,7 @@ function OrganizationDashboard() {
         <div className="space-y-6 animate-fadeIn">
             
             {/* Welcome Banner */}
-            <div className="bg-bg-surface border border-border-subtle p-6 sm:p-8 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+            <div className="bg-bg-surface border border-border-subtle p-6 sm:p-8 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden animate-slideUp stagger-1">
                 <div className="space-y-1.5 relative z-10">
                     <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">
                         Welcome back, {user?.name || "Organization Manager"}
@@ -125,7 +125,7 @@ function OrganizationDashboard() {
             </div>
 
             {/* Statistics Cards Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 animate-slideUp stagger-2">
                 <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                     <Statistic 
                         title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Teams Created</span>}
@@ -164,7 +164,7 @@ function OrganizationDashboard() {
             </div>
 
             {/* Quick Actions & Recent Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 animate-slideUp stagger-3">
                 
                 {/* Quick Actions */}
                 <div className="lg:col-span-2 space-y-4">
