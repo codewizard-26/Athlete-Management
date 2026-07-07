@@ -108,8 +108,8 @@ function TournamentDetails() {
             key: "team",
             render: (_, record) => (
                 <div className="flex items-center space-x-2.5">
-                    {record.logo ? (
-                        <img src={record.logo} alt="Logo" className="w-6 h-6 rounded object-cover border border-border-subtle" />
+                    {(record.logo?.url || (typeof record.logo === "string" && record.logo)) ? (
+                        <img src={.logo?.url || .logo} alt="Logo" className="w-6 h-6 rounded object-cover border border-border-subtle" />
                     ) : (
                         <Avatar size={24} icon={<TeamOutlined />} className="bg-brand-primary rounded" />
                     )}
@@ -233,8 +233,8 @@ function TournamentDetails() {
                         {approvedTeams.map(t => (
                             <Card key={t._id} bordered={false} className="border border-border-subtle bg-bg-surface rounded-xl shadow-sm p-4">
                                 <div className="flex items-center space-x-3">
-                                    {t.logo ? (
-                                        <img src={t.logo} alt="Logo" className="w-10 h-10 rounded object-cover border border-border-subtle" />
+                                    {(t.logo?.url || (typeof t.logo === "string" && t.logo)) ? (
+                                        <img src={.logo?.url || .logo} alt="Logo" className="w-10 h-10 rounded object-cover border border-border-subtle" />
                                     ) : (
                                         <Avatar size={40} icon={<TeamOutlined />} className="bg-brand-primary rounded" />
                                     )}

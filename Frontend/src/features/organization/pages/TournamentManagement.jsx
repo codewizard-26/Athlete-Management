@@ -186,8 +186,8 @@ function TournamentManagement() {
             key: "team",
             render: (team) => (
                 <div className="flex items-center space-x-2.5">
-                    {team?.logo ? (
-                        <img src={team.logo} alt="Logo" className="w-6 h-6 rounded object-cover border border-border-subtle" />
+                    {(team?.logo?.url || (typeof team?.logo === "string" && team?.logo)) ? (
+                        <img src={.logo?.url || .logo} alt="Logo" className="w-6 h-6 rounded object-cover border border-border-subtle" />
                     ) : (
                         <Avatar size={24} icon={<TeamOutlined />} className="bg-brand-primary rounded" />
                     )}

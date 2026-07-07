@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Card, message, Tabs, Select, Spin } from "antd";
-import { SettingOutlined, GlobalOutlined, LinkOutlined, PictureOutlined, TrophyOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Card, message, Tabs, Select, Spin, Upload } from "antd";
+import { SettingOutlined, GlobalOutlined, LinkOutlined, PictureOutlined, TrophyOutlined, UploadOutlined } from "@ant-design/icons";
 import api from "../../../api/axios";
+import { uploadImage } from "../../../api/uploadImage";
 import { COUNTRIES } from "../../../utils/countries";
 
 const { TextArea } = Input;
@@ -11,6 +12,7 @@ function OrgSettings() {
     const [loading, setLoading] = useState(false);
     const [, setProfile] = useState(null);
     const [pageLoading, setPageLoading] = useState(true);
+    const [fileList, setFileList] = useState([]);
 
     const fetchOrgProfile = async () => {
         try {
@@ -35,10 +37,16 @@ function OrgSettings() {
     const onFinish = async (values) => {
         try {
             setLoading(true);
+
+            let uploadedLogo = form.getFieldValue("logo");
+            if (fileList.length > 0) {
+                uploadedLogo = await uploadImage(fileList[0], "organization-logos");
+            }
+
             const payload = {
                 organizationName: values.organizationName.trim(),
                 description: values.description.trim(),
-                logo: values.logo ? values.logo.trim() : "",
+                logo: uploadedLogo,
                 city: values.city.trim(),
                 state: values.state.trim(),
                 country: values.country.trim(),
@@ -84,11 +92,25 @@ function OrgSettings() {
                             </Form.Item>
 
                             <Form.Item
-                                name="logo"
-                                label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Logo Image URL</span>}
-                                rules={[{ type: "url", message: "Please enter a valid image URL" }]}
+                                label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Logo Image</span>}
                             >
-                                <Input placeholder="E.g. https://domain.com/logo.png" prefix={<PictureOutlined className="text-text-secondary mr-1.5" />} />
+                                <Upload
+                                    beforeUpload={(file) => {
+                                        setFileList([file]);
+                                        return false;
+                                    }}
+                                    onRemove={() => setFileList([])}
+                                    fileList={fileList}
+                                    accept="image/*"
+                                    maxCount={1}
+                                >
+                                    <Button icon={<UploadOutlined className="text-xs" />} className="text-xs h-9">
+                                        Change Logo
+                                    </Button>
+                                </Upload>
+                                {form.getFieldValue("logo")?.url && (
+                                    <div className="mt-2 text-[10px] text-text-secondary">Current logo will be kept if no new image is selected.</div>
+                                )}
                             </Form.Item>
 
                             <Form.Item

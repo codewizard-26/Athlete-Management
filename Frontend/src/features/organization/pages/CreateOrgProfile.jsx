@@ -10,9 +10,11 @@ import {
     PictureOutlined,
     CheckOutlined,
     ArrowLeftOutlined,
-    EditOutlined
+    EditOutlined,
+    UploadOutlined
 } from "@ant-design/icons";
 import api from "../../../api/axios";
+import { uploadImage } from "../../../api/uploadImage";
 import { loginSuccess } from "../../auth/authSlice";
 import { COUNTRIES } from "../../../utils/countries";
 
@@ -27,6 +29,7 @@ function CreateOrgProfile() {
     const [pageLoading, setPageLoading] = useState(false);
     const [draftLoading, setDraftLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(!user?.isProfileCompleted);
+    const [fileList, setFileList] = useState([]);
 
     useEffect(() => {
         if (user?.isProfileCompleted) {
@@ -52,11 +55,16 @@ function CreateOrgProfile() {
         try {
             setLoading(true);
 
+            let uploadedLogo = isEditing && form.getFieldValue("logo"); // keep existing if not changed
+            if (fileList.length > 0) {
+                uploadedLogo = await uploadImage(fileList[0], "organization-logos");
+            }
+
             // Structure request body for the backend
             const payload = {
                 organizationName: values.organizationName.trim(),
                 description: values.description.trim(),
-                logo: values.logo ? values.logo.trim() : "",
+                logo: uploadedLogo,
                 city: values.city.trim(),
                 state: values.state.trim(),
                 country: values.country.trim(),
@@ -122,7 +130,7 @@ function CreateOrgProfile() {
                 <div className="pt-2 sm:pt-4">
                     {/* Org Header */}
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-border-subtle pb-5">
-                        <Avatar size={64} src={form.getFieldValue("logo") || undefined} icon={!form.getFieldValue("logo") && <TrophyOutlined />} className="bg-brand-primary rounded shadow-sm shrink-0" />
+                        <Avatar size={64} src={form.getFieldValue("logo")?.url || undefined} icon={!form.getFieldValue("logo")?.url && <TrophyOutlined />} className="bg-brand-primary rounded shadow-sm shrink-0" />
                         <div className="text-center sm:text-left space-y-2 min-w-0">
                             <h2 className="text-base font-bold text-text-primary leading-tight m-0">{form.getFieldValue("organizationName")}</h2>
                             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
@@ -269,16 +277,30 @@ function CreateOrgProfile() {
                             </div>
 
                             <Form.Item
-                                name="logo"
                                 label={
                                     <div className="flex items-center space-x-1">
-                                        <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Logo Image URL</span>
+                                        <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Logo Image</span>
                                         <span className="text-[9px] text-text-secondary/50 font-semibold uppercase tracking-wide">(Optional)</span>
                                     </div>
                                 }
-                                rules={[{ type: "url", message: "Please enter a valid image URL" }]}
                             >
-                                <Input placeholder="E.g. https://domain.com/logo.png" prefix={<PictureOutlined className="text-text-secondary mr-1" />} />
+                                <Upload
+                                    beforeUpload={(file) => {
+                                        setFileList([file]);
+                                        return false;
+                                    }}
+                                    onRemove={() => setFileList([])}
+                                    fileList={fileList}
+                                    accept="image/*"
+                                    maxCount={1}
+                                >
+                                    <Button icon={<UploadOutlined className="text-xs" />} className="text-xs h-9">
+                                        Select Image
+                                    </Button>
+                                </Upload>
+                                {isEditing && form.getFieldValue("logo")?.url && (
+                                    <div className="mt-2 text-[10px] text-text-secondary">Current logo will be kept if no new image is selected.</div>
+                                )}
                             </Form.Item>
                         </div>
 

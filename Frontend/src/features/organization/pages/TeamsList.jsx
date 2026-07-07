@@ -318,8 +318,8 @@ function TeamsList() {
                                 title={
                                     <div className="flex items-center space-x-3 py-1">
                                         <Avatar 
-                                            src={team.logo || undefined} 
-                                            icon={!team.logo && <TeamOutlined />} 
+                                            src={.logo?.url || .logo || undefined} 
+                                            icon={!(team.logo?.url || (typeof team.logo === "string" && team.logo)) && <TeamOutlined />} 
                                             className="bg-brand-primary/10 text-brand-primary border border-brand-primary/10 shrink-0 rounded" 
                                         />
                                         <div className="min-w-0">

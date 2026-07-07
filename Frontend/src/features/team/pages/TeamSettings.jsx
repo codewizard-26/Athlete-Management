@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Form, Input, Button, Card, message, Tabs } from "antd";
-import { SettingOutlined, TeamOutlined, CheckOutlined, InfoCircleOutlined, PictureOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Card, message, Tabs, Upload } from "antd";
+import { SettingOutlined, TeamOutlined, CheckOutlined, InfoCircleOutlined, PictureOutlined, UploadOutlined } from "@ant-design/icons";
 import api from "../../../api/axios";
+import { uploadImage } from "../../../api/uploadImage";
 
 const { TextArea } = Input;
 
@@ -10,6 +11,7 @@ function TeamSettings() {
     const { teamData, fetchTeamData } = useOutletContext(); // Retrieve team data and fetch helper from layout context
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const [fileList, setFileList] = useState([]);
 
     useEffect(() => {
         if (teamData) {
@@ -25,10 +27,16 @@ function TeamSettings() {
         if (!teamData?._id) return;
         try {
             setLoading(true);
+
+            let uploadedLogo = teamData.logo;
+            if (fileList.length > 0) {
+                uploadedLogo = await uploadImage(fileList[0], "team-logos");
+            }
+
             const payload = {
                 teamName: values.teamName.trim(),
                 description: values.description ? values.description.trim() : "",
-                logo: values.logo ? values.logo.trim() : ""
+                logo: uploadedLogo
             };
 
             await api.put(`/team/${teamData._id}`, payload);
@@ -70,11 +78,25 @@ function TeamSettings() {
                             </Form.Item>
 
                             <Form.Item
-                                name="logo"
-                                label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Squad Logo URL</span>}
-                                rules={[{ type: "url", message: "Please enter a valid image URL" }]}
+                                label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Squad Logo</span>}
                             >
-                                <Input placeholder="e.g. https://domain.com/logo.png" prefix={<PictureOutlined className="text-text-secondary mr-1.5" />} />
+                                <Upload
+                                    beforeUpload={(file) => {
+                                        setFileList([file]);
+                                        return false;
+                                    }}
+                                    onRemove={() => setFileList([])}
+                                    fileList={fileList}
+                                    accept="image/*"
+                                    maxCount={1}
+                                >
+                                    <Button icon={<UploadOutlined className="text-xs" />} className="text-xs h-9">
+                                        Change Logo
+                                    </Button>
+                                </Upload>
+                                {teamData?.logo && (
+                                    <div className="mt-2 text-[10px] text-text-secondary">Current logo will be kept if no new image is selected.</div>
+                                )}
                             </Form.Item>
                         </div>
 

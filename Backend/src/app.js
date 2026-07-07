@@ -12,6 +12,7 @@ import tournamentRoutes from './modules/tournament/tournament.routes.js'
 import matchRoutes from './modules/match/match.routes.js'
 import performanceRoutes from './modules/performance/performance.routes.js'
 import dashboardRoutes from './modules/dashboard/dashboard.routes.js'
+import uploadRoutes from './modules/upload/upload.routes.js'
 
 
 
@@ -44,5 +45,6 @@ app.use("/api/tournament",tournamentRoutes)
 app.use("/api/match",matchRoutes)
 app.use("/api/performance",performanceRoutes)
 app.use("/api/dashboard",dashboardRoutes)
+app.use("/api/upload", uploadRoutes)
 
 export default app;

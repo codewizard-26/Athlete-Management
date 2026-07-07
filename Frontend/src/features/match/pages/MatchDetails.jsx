@@ -320,8 +320,8 @@ function MatchDetails() {
                                 
                                 {/* Home Team */}
                                 <div className="flex flex-col items-center text-center w-1/3 min-w-0">
-                                    {match.homeTeamId?.logo ? (
-                                        <img src={match.homeTeamId.logo} alt="Logo" className="w-12 h-12 sm:w-16 sm:h-16 rounded object-cover border border-border-subtle shadow-sm shrink-0" />
+                                    {(match.homeTeamId?.logo?.url || (typeof match.homeTeamId?.logo === "string" && match.homeTeamId?.logo)) ? (
+                                        <img src={.logo?.url || .logo} alt="Logo" className="w-12 h-12 sm:w-16 sm:h-16 rounded object-cover border border-border-subtle shadow-sm shrink-0" />
                                     ) : (
                                         <Avatar size={48} icon={<TrophyOutlined />} className="bg-brand-primary rounded shrink-0" />
                                     )}
@@ -354,8 +354,8 @@ function MatchDetails() {
 
                                 {/* Away Team */}
                                 <div className="flex flex-col items-center text-center w-1/3 min-w-0">
-                                    {match.awayTeamId?.logo ? (
-                                        <img src={match.awayTeamId.logo} alt="Logo" className="w-12 h-12 sm:w-16 sm:h-16 rounded object-cover border border-border-subtle shadow-sm shrink-0" />
+                                    {(match.awayTeamId?.logo?.url || (typeof match.awayTeamId?.logo === "string" && match.awayTeamId?.logo)) ? (
+                                        <img src={.logo?.url || .logo} alt="Logo" className="w-12 h-12 sm:w-16 sm:h-16 rounded object-cover border border-border-subtle shadow-sm shrink-0" />
                                     ) : (
                                         <Avatar size={48} icon={<TrophyOutlined />} className="bg-brand-primary rounded shrink-0" />
                                     )}

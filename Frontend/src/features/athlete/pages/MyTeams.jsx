@@ -244,8 +244,8 @@ function MyTeams() {
                             <div className="space-y-4">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-center space-x-3 min-w-0">
-                                        {team.logo ? (
-                                            <img src={team.logo} alt="Logo" className="w-9 h-9 rounded object-cover border border-border-subtle shrink-0" />
+                                        {(team.logo?.url || (typeof team.logo === "string" && team.logo)) ? (
+                                            <img src={.logo?.url || .logo} alt="Logo" className="w-9 h-9 rounded object-cover border border-border-subtle shrink-0" />
                                         ) : (
                                             <Avatar size={36} icon={<TeamOutlined />} className="bg-brand-primary rounded font-bold shrink-0" />
                                         )}

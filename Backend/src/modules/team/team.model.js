@@ -31,9 +31,9 @@ const teamSchema = new mongoose.Schema(
             type:String,
             // required:true
         },
-        logo:{
-            type:String,
-            default:""
+        logo: {
+            url: { type: String, default: "" },
+            public_id: { type: String, default: "" }
         },
         isActive:{
             type:Boolean,

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Form, Input, Button, Card, message, Avatar } from "antd";
-import { TeamOutlined, EditOutlined, CheckOutlined, GlobalOutlined, InfoCircleOutlined, PictureOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Card, message, Avatar, Upload } from "antd";
+import { TeamOutlined, EditOutlined, CheckOutlined, GlobalOutlined, InfoCircleOutlined, PictureOutlined, UploadOutlined } from "@ant-design/icons";
 import api from "../../../api/axios";
+import { uploadImage } from "../../../api/uploadImage";
 
 const { TextArea } = Input;
 
@@ -11,6 +12,7 @@ function TeamProfile() {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [fileList, setFileList] = useState([]);
 
     useEffect(() => {
         if (teamData) {
@@ -28,10 +30,16 @@ function TeamProfile() {
         if (!teamData?._id) return;
         try {
             setLoading(true);
+
+            let uploadedLogo = teamData.logo;
+            if (fileList.length > 0) {
+                uploadedLogo = await uploadImage(fileList[0], "team-logos");
+            }
+
             const payload = {
                 teamName: values.teamName.trim(),
                 description: values.description ? values.description.trim() : "",
-                logo: values.logo ? values.logo.trim() : ""
+                logo: uploadedLogo
             };
 
             await api.put(`/team/${teamData._id}`, payload);
@@ -74,7 +82,9 @@ function TeamProfile() {
                     
                     {/* Team Identity Banner */}
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-border-subtle pb-5">
-                        {teamData?.logo ? (
+                        {teamData?.logo?.url ? (
+                            <img src={teamData.logo.url} alt="Logo" className="w-16 h-16 rounded object-cover border border-border-subtle shadow-sm shrink-0" />
+                        ) : teamData?.logo ? (
                             <img src={teamData.logo} alt="Logo" className="w-16 h-16 rounded object-cover border border-border-subtle shadow-sm shrink-0" />
                         ) : (
                             <Avatar size={64} icon={<TeamOutlined />} className="bg-brand-primary rounded shadow-sm shrink-0" />
@@ -182,16 +192,30 @@ function TeamProfile() {
                     </div>
 
                     <Form.Item
-                        name="logo"
                         label={
                             <div className="flex items-center space-x-1">
-                                <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Branding Logo URL</span>
+                                <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Branding Logo</span>
                                 <span className="text-[9px] text-text-secondary/50 font-semibold uppercase tracking-wide">(Optional)</span>
                             </div>
                         }
-                        rules={[{ type: "url", message: "Please enter a valid URL" }]}
                     >
-                        <Input placeholder="e.g. https://domain.com/team-logo.png" prefix={<PictureOutlined className="text-text-secondary mr-1" />} />
+                        <Upload
+                            beforeUpload={(file) => {
+                                setFileList([file]);
+                                return false;
+                            }}
+                            onRemove={() => setFileList([])}
+                            fileList={fileList}
+                            accept="image/*"
+                            maxCount={1}
+                        >
+                            <Button icon={<UploadOutlined className="text-xs" />} className="text-xs h-9">
+                                Change Logo
+                            </Button>
+                        </Upload>
+                        {teamData?.logo && (
+                            <div className="mt-2 text-[10px] text-text-secondary">Current logo will be kept if no new image is selected.</div>
+                        )}
                     </Form.Item>
 
                     <Form.Item

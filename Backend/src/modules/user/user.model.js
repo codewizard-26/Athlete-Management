@@ -24,9 +24,9 @@ const userSchema = new mongoose.Schema(
             required:true,
         },
         avatar: {
-    type: String,
-    default: ""
-},
+            url: { type: String, default: "" },
+            public_id: { type: String, default: "" }
+        },
         role:{
             type:String,
             enum: ['athlete', 'organization', 'team'],

@@ -18,9 +18,9 @@ const organizationSchema = new mongoose.Schema(
             type:String,
             // required:true
         },
-        logo:{
-            type:String,
-            default:""
+        logo: {
+            url: { type: String, default: "" },
+            public_id: { type: String, default: "" }
         },
         city:{
             type:String,

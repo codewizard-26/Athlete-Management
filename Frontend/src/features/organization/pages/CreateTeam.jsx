@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Form, Input, Select, Button, message, Modal, Alert, Card } from "antd";
+import { Form, Input, Select, Button, message, Modal, Alert, Card, Upload } from "antd";
 import {
     TeamOutlined,
     InfoCircleOutlined,
@@ -10,9 +10,11 @@ import {
     PhoneOutlined,
     CopyOutlined,
     CheckCircleFilled,
-    PictureOutlined
+    PictureOutlined,
+    UploadOutlined
 } from "@ant-design/icons";
 import api from "../../../api/axios";
+import { uploadImage } from "../../../api/uploadImage";
 
 const { TextArea } = Input;
 
@@ -24,17 +26,23 @@ function CreateTeam() {
     // Modal states
     const [modalVisible, setModalVisible] = useState(false);
     const [credentials, setCredentials] = useState(null);
+    const [fileList, setFileList] = useState([]);
 
     const handleFormSubmit = async (values) => {
         try {
             setLoading(true);
+
+            let uploadedLogo = null;
+            if (fileList.length > 0) {
+                uploadedLogo = await uploadImage(fileList[0], "team-logos");
+            }
 
             const payload = {
                 teamName: values.teamName.trim(),
                 sport: values.sport,
                 ageCategory: values.ageCategory,
                 description: values.description ? values.description.trim() : "",
-                logo: values.logo ? values.logo.trim() : "",
+                logo: uploadedLogo,
                 teamEmail: values.teamEmail.trim().toLowerCase(),
                 teamPhone: values.teamPhone.trim()
             };
@@ -151,16 +159,27 @@ function CreateTeam() {
                             </div>
 
                             <Form.Item
-                                name="logo"
                                 label={
                                     <div className="flex items-center space-x-1">
-                                        <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Team Logo Image URL</span>
+                                        <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Team Logo</span>
                                         <span className="text-[9px] text-text-secondary/50 font-semibold uppercase tracking-wide">(Optional)</span>
                                     </div>
                                 }
-                                rules={[{ type: "url", message: "Please enter a valid image URL" }]}
                             >
-                                <Input placeholder="E.g. https://domain.com/team-logo.png" prefix={<PictureOutlined className="text-text-secondary mr-1" />} />
+                                <Upload
+                                    beforeUpload={(file) => {
+                                        setFileList([file]);
+                                        return false; // Prevent auto upload
+                                    }}
+                                    onRemove={() => setFileList([])}
+                                    fileList={fileList}
+                                    accept="image/*"
+                                    maxCount={1}
+                                >
+                                    <Button icon={<UploadOutlined className="text-xs" />} className="text-xs h-9">
+                                        Select Image
+                                    </Button>
+                                </Upload>
                             </Form.Item>
                         </div>
 

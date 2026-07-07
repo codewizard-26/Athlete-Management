@@ -150,7 +150,7 @@ function TeamDashboard() {
                 </div>
                 {teamData && (
                     <div className="shrink-0 flex items-center space-x-3 bg-brand-primary/10 border border-brand-primary/20 px-4 py-3 rounded-xl relative z-10">
-                        <Avatar size={36} src={teamData.logo} icon={<TeamOutlined />} className="bg-brand-primary rounded" />
+                        <Avatar size={36} src={.logo?.url || .logo} icon={<TeamOutlined />} className="bg-brand-primary rounded" />
                         <div>
                             <p className="text-[9px] text-brand-primary uppercase tracking-wider font-semibold leading-none">Category</p>
                             <p className="text-xs font-bold text-text-primary mt-1.5 leading-none">{teamData.ageCategory}</p>

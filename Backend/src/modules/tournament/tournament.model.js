@@ -45,6 +45,10 @@ const tournamentSchema = new mongoose.Schema(
         type:String,
         enum:["open","closed","completed"],
         default:"open"
+    },
+    banner: {
+        url: { type: String, default: "" },
+        public_id: { type: String, default: "" }
     }
 },
 {timestamps:true}

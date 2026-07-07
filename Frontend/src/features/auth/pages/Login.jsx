@@ -79,7 +79,7 @@ function Login() {
                 }
             }}
         >
-            <div className="min-h-screen lg:h-screen w-full flex flex-col lg:flex-row bg-bg-base text-text-primary font-sans overflow-x-hidden lg:overflow-hidden transition-colors duration-150 animate-fadeIn">
+            <div className="min-h-screen w-full flex flex-col lg:flex-row bg-bg-base text-text-primary font-sans transition-colors duration-150 animate-fadeIn">
                 
                 {/* Left Side Banner */}
                 <div className="relative z-0 w-full lg:w-5/12 flex flex-col justify-between p-8 sm:p-10 lg:p-16 bg-[#0B0E14] text-white border-b lg:border-b-0 lg:border-r border-border-subtle overflow-hidden min-h-[30vh] lg:min-h-0 lg:h-full">
@@ -149,7 +149,7 @@ function Login() {
                 </div>
 
                 {/* Right Side Form */}
-                <div className="w-full lg:w-7/12 flex items-center justify-center p-6 sm:p-8 lg:py-6 lg:px-12 bg-bg-base lg:h-full lg:overflow-y-auto">
+                <div className="w-full lg:w-7/12 flex items-center justify-center p-6 sm:p-8 lg:py-6 lg:px-12 bg-bg-base lg:min-h-screen">
                     <div className="w-full max-w-[440px]">
                         
                         {success ? (

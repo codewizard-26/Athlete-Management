@@ -265,8 +265,8 @@ function TeamLayout() {
 
                             {!loading && teamData && (
                                 <div className="flex items-center space-x-2.5 px-3 py-1 bg-bg-elevated border border-border-subtle rounded-full">
-                                    {teamData.logo ? (
-                                        <img src={teamData.logo} alt="Logo" className="w-5 h-5 rounded-full object-cover shrink-0" />
+                                    {(teamData.logo?.url || (typeof teamData.logo === "string" && teamData.logo)) ? (
+                                        <img src={.logo?.url || .logo} alt="Logo" className="w-5 h-5 rounded-full object-cover shrink-0" />
                                     ) : (
                                         <Avatar size={20} icon={<TeamOutlined />} className="bg-brand-primary text-white text-[10px] flex items-center justify-center" />
                                     )}

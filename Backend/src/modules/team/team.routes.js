@@ -10,6 +10,7 @@ import User from "../user/user.model.js";
 import multer from "multer";
 import csvParser from "csv-parser";
 import fs from "fs";
+import { deleteImageFromCloudinary } from "../../utils/cloudinaryUpload.js";
 
 const upload = multer({ dest: "uploads/" });
 
@@ -276,20 +277,36 @@ router.get("/:teamId", authMiddleware, async (req, res) => {
 router.put("/:teamId",authMiddleware,async(req,res)=>{
     try {
         const {teamId}=req.params;
+        
+        // Fetch existing team to check for old logo
+        const existingTeam = await Team.findById(teamId);
+        if(!existingTeam){
+            return res.status(404).json({
+                message:"Team not found"
+            });
+        }
+        
+        // If a new logo is provided and it's different from the old one, delete the old one
+        if (req.body.logo && req.body.logo.public_id && existingTeam.logo && existingTeam.logo.public_id) {
+            if (req.body.logo.public_id !== existingTeam.logo.public_id) {
+                await deleteImageFromCloudinary(existingTeam.logo.public_id);
+            }
+        }
+        
         const team = await Team.findByIdAndUpdate(
             teamId,
             req.body,
             {new:true}  
         )
         if(!team){
-    return res.status(404).json({
-        message:"Team not found"
-    });
-}
-return res.status(200).json({
-    message:"Team updated successfully",
-    team
-});
+            return res.status(404).json({
+                message:"Team not found"
+            });
+        }
+        return res.status(200).json({
+            message:"Team updated successfully",
+            team
+        });
     } catch (err) {
             return res.status(500).json({
             message: err.message
