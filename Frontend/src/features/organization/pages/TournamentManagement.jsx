@@ -184,14 +184,14 @@ function TournamentManagement() {
             title: "TEAM NAME",
             dataIndex: "teamId",
             key: "team",
-            render: (team) => (
+            render: (t) => (
                 <div className="flex items-center space-x-2.5">
-                    {(team?.logo?.url || (typeof team?.logo === "string" && team?.logo)) ? (
-                        <img src={.logo?.url || .logo} alt="Logo" className="w-6 h-6 rounded object-cover border border-border-subtle" />
+                    {(t?.logo?.url || (typeof t?.logo === "string" && t?.logo)) ? (
+                        <img src={t.logo?.url || t.logo} alt="Logo" className="w-6 h-6 rounded object-cover border border-border-subtle" />
                     ) : (
                         <Avatar size={24} icon={<TeamOutlined />} className="bg-brand-primary rounded" />
                     )}
-                    <span className="text-xs font-semibold text-text-primary">{team?.teamName || "N/A"}</span>
+                    <span className="text-xs font-semibold text-text-primary">{t?.teamName || "N/A"}</span>
                 </div>
             )
         },

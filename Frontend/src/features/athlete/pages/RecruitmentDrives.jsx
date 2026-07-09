@@ -144,7 +144,7 @@ function RecruitmentDrives() {
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-center space-x-3 min-w-0">
                                         {(drive.teamId?.logo?.url || (typeof drive.teamId?.logo === "string" && drive.teamId?.logo)) ? (
-                                            <img src={.logo?.url || .logo} alt="Logo" className="w-9 h-9 rounded object-cover border border-border-subtle shrink-0" />
+                                            <img src={drive.teamId?.logo?.url || drive.teamId?.logo} alt="Logo" className="w-9 h-9 rounded object-cover border border-border-subtle shrink-0" />
                                         ) : (
                                             <Avatar size={36} icon={<UserOutlined />} className="bg-brand-primary rounded font-bold shrink-0" />
                                         )}

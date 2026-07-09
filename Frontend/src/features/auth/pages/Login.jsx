@@ -82,7 +82,7 @@ function Login() {
             <div className="min-h-screen w-full flex flex-col lg:flex-row bg-bg-base text-text-primary font-sans transition-colors duration-150 animate-fadeIn">
                 
                 {/* Left Side Banner */}
-                <div className="relative z-0 w-full lg:w-5/12 flex flex-col justify-between p-8 sm:p-10 lg:p-16 bg-[#0B0E14] text-white border-b lg:border-b-0 lg:border-r border-border-subtle overflow-hidden min-h-[30vh] lg:min-h-0 lg:h-full">
+                <div className="relative z-0 w-full lg:w-1/2 flex flex-col justify-between p-8 sm:p-10 lg:p-16 bg-[#0B0E14] text-white border-b lg:border-b-0 lg:border-r border-border-subtle overflow-hidden min-h-[30vh] lg:min-h-screen">
                     <div className="absolute inset-0 bg-gradient-to-br from-[#0B0E14] via-[#121826] to-[#0B0E14] -z-20" />
                     
                     <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-brand-primary/10 rounded-full blur-[80px] pointer-events-none -z-10" />
@@ -106,8 +106,8 @@ function Login() {
                             </svg>
                         </div>
                         <div>
-                            <span className="text-base font-bold tracking-wider text-white uppercase leading-none block">APEX</span>
-                            <span className="text-[8px] uppercase tracking-widest block text-brand-primary font-semibold">Athlete Management Platform</span>
+                            <span className="text-base font-bold tracking-wider text-white uppercase leading-none block">ATHLETIX</span>
+                            <span className="text-[8px] uppercase tracking-widest block text-[#06B6D4] font-semibold">Sports Tech Platform</span>
                         </div>
                     </div>
 
@@ -149,7 +149,7 @@ function Login() {
                 </div>
 
                 {/* Right Side Form */}
-                <div className="w-full lg:w-7/12 flex items-center justify-center p-6 sm:p-8 lg:py-6 lg:px-12 bg-bg-base lg:min-h-screen">
+                <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:py-6 lg:px-12 bg-bg-base lg:min-h-screen">
                     <div className="w-full max-w-[440px]">
                         
                         {success ? (
