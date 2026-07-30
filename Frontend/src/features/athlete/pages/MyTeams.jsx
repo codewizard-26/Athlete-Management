@@ -241,22 +241,23 @@ function MyTeams() {
                             onClick={() => handleOpenDetails(team)}
                             className="border border-border-subtle bg-bg-surface shadow-sm hover:border-brand-primary/25 cursor-pointer transition-all duration-150 rounded-xl flex flex-col justify-between group"
                         >
-                            <div className="space-y-4">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center space-x-3 min-w-0">
-                                        {(team.logo?.url || (typeof team.logo === "string" && team.logo)) ? (
-                                            <img src={team.logo?.url || team.logo} alt="Logo" className="w-9 h-9 rounded object-cover border border-border-subtle shrink-0" />
-                                        ) : (
-                                            <Avatar size={36} icon={<TeamOutlined />} className="bg-brand-primary rounded font-bold shrink-0" />
-                                        )}
-                                        <div className="min-w-0">
-                                            <h3 className="text-xs font-semibold text-text-primary group-hover:text-brand-primary transition-colors leading-tight truncate">{team.teamName || "Apex Squad"}</h3>
-                                            <p className="text-[10px] text-text-secondary truncate mt-0.5">Category: {team.ageCategory}</p>
+                            <div className="space-y-4 flex-grow">
+                                {/* Header: Avatar, Title, Team & Tag */}
+                                <div className="flex items-center gap-4">
+                                    {(team.logo?.url || (typeof team.logo === "string" && team.logo)) ? (
+                                        <img src={team.logo?.url || team.logo} alt="Logo" className="w-12 h-12 rounded-xl object-cover border border-border-subtle shrink-0 shadow-sm" />
+                                    ) : (
+                                        <Avatar size={48} icon={<TeamOutlined />} className="bg-brand-primary rounded-xl font-bold shrink-0 shadow-sm" />
+                                    )}
+                                    <div className="min-w-0 flex-grow">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <h3 className="text-sm font-bold text-text-primary group-hover:text-brand-primary transition-colors leading-tight truncate">{team.teamName || "Apex Squad"}</h3>
+                                            <Tag color={team.sport?.toLowerCase() === "football" ? "blue" : "gold"} className="m-0 border-0 text-[9px] font-bold uppercase shrink-0 px-2 py-0.5 rounded-md">
+                                                {team.sport}
+                                            </Tag>
                                         </div>
+                                        <p className="text-[11.5px] font-semibold text-text-secondary truncate">Category: {team.ageCategory}</p>
                                     </div>
-                                    <Tag color={team.sport?.toLowerCase() === "football" ? "blue" : "gold"} className="m-0 border-0 font-semibold uppercase text-[9px]">
-                                        {team.sport}
-                                    </Tag>
                                 </div>
 
                                 <p className="text-xs text-text-secondary line-clamp-3 leading-relaxed">

@@ -1,127 +1,197 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence, useScroll, useTransform ,} from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import CountUpPkg from "react-countup";
 const CountUp = CountUpPkg.default ? CountUpPkg.default : CountUpPkg;
 import { 
     TrophyOutlined as Trophy, TeamOutlined as Users, UserOutlined as User, BarChartOutlined as Activity, CalendarOutlined as Calendar, SafetyOutlined as ShieldCheck,
-    ArrowRightOutlined as ArrowRight, RightOutlined as ChevronRight, CheckCircleOutlined as CheckCircle2, PlayCircleOutlined as Play, GlobalOutlined as Globe
+    ArrowRightOutlined as ArrowRight, GlobalOutlined as Globe, SunOutlined, MoonOutlined
 } from "@ant-design/icons";
 
-// Particle Background Component
-const ParticleBackground = () => {
-    return (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {/* Glowing Orbs */}
-            <motion.div 
-                animate={{ 
-                    scale: [1, 1.2, 1],
-                    opacity: [0.1, 0.3, 0.1],
-                }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-1/4 -left-1/4 w-[50vw] h-[50vw] rounded-full bg-[#2563EB]/20 blur-[120px]" 
-            />
-            <motion.div 
-                animate={{ 
-                    scale: [1, 1.3, 1],
-                    opacity: [0.1, 0.2, 0.1],
-                }}
-                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                className="absolute bottom-1/4 -right-1/4 w-[60vw] h-[60vw] rounded-full bg-[#06B6D4]/15 blur-[120px]" 
-            />
-            
-            {/* Floating Particles Network */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
-        </div>
-    );
+// Official ATHLETIX "A" Emblem Component
+export const AthletixEmblem = ({ className = "w-6 h-6" }) => (
+    <svg viewBox="0 0 100 100" className={className} fill="currentColor">
+        <path d="M50 15 L15 85 L32 85 L50 45 L68 85 L85 85 Z" />
+        <path d="M38 65 L62 65" stroke="currentColor" strokeWidth="7" strokeLinecap="round" opacity="0.6" />
+    </svg>
+);
+
+// Interactive Kinetic Canvas Background Component
+const KineticParticleCanvas = () => {
+    const canvasRef = useRef(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        let animationFrameId;
+        let width = (canvas.width = window.innerWidth);
+        let height = (canvas.height = window.innerHeight);
+
+        const handleResize = () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        };
+        window.addEventListener("resize", handleResize);
+
+        // Mouse position for interaction
+        const mouse = { x: width / 2, y: height / 2, active: false };
+
+        const handleMouseMove = (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            mouse.active = true;
+        };
+        window.addEventListener("mousemove", handleMouseMove);
+
+        // Generate particles
+        const numParticles = Math.min(Math.floor(width / 22), 65);
+        const particles = Array.from({ length: numParticles }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.6,
+            vy: (Math.random() - 0.5) * 0.6,
+            radius: Math.random() * 1.8 + 1,
+            alpha: Math.random() * 0.3 + 0.1,
+        }));
+
+        const render = () => {
+            const isDark = document.documentElement.classList.contains("dark");
+            ctx.clearRect(0, 0, width, height);
+
+            const particleColor = isDark ? "255, 255, 255" : "30, 30, 30";
+            const lineColor = isDark ? "255, 255, 255" : "40, 40, 40";
+
+            // Update & Draw Particles
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                // Mouse interaction - gentle pull
+                if (mouse.active) {
+                    const dx = mouse.x - p.x;
+                    const dy = mouse.y - p.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 160) {
+                        p.x += dx * 0.015;
+                        p.y += dy * 0.015;
+                    }
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${particleColor}, ${p.alpha})`;
+                ctx.fill();
+
+                // Connect nearby particles
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 120) {
+                        const alpha = (1 - dist / 120) * 0.12;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(${lineColor}, ${alpha})`;
+                        ctx.lineWidth = 0.6;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            animationFrameId = requestAnimationFrame(render);
+        };
+
+        render();
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+            window.removeEventListener("mousemove", handleMouseMove);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
+
+    return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />;
 };
 
-// Logo Animation Component
-const AnimatedLogo = ({ isComplete }) => {
+// Animated Hero "A" Emblem
+const AnimatedHeroLogo = () => {
     return (
         <motion.div 
-            className="relative flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 mb-8"
-            initial={{ scale: 2, filter: "blur(20px)", opacity: 0 }}
-            animate={{ scale: 1, filter: "blur(0px)", opacity: 1 }}
-            transition={{ duration: 2, ease: "easeOut" }}
+            className="relative flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 mb-6"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
         >
-            <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_0_15px_rgba(37,99,235,0.8)]">
-                {/* Network nodes collapsing (only visible at start) */}
-                {!isComplete && (
-                    <motion.g
-                        initial={{ opacity: 1 }}
-                        animate={{ opacity: 0, scale: 0.5 }}
-                        transition={{ duration: 1.5, delay: 1.5 }}
-                    >
-                        <circle cx="20" cy="20" r="2" fill="#06B6D4" />
-                        <circle cx="80" cy="30" r="2" fill="#06B6D4" />
-                        <circle cx="10" cy="70" r="2" fill="#06B6D4" />
-                        <circle cx="90" cy="80" r="2" fill="#06B6D4" />
-                        <line x1="20" y1="20" x2="50" y2="10" stroke="#06B6D4" strokeWidth="0.5" />
-                        <line x1="80" y1="30" x2="50" y2="10" stroke="#06B6D4" strokeWidth="0.5" />
-                    </motion.g>
-                )}
-
-                {/* The "A" Logo */}
-                <motion.path
-                    d="M50 15 L15 85 L32 85 L50 45 L68 85 L85 85 Z"
-                    fill="url(#blue-gradient)"
-                    initial={{ pathLength: 0, fillOpacity: 0 }}
-                    animate={{ pathLength: 1, fillOpacity: 1 }}
-                    transition={{ duration: 2, ease: "easeInOut", delay: 0.5 }}
-                />
-                <motion.path
-                    d="M38 65 L62 65"
-                    stroke="#06B6D4"
-                    strokeWidth="6"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 1 }}
-                    transition={{ duration: 1, ease: "easeOut", delay: 1.5 }}
-                />
-                <defs>
-                    <linearGradient id="blue-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#2563EB" />
-                        <stop offset="100%" stopColor="#06B6D4" />
-                    </linearGradient>
-                </defs>
-            </svg>
-            
-            {/* Core Glow */}
+            {/* Ambient Pulse Ring */}
             <motion.div 
-                className="absolute inset-0 bg-[#2563EB] rounded-full blur-[40px] -z-10"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.4 }}
-                transition={{ duration: 2, delay: 1 }}
+                className="absolute inset-0 rounded-full border border-text-primary/20"
+                animate={{ scale: [1, 1.35, 1], opacity: [0.3, 0, 0.3] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
+            
+            {/* The Official "A" Logo with Path Drawing */}
+            <motion.div
+                animate={{ y: [-4, 4, -4] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="w-full h-full text-text-primary flex items-center justify-center"
+            >
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
+                    <motion.path
+                        d="M50 15 L15 85 L32 85 L50 45 L68 85 L85 85 Z"
+                        fill="currentColor"
+                        initial={{ pathLength: 0, fillOpacity: 0 }}
+                        animate={{ pathLength: 1, fillOpacity: 1 }}
+                        transition={{ duration: 1.5, ease: "easeInOut" }}
+                    />
+                    <motion.path
+                        d="M38 65 L62 65"
+                        stroke="currentColor"
+                        strokeWidth="7"
+                        strokeLinecap="round"
+                        opacity="0.6"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 0.6 }}
+                        transition={{ duration: 0.8, ease: "easeOut", delay: 1 }}
+                    />
+                </svg>
+            </motion.div>
         </motion.div>
     );
 };
 
 function Home() {
-    const [splashComplete, setSplashComplete] = useState(false);
+    const [themeMode, setThemeMode] = useState(() => localStorage.getItem("themeMode") || "light");
 
     useEffect(() => {
-        // Enforce dark theme for the landing page
-        document.documentElement.classList.add("dark");
-        document.body.style.backgroundColor = "#050816";
-        document.body.style.color = "#FFFFFF";
+        if (themeMode === "dark") {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+    }, [themeMode]);
 
-        // Splash screen timing
-        const timer = setTimeout(() => {
-            setSplashComplete(true);
-        }, 3000);
-
-        return () => clearTimeout(timer);
-    }, []);
+    const toggleTheme = () => {
+        const newTheme = themeMode === "dark" ? "light" : "dark";
+        setThemeMode(newTheme);
+        localStorage.setItem("themeMode", newTheme);
+    };
 
     const features = [
-        { icon: <Trophy style={{ fontSize: 24 }} />, title: "Tournament Management", desc: "Automate brackets, scheduling, and league standings effortlessly." },
-        { icon: <Users style={{ fontSize: 24 }} />, title: "Team Recruitment", desc: "Discover top talent and manage applications with AI-driven insights." },
-        { icon: <User style={{ fontSize: 24 }} />, title: "Athlete Profiles", desc: "Showcase stats, highlights, and career progression in one place." },
-        { icon: <Activity style={{ fontSize: 24 }} />, title: "Performance Analytics", desc: "Track longitudinal data and key performance indicators." },
-        { icon: <Calendar style={{ fontSize: 24 }} />, title: "Match Scheduling", desc: "Coordinate fixtures, referees, and venues seamlessly." },
-        { icon: <ShieldCheck style={{ fontSize: 24 }} />, title: "Secure Authentication", desc: "Role-based access ensuring data privacy and security." }
+        { icon: <Trophy style={{ fontSize: 22 }} />, title: "Tournament Management", desc: "Automate brackets, scheduling, and league standings effortlessly." },
+        { icon: <Users style={{ fontSize: 22 }} />, title: "Team Recruitment", desc: "Discover top talent and manage applications with AI-driven insights." },
+        { icon: <User style={{ fontSize: 22 }} />, title: "Athlete Profiles", desc: "Showcase stats, highlights, and career progression in one place." },
+        { icon: <Activity style={{ fontSize: 22 }} />, title: "Performance Analytics", desc: "Track longitudinal data and key performance indicators." },
+        { icon: <Calendar style={{ fontSize: 22 }} />, title: "Match Scheduling", desc: "Coordinate fixtures, referees, and venues seamlessly." },
+        { icon: <ShieldCheck style={{ fontSize: 22 }} />, title: "Secure Authentication", desc: "Role-based access ensuring data privacy and security." }
     ];
 
     const workflowNodes = [
@@ -141,72 +211,82 @@ function Home() {
     ];
 
     const { scrollYProgress } = useScroll();
-    const yTransform = useTransform(scrollYProgress, [0, 1], [0, -100]);
+    const yTransform = useTransform(scrollYProgress, [0, 1], [0, -60]);
 
     return (
-        <div className="min-h-screen bg-[#050816] text-white font-sans overflow-hidden selection:bg-[#2563EB] selection:text-white">
-            <ParticleBackground />
+        <div className="min-h-screen bg-bg-base text-text-primary font-sans overflow-hidden relative">
+            <KineticParticleCanvas />
 
-            {/* Navbar (Fades in after splash) */}
+            {/* Navbar */}
             <motion.header 
                 initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: splashComplete ? 1 : 0, y: splashComplete ? 0 : -20 }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 sm:px-12 py-5 bg-[#050816]/60 backdrop-blur-xl border-b border-white/5"
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 sm:px-12 py-4 bg-bg-surface/90 backdrop-blur-md border-b border-border-subtle"
             >
                 <div className="flex items-center space-x-3">
-                    <svg className="w-6 h-6 sm:w-8 sm:h-8" viewBox="0 0 100 100">
-                        <path d="M50 15 L15 85 L32 85 L50 45 L68 85 L85 85 Z" fill="#2563EB" />
-                        <path d="M38 65 L62 65" stroke="#06B6D4" strokeWidth="6" strokeLinecap="round" />
-                    </svg>
-                    <span className="text-xl font-bold tracking-widest text-white">ATHLETIX</span>
+                    <div className="h-8 w-8 rounded-lg bg-[#1A1A1A] dark:bg-white text-white dark:text-[#0A0A0A] flex items-center justify-center shadow-sm shrink-0">
+                        <AthletixEmblem className="w-4 h-4" />
+                    </div>
+                    <span className="text-base font-extrabold tracking-wider text-text-primary uppercase">ATHLETIX</span>
                 </div>
-                <div className="flex items-center space-x-6">
-                    <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
+
+                <div className="flex items-center space-x-4">
+                    <button 
+                        onClick={toggleTheme}
+                        className="p-2 rounded-md bg-bg-elevated hover:bg-bg-inset text-text-primary border border-border-subtle transition-all cursor-pointer flex items-center justify-center"
+                        title="Toggle Light/Dark Theme"
+                    >
+                        {themeMode === "dark" ? <SunOutlined className="text-amber-400 text-sm" /> : <MoonOutlined className="text-slate-600 text-sm" />}
+                    </button>
+                    <Link to="/login" className="text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors px-3 py-1.5">
                         Sign In
                     </Link>
-                    <Link to="/register" className="hidden sm:inline-flex items-center justify-center px-5 py-2 text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all">
+                    <Link 
+                        to="/register" 
+                        className="inline-flex items-center justify-center px-5 py-2 text-xs font-bold bg-[#1A1A1A] text-white hover:bg-[#2A2A2A] dark:bg-white dark:text-[#0A0A0A] dark:hover:bg-[#E5E5E5] rounded-full shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                    >
                         Register
                     </Link>
                 </div>
             </motion.header>
 
             {/* HERO SECTION */}
-            <section className="relative w-full min-h-screen flex flex-col items-center justify-center pt-20 pb-16 px-6 z-10">
-                <AnimatedLogo isComplete={splashComplete} />
+            <section className="relative w-full min-h-screen flex flex-col items-center justify-center pt-24 pb-16 px-6 z-10">
+                <AnimatedHeroLogo />
 
                 <motion.div 
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: splashComplete ? 1 : 0, y: splashComplete ? 0 : 30 }}
-                    transition={{ duration: 1, delay: 0.2 }}
-                    className="text-center max-w-4xl mx-auto space-y-6"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                    className="text-center max-w-3xl mx-auto space-y-6"
                 >
-                    <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter">
-                        <span className="text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/60">ATHLETIX</span>
+                    <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-text-primary uppercase">
+                        ATHLETIX
                     </h1>
                     
-                    <h2 className="text-xl sm:text-3xl font-medium tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#2563EB] to-[#06B6D4]">
+                    <h2 className="text-lg sm:text-2xl font-semibold tracking-tight text-text-secondary">
                         Connecting Talent. Teams. Tournaments.
                     </h2>
                     
-                    <p className="text-sm sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-xs sm:text-base text-text-secondary max-w-2xl mx-auto leading-relaxed">
                         The complete platform for athlete recruitment, team management, tournament organization, match scheduling, and performance analytics.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-                        <Link to="/register">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-6">
+                        <Link to="/register" className="w-full sm:w-auto">
                             <motion.button 
-                                whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(37,99,235,0.5)" }}
-                                whileTap={{ scale: 0.95 }}
-                                className="w-full sm:w-auto px-8 py-3.5 bg-[#2563EB] text-white font-semibold rounded-full flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]"
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                className="w-full sm:w-auto px-8 py-3.5 bg-[#1A1A1A] text-white hover:bg-[#2A2A2A] dark:bg-white dark:text-[#0A0A0A] dark:hover:bg-[#F0F0F0] font-bold text-xs sm:text-sm rounded-full flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                             >
-                                Get Started <ArrowRight style={{ fontSize: 18 }} />
+                                Get Started <ArrowRight style={{ fontSize: 14 }} />
                             </motion.button>
                         </Link>
                         <motion.button 
-                            whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
-                            whileTap={{ scale: 0.95 }}
-                            className="w-full sm:w-auto px-8 py-3.5 bg-white/5 border border-white/10 text-white font-semibold rounded-full flex items-center justify-center gap-2 backdrop-blur-md transition-all"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            className="w-full sm:w-auto px-8 py-3.5 bg-bg-surface border border-border-subtle hover:border-text-primary/40 text-text-primary font-semibold text-xs sm:text-sm rounded-full flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                             onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
                         >
                             Explore Platform
@@ -216,41 +296,38 @@ function Home() {
             </section>
 
             {/* FEATURE SECTION */}
-            <section className="py-32 px-6 sm:px-12 relative z-10 border-t border-white/5 bg-gradient-to-b from-[#050816] to-[#0a0f25]">
-                <div className="max-w-7xl mx-auto">
+            <section className="py-24 px-6 sm:px-12 relative z-10 border-t border-border-subtle bg-bg-surface">
+                <div className="max-w-6xl mx-auto">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-center mb-20"
+                        className="text-center mb-16"
                     >
-                        <h2 className="text-3xl sm:text-5xl font-bold tracking-tight mb-4 text-white">
+                        <h2 className="text-2xl sm:text-4xl font-bold tracking-tight mb-3 text-text-primary">
                             Powered for Performance
                         </h2>
-                        <p className="text-slate-400 max-w-2xl mx-auto">
+                        <p className="text-xs sm:text-sm text-text-secondary max-w-xl mx-auto">
                             Advanced tools engineered for the modern sports ecosystem.
                         </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {features.map((feat, idx) => (
                             <motion.div
                                 key={idx}
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
-                                whileHover={{ y: -10, boxShadow: "0 10px 40px -10px rgba(37,99,235,0.3)", borderColor: "rgba(37,99,235,0.5)" }}
-                                className="p-8 rounded-3xl bg-white/[0.02] border border-white/5 backdrop-blur-xl group transition-all duration-300 relative overflow-hidden"
+                                transition={{ delay: idx * 0.08 }}
+                                whileHover={{ y: -6, scale: 1.01 }}
+                                className="p-6 rounded-lg bg-bg-base border border-border-subtle hover:border-border-hover transition-all duration-200"
                             >
-                                {/* Subtle Hover Glow */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-[#2563EB]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                
-                                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#06B6D4] mb-6 group-hover:scale-110 group-hover:bg-[#2563EB]/20 transition-all duration-300">
+                                <div className="w-10 h-10 rounded-md bg-bg-surface border border-border-subtle flex items-center justify-center text-text-primary mb-4 shadow-sm">
                                     {feat.icon}
                                 </div>
-                                <h3 className="text-xl font-semibold mb-3 text-slate-100">{feat.title}</h3>
-                                <p className="text-slate-400 text-sm leading-relaxed">{feat.desc}</p>
+                                <h3 className="text-base font-semibold mb-2 text-text-primary">{feat.title}</h3>
+                                <p className="text-text-secondary text-xs leading-relaxed">{feat.desc}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -258,73 +335,54 @@ function Home() {
             </section>
 
             {/* WORKFLOW SECTION */}
-            <section className="py-32 px-6 sm:px-12 relative z-10 overflow-hidden bg-[#050816]">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.05)_0%,transparent_70%)]" />
-                <div className="max-w-7xl mx-auto relative">
+            <section className="py-24 px-6 sm:px-12 relative z-10 overflow-hidden bg-bg-base">
+                <div className="max-w-6xl mx-auto relative">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-center mb-24"
+                        className="text-center mb-16"
                     >
-                        <h2 className="text-3xl sm:text-5xl font-bold tracking-tight mb-4 text-white">
+                        <h2 className="text-2xl sm:text-4xl font-bold tracking-tight mb-3 text-text-primary">
                             The Complete Journey
                         </h2>
-                        <p className="text-slate-400 max-w-2xl mx-auto">
+                        <p className="text-xs sm:text-sm text-text-secondary max-w-xl mx-auto">
                             A seamless flow from organization setup to final match analytics.
                         </p>
                     </motion.div>
 
-                    <div className="flex flex-col md:flex-row items-start justify-between gap-4 md:gap-0 relative">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0 relative">
                         {/* Connecting Line (Desktop Base) */}
-                        <div className="hidden md:block absolute top-[2rem] left-[2rem] right-[2rem] h-0.5 bg-white/10" />
+                        <div className="hidden md:block absolute top-[2rem] left-[2rem] right-[2rem] h-0.5 bg-border-subtle" />
                         
                         {/* Animated Connecting Line */}
                         <motion.div 
-                            className="hidden md:block absolute top-[2rem] left-[2rem] right-[2rem] h-0.5 bg-gradient-to-r from-[#2563EB] to-[#06B6D4] origin-left"
+                            className="hidden md:block absolute top-[2rem] left-[2rem] right-[2rem] h-0.5 bg-text-primary origin-left"
                             initial={{ scaleX: 0 }}
                             whileInView={{ scaleX: 1 }}
                             viewport={{ once: true, margin: "-100px" }}
-                            transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
+                            transition={{ duration: 1.2, ease: "easeInOut" }}
                         />
 
                         {workflowNodes.map((node, idx) => (
                             <React.Fragment key={idx}>
                                 <motion.div
-                                    initial={{ opacity: 0, y: 30 }}
+                                    initial={{ opacity: 0, y: 20 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true, margin: "-50px" }}
-                                    transition={{ delay: 0.3 + idx * 0.2, type: "spring", stiffness: 100, damping: 15 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.2 + idx * 0.15 }}
                                     className="relative z-10 w-full md:w-auto"
                                 >
-                                    <div className="flex flex-col items-center gap-4 group">
+                                    <div className="flex flex-col items-center gap-3 group">
                                         <motion.div 
-                                            whileHover={{ scale: 1.15 }}
-                                            className="w-16 h-16 rounded-full bg-[#050816] border-2 border-[#2563EB]/50 flex items-center justify-center text-white relative group-hover:border-[#06B6D4] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] transition-all duration-300"
+                                            whileHover={{ scale: 1.1 }}
+                                            className="w-14 h-14 rounded-full bg-bg-surface border-2 border-border-subtle flex items-center justify-center text-text-primary group-hover:border-text-primary transition-all duration-200 shadow-sm"
                                         >
-                                            <span className="font-mono text-sm font-bold z-10">{`0${idx + 1}`}</span>
-                                            
-                                            {/* Pulse ring */}
-                                            <motion.div 
-                                                className="absolute inset-0 rounded-full border border-[#06B6D4]"
-                                                animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0] }}
-                                                transition={{ duration: 2.5, repeat: Infinity, delay: idx * 0.4 }}
-                                            />
+                                            <span className="font-mono text-xs font-bold">{`0${idx + 1}`}</span>
                                         </motion.div>
-                                        <span className="text-sm font-bold text-slate-400 text-center w-32 group-hover:text-[#06B6D4] transition-colors">{node}</span>
+                                        <span className="text-xs font-semibold text-text-secondary text-center w-28 group-hover:text-text-primary transition-colors">{node}</span>
                                     </div>
                                 </motion.div>
-                                
-                                {/* Mobile connector */}
-                                {idx < workflowNodes.length - 1 && (
-                                    <motion.div 
-                                        initial={{ scaleY: 0 }}
-                                        whileInView={{ scaleY: 1 }}
-                                        viewport={{ once: true }}
-                                        transition={{ duration: 0.5, delay: 0.4 + idx * 0.2 }}
-                                        className="md:hidden h-10 w-0.5 bg-gradient-to-b from-[#2563EB] to-[#06B6D4] my-2 origin-top" 
-                                    />
-                                )}
                             </React.Fragment>
                         ))}
                     </div>
@@ -332,9 +390,9 @@ function Home() {
             </section>
 
             {/* STATS SECTION */}
-            <section className="py-24 px-6 sm:px-12 relative z-10 border-t border-b border-white/5 bg-[#0a0f25]/50">
-                <div className="max-w-6xl mx-auto">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
+            <section className="py-20 px-6 sm:px-12 relative z-10 border-t border-b border-border-subtle bg-bg-surface">
+                <div className="max-w-5xl mx-auto">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                         {stats.map((stat, idx) => (
                             <motion.div
                                 key={idx}
@@ -342,19 +400,19 @@ function Home() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="space-y-3"
+                                className="space-y-2"
                             >
-                                <div className="text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
+                                <div className="text-3xl sm:text-5xl font-black font-mono text-text-primary">
                                     <CountUp 
                                         end={stat.value} 
-                                        duration={2.5} 
+                                        duration={2} 
                                         enableScrollSpy 
                                         scrollSpyOnce
                                         separator=","
                                     />
-                                    <span className="text-[#06B6D4]">+</span>
+                                    <span>+</span>
                                 </div>
-                                <div className="text-sm sm:text-base font-medium text-slate-400 uppercase tracking-widest">
+                                <div className="text-xs font-medium text-text-secondary uppercase tracking-wider font-mono">
                                     {stat.label}
                                 </div>
                             </motion.div>
@@ -364,56 +422,43 @@ function Home() {
             </section>
 
             {/* CTA SECTION */}
-            <section className="py-40 px-6 sm:px-12 relative z-10 overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(37,99,235,0.15)_0%,transparent_60%)] pointer-events-none" />
-                
+            <section className="py-28 px-6 sm:px-12 relative z-10">
                 <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    className="max-w-4xl mx-auto text-center p-12 sm:p-20 rounded-[3rem] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/10 backdrop-blur-sm relative"
+                    className="max-w-3xl mx-auto text-center p-8 sm:p-14 rounded-xl bg-bg-surface border border-border-subtle shadow-sm"
                 >
-                    <div className="absolute inset-0 bg-[#2563EB]/5 blur-3xl -z-10 rounded-full" />
-                    <h2 className="text-4xl sm:text-6xl font-bold tracking-tight mb-8 text-white">
+                    <h2 className="text-2xl sm:text-4xl font-bold tracking-tight mb-6 text-text-primary">
                         Ready to Build the Future of Sports?
                     </h2>
                     <Link to="/register">
                         <motion.button 
-                            whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(37,99,235,0.6)" }}
-                            whileTap={{ scale: 0.95 }}
-                            className="px-10 py-4 bg-white text-[#050816] font-bold text-lg rounded-full flex items-center justify-center gap-3 mx-auto transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:bg-slate-100"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            className="px-8 py-3.5 bg-[#1A1A1A] text-white hover:bg-[#2A2A2A] dark:bg-white dark:text-[#0A0A0A] dark:hover:bg-[#F0F0F0] font-bold text-xs sm:text-sm rounded-full flex items-center justify-center gap-2.5 mx-auto transition-all shadow-md hover:shadow-lg cursor-pointer"
                         >
-                            Launch Athletix <ArrowRight style={{ fontSize: 20 }} />
+                            Launch Athletix <ArrowRight style={{ fontSize: 16 }} />
                         </motion.button>
                     </Link>
                 </motion.div>
             </section>
 
             {/* FOOTER */}
-            <footer className="py-12 px-6 sm:px-12 border-t border-white/5 bg-[#03050c] relative z-10">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <footer className="py-8 px-6 sm:px-12 border-t border-border-subtle bg-bg-surface relative z-10">
+                <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                     <div className="flex items-center space-x-3">
-                        <svg className="w-6 h-6" viewBox="0 0 100 100">
-                            <path d="M50 15 L15 85 L32 85 L50 45 L68 85 L85 85 Z" fill="#2563EB" />
-                        </svg>
-                        <span className="text-lg font-bold tracking-widest text-slate-300">ATHLETIX</span>
+                        <div className="h-7 w-7 rounded-lg bg-[#1A1A1A] dark:bg-white text-white dark:text-[#0A0A0A] flex items-center justify-center shadow-sm shrink-0">
+                            <AthletixEmblem className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-sm font-extrabold tracking-wider text-text-primary uppercase">ATHLETIX</span>
                     </div>
                     
-                    <div className="flex items-center space-x-6 text-slate-500">
-                        <a href="#" className="hover:text-white transition-colors"><Globe style={{ fontSize: 20 }} /></a>
-                        <a href="#" className="hover:text-white transition-colors">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                            </svg>
-                        </a>
-                        <a href="#" className="hover:text-white transition-colors">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-                            </svg>
-                        </a>
+                    <div className="flex items-center space-x-5 text-text-secondary">
+                        <a href="#" className="hover:text-text-primary transition-colors"><Globe style={{ fontSize: 18 }} /></a>
                     </div>
 
-                    <div className="text-sm text-slate-600">
+                    <div className="text-xs text-text-secondary font-mono">
                         © {new Date().getFullYear()} Athletix. All rights reserved.
                     </div>
                 </div>

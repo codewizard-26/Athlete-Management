@@ -3,11 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import api from "../../../api/axios";
 import { loginSuccess } from "../authSlice";
-import { Form, Input, Button, ConfigProvider, theme, Card } from "antd";
+import { Form, Input, ConfigProvider, theme, Card } from "antd";
 import { 
     MailOutlined, 
     LockOutlined, 
-    CheckCircleFilled
+    CheckCircleFilled,
+    SunOutlined,
+    MoonOutlined
 } from "@ant-design/icons";
 
 function Login() {
@@ -17,17 +19,21 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState("");
     const [success, setSuccess] = useState(false);
-    const [themeMode, setThemeMode] = useState("dark");
+    const [themeMode, setThemeMode] = useState(() => localStorage.getItem("themeMode") || "light");
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem("themeMode") || "dark";
-        setThemeMode(savedTheme);
-        if (savedTheme === "dark") {
+        if (themeMode === "dark") {
             document.documentElement.classList.add("dark");
         } else {
             document.documentElement.classList.remove("dark");
         }
-    }, []);
+    }, [themeMode]);
+
+    const toggleTheme = () => {
+        const newTheme = themeMode === "dark" ? "light" : "dark";
+        setThemeMode(newTheme);
+        localStorage.setItem("themeMode", newTheme);
+    };
 
     const handleSubmit = async (values) => {
         try {
@@ -68,167 +74,215 @@ function Login() {
         }
     };
 
+    const antdTheme = {
+        algorithm: themeMode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        token: {
+            colorPrimary: themeMode === "dark" ? "#FFFFFF" : "#1A1A1A",
+            colorBgLayout: "transparent",
+            colorBgContainer: themeMode === "dark" ? "#121212" : "#FFFFFF",
+            colorBorder: themeMode === "dark" ? "#222222" : "#E5E3DC",
+            colorText: themeMode === "dark" ? "#EDEDED" : "#1A1A1A",
+            colorTextSecondary: themeMode === "dark" ? "#888888" : "#555555",
+            borderRadius: 6,
+            fontFamily: "Geist, -apple-system, BlinkMacSystemFont, sans-serif",
+        },
+        components: {
+            Button: {
+                borderRadius: 6,
+                controlHeight: 38,
+                fontWeight: 600,
+                boxShadow: "none",
+                colorTextLightSolid: themeMode === "dark" ? "#0A0A0A" : "#FFFFFF",
+            },
+            Card: {
+                borderRadius: 8,
+            },
+            Input: {
+                colorText: themeMode === "dark" ? "#EDEDED" : "#1A1A1A",
+                colorTextPlaceholder: themeMode === "dark" ? "#666666" : "#777777",
+                colorBgContainer: themeMode === "dark" ? "#161616" : "#F4F2EC",
+                colorBorder: themeMode === "dark" ? "#222222" : "#E5E3DC",
+            }
+        }
+    };
+
     return (
-        <ConfigProvider 
-            theme={{
-                algorithm: themeMode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
-                token: {
-                    colorPrimary: "#6366F1",
-                    borderRadius: 8,
-                    fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-                }
-            }}
-        >
-            <div className="min-h-screen w-full flex flex-col lg:flex-row bg-bg-base text-text-primary font-sans transition-colors duration-150 animate-fadeIn">
+        <ConfigProvider theme={antdTheme}>
+            <div className="h-screen max-h-screen w-full flex flex-col bg-bg-base text-text-primary font-sans overflow-hidden transition-colors duration-200">
                 
-                {/* Left Side Banner */}
-                <div className="relative z-0 w-full lg:w-1/2 flex flex-col justify-between p-8 sm:p-10 lg:p-16 bg-[#0B0E14] text-white border-b lg:border-b-0 lg:border-r border-border-subtle overflow-hidden min-h-[30vh] lg:min-h-screen">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#0B0E14] via-[#121826] to-[#0B0E14] -z-20" />
-                    
-                    <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-brand-primary/10 rounded-full blur-[80px] pointer-events-none -z-10" />
-                    <div className="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] bg-brand-primary/10 rounded-full blur-[80px] pointer-events-none -z-10" />
-
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] -z-10">
-                        <svg className="w-4/5 h-4/5 text-white" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-                            <rect x="5" y="5" width="90" height="90" rx="3" strokeWidth="0.6" />
-                            <line x1="5" y1="50" x2="95" y2="50" strokeWidth="0.6" />
-                            <circle cx="50" cy="50" r="15" strokeWidth="0.6" />
-                            <rect x="30" y="5" width="40" height="15" strokeWidth="0.6" />
-                            <rect x="30" y="80" width="40" height="15" strokeWidth="0.6" />
-                        </svg>
-                    </div>
-
-                    {/* Brand Header */}
-                    <div className="relative z-10 flex items-center space-x-3">
-                        <div className="h-9 w-9 rounded bg-brand-primary flex items-center justify-center shadow-lg">
-                            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                {/* Navbar Header (Fixed 52px height) */}
+                <header className="h-13 shrink-0 w-full flex items-center justify-between px-6 sm:px-10 bg-bg-surface border-b border-border-subtle z-20">
+                    <Link to="/" className="flex items-center space-x-3">
+                        <div className="h-7 w-7 rounded-lg bg-[#1A1A1A] dark:bg-white text-white dark:text-[#0A0A0A] flex items-center justify-center shadow-sm shrink-0">
+                            <svg viewBox="0 0 100 100" className="w-3.5 h-3.5 fill-current">
+                                <path d="M50 15 L15 85 L32 85 L50 45 L68 85 L85 85 Z" />
+                                <path d="M38 65 L62 65" stroke="currentColor" strokeWidth="7" strokeLinecap="round" opacity="0.6" />
                             </svg>
                         </div>
-                        <div>
-                            <span className="text-base font-bold tracking-wider text-white uppercase leading-none block">ATHLETIX</span>
-                            <span className="text-[8px] uppercase tracking-widest block text-[#06B6D4] font-semibold">Sports Tech Platform</span>
+                        <span className="text-sm font-extrabold tracking-wider text-text-primary uppercase">ATHLETIX</span>
+                    </Link>
+
+                    <div className="flex items-center space-x-4">
+                        <button 
+                            onClick={toggleTheme}
+                            className="p-1.5 rounded-md bg-bg-elevated hover:bg-bg-inset text-text-primary border border-border-subtle transition-all cursor-pointer flex items-center justify-center"
+                            title="Toggle Light/Dark Theme"
+                        >
+                            {themeMode === "dark" ? <SunOutlined className="text-amber-400 text-xs" /> : <MoonOutlined className="text-slate-600 text-xs" />}
+                        </button>
+                        <Link to="/register" className="text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors">
+                            Create Account
+                        </Link>
+                    </div>
+                </header>
+
+                {/* Main Content Split - Fits 100% of viewport height without scrolling */}
+                <div className="flex-grow flex flex-col lg:flex-row w-full h-[calc(100vh-52px)] overflow-hidden">
+                    
+                    {/* Left Side Banner with Stitch Layout Grid */}
+                    <div className="relative z-0 w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-bg-surface text-text-primary border-b lg:border-b-0 lg:border-r border-border-subtle overflow-hidden h-full">
+                        {/* Background Grid */}
+                        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
+
+                        {/* Centered Pitch Watermark Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] dark:opacity-[0.07] z-0">
+                            <svg className="w-3/4 h-3/4 text-text-primary" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                                <rect x="5" y="5" width="90" height="90" rx="3" strokeWidth="0.6" />
+                                <line x1="5" y1="50" x2="95" y2="50" strokeWidth="0.6" />
+                                <circle cx="50" cy="50" r="15" strokeWidth="0.6" />
+                                <rect x="30" y="5" width="40" height="15" strokeWidth="0.6" />
+                                <rect x="30" y="80" width="40" height="15" strokeWidth="0.6" />
+                            </svg>
+                        </div>
+
+                        {/* Optical Center Aligned Text Block */}
+                        <div className="relative z-10 my-auto max-w-md w-full mx-auto flex flex-col justify-center py-2">
+                            <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 rounded-md bg-bg-elevated border border-border-subtle text-text-secondary text-[10px] font-mono font-semibold uppercase tracking-widest w-fit mb-3">
+                                <span>ATHLETIX ECOSYSTEM</span>
+                            </div>
+
+                            <h1 className="text-3xl sm:text-4xl lg:text-[38px] font-extrabold tracking-tight leading-[1.1] text-text-primary mb-3">
+                                Welcome Back.
+                            </h1>
+
+                            <p className="text-xs text-text-secondary leading-relaxed font-normal max-w-sm mb-6">
+                                Access your athlete, team, and competition management workspace with real-time analytics and scouting insights.
+                            </p>
+
+                            <ul className="space-y-2.5">
+                                <li className="flex items-start space-x-2.5 text-xs">
+                                    <svg className="w-3.5 h-3.5 text-text-primary mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span className="font-medium text-text-primary leading-snug">Longitudinal Athlete Metrics & Biometrics</span>
+                                </li>
+                                <li className="flex items-start space-x-2.5 text-xs">
+                                    <svg className="w-3.5 h-3.5 text-text-primary mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span className="font-medium text-text-primary leading-snug">Scouting & Recruitment Callouts</span>
+                                </li>
+                                <li className="flex items-start space-x-2.5 text-xs">
+                                    <svg className="w-3.5 h-3.5 text-text-primary mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span className="font-medium text-text-primary leading-snug">Tournament Brackets & Automated Fixtures</span>
+                                </li>
+                                <li className="flex items-start space-x-2.5 text-xs">
+                                    <svg className="w-3.5 h-3.5 text-text-primary mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span className="font-medium text-text-primary leading-snug">Role-Based Secure Multi-Tenant Portals</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="relative z-10 pt-4 border-t border-border-subtle/50 text-[9px] text-text-muted font-mono tracking-widest uppercase text-center lg:text-left shrink-0">
+                            <span>Connecting Athletes, Teams, and Organizations</span>
                         </div>
                     </div>
 
-                    {/* Headline and Description */}
-                    <div className="relative z-10 my-auto py-8">
-                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight text-white mb-4">
-                            Welcome Back.
-                        </h1>
-                        <h2 className="text-xs sm:text-sm font-semibold text-brand-primary mb-3 leading-normal">
-                            Access your athlete, team, and competition management workspace.
-                        </h2>
-                        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-md mb-6 sm:mb-8">
-                            Sign in to manage athlete profiles, recruitment drives, tournaments, matches, and performance analytics.
-                        </p>
-
-                        <div className="space-y-2.5">
-                            <div className="flex items-center space-x-2 text-xs text-slate-300">
-                                <span className="text-brand-secondary font-bold shrink-0">✓</span>
-                                <span>Athlete Profile Management</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-slate-300">
-                                <span className="text-brand-secondary font-bold shrink-0">✓</span>
-                                <span>Team Recruitment</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-slate-300">
-                                <span className="text-brand-secondary font-bold shrink-0">✓</span>
-                                <span>Tournament Management</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-slate-300">
-                                <span className="text-brand-secondary font-bold shrink-0">✓</span>
-                                <span>Performance Analytics</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="relative z-10 pt-4 flex items-center space-x-2 text-[9px] text-slate-400 font-semibold tracking-wider uppercase">
-                        <span>Connecting Athletes, Teams, and Organizations</span>
-                    </div>
-                </div>
-
-                {/* Right Side Form */}
-                <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:py-6 lg:px-12 bg-bg-base lg:min-h-screen">
-                    <div className="w-full max-w-[440px]">
-                        
-                        {success ? (
-                            <Card className="border border-brand-secondary/20 bg-bg-surface text-center shadow-sm rounded-xl py-8">
-                                <div className="mx-auto w-12 h-12 bg-brand-secondary/10 text-brand-secondary rounded-full flex items-center justify-center mb-4">
-                                    <CheckCircleFilled className="text-lg" />
-                                </div>
-                                <h2 className="text-base font-bold text-text-primary mb-1">Welcome Back!</h2>
-                                <p className="text-text-secondary text-xs mb-6">Login successful. Loading your sports workspace...</p>
-                                <div className="flex items-center justify-center space-x-2 text-brand-primary font-semibold text-xs tracking-wider">
-                                    <span className="animate-spin h-4 w-4 border-2 border-brand-primary border-t-transparent rounded-full" />
-                                    <span>Redirecting...</span>
-                                </div>
-                            </Card>
-                        ) : (
-                            <Card className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl p-2">
-                                
-                                <div className="mb-6">
-                                    <h2 className="text-lg font-bold text-text-primary tracking-tight">
-                                        Sign In
-                                    </h2>
-                                    <p className="text-text-secondary text-xs mt-1 leading-relaxed">
-                                        Access your account and continue your sporting journey.
-                                    </p>
-                                </div>
-
-                                {apiError && (
-                                    <div className="mb-4 p-3 bg-status-error/5 border border-status-error/15 rounded-lg text-xs text-status-error">
-                                        {apiError}
+                    {/* Right Side Form */}
+                    <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-bg-base h-full overflow-y-auto lg:overflow-hidden">
+                        <div className="w-full max-w-[400px]">
+                            
+                            {success ? (
+                                <Card className="border border-border-subtle bg-bg-surface text-center shadow-sm rounded-xl py-6">
+                                    <div className="mx-auto w-10 h-10 bg-status-success/10 text-status-success rounded-full flex items-center justify-center mb-3">
+                                        <CheckCircleFilled className="text-base" />
                                     </div>
-                                )}
-
-                                <Form
-                                    form={form}
-                                    layout="vertical"
-                                    onFinish={handleSubmit}
-                                    requiredMark={false}
-                                >
-                                    <Form.Item
-                                        name="email"
-                                        label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Email Address</span>}
-                                        rules={[
-                                            { required: true, message: "Please enter your email" },
-                                            { type: "email", message: "Please enter a valid email address" }
-                                        ]}
-                                    >
-                                        <Input placeholder="name@domain.com" prefix={<MailOutlined className="text-text-secondary/50 mr-1" />} />
-                                    </Form.Item>
-
-                                    <Form.Item
-                                        name="password"
-                                        label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Password</span>}
-                                        rules={[{ required: true, message: "Please enter your password" }]}
-                                    >
-                                        <Input.Password placeholder="••••••••" prefix={<LockOutlined className="text-text-secondary/50 mr-1" />} />
-                                    </Form.Item>
-
-                                    <Form.Item className="mt-6 mb-2">
-                                        <Button 
-                                            type="primary" 
-                                            htmlType="submit" 
-                                            loading={loading} 
-                                            className="w-full font-semibold text-xs h-10 rounded-md cursor-pointer"
-                                        >
+                                    <h2 className="text-sm font-bold text-text-primary mb-1">Welcome Back!</h2>
+                                    <p className="text-text-secondary text-xs mb-4">Login successful. Loading your sports workspace...</p>
+                                    <div className="flex items-center justify-center space-x-2 text-text-primary font-semibold text-xs tracking-wider font-mono">
+                                        <span className="animate-spin h-3.5 w-3.5 border-2 border-text-primary border-t-transparent rounded-full" />
+                                        <span>Redirecting...</span>
+                                    </div>
+                                </Card>
+                            ) : (
+                                <Card className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl p-3 sm:p-4">
+                                    
+                                    <div className="mb-4">
+                                        <h2 className="text-lg font-bold text-text-primary tracking-tight">
                                             Sign In
-                                        </Button>
-                                    </Form.Item>
-                                </Form>
+                                        </h2>
+                                        <p className="text-text-secondary text-xs mt-0.5 leading-relaxed">
+                                            Access your account and continue your sporting journey.
+                                        </p>
+                                    </div>
 
-                                <div className="mt-4 text-center">
-                                    <p className="text-xs text-text-secondary">
-                                        Don't have an account?{" "}
-                                        <Link to="/register" className="text-brand-primary hover:text-brand-primary-hover font-semibold">
-                                            Sign Up
-                                        </Link>
-                                    </p>
-                                </div>
-                            </Card>
-                        )}
+                                    {apiError && (
+                                        <div className="mb-3 p-2.5 bg-status-danger/10 border border-status-danger/20 rounded-lg text-xs text-status-danger font-medium">
+                                            {apiError}
+                                        </div>
+                                    )}
+
+                                    <Form
+                                        form={form}
+                                        layout="vertical"
+                                        onFinish={handleSubmit}
+                                        requiredMark={false}
+                                    >
+                                        <Form.Item
+                                            name="email"
+                                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Email Address</span>}
+                                            rules={[
+                                                { required: true, message: "Please enter your email" },
+                                                { type: "email", message: "Please enter a valid email address" }
+                                            ]}
+                                            className="mb-3"
+                                        >
+                                            <Input placeholder="name@domain.com" prefix={<MailOutlined className="text-text-secondary/50 mr-1" />} />
+                                        </Form.Item>
+
+                                        <Form.Item
+                                            name="password"
+                                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Password</span>}
+                                            rules={[{ required: true, message: "Please enter your password" }]}
+                                            className="mb-3"
+                                        >
+                                            <Input.Password placeholder="••••••••" prefix={<LockOutlined className="text-text-secondary/50 mr-1" />} />
+                                        </Form.Item>
+
+                                        <Form.Item className="mt-5 mb-2">
+                                            <button
+                                                type="submit"
+                                                disabled={loading}
+                                                className="w-full h-9 bg-[#1A1A1A] text-white hover:bg-[#333333] dark:bg-white dark:text-[#0A0A0A] dark:hover:bg-[#E5E5E5] font-bold text-xs rounded-md shadow-sm transition-all cursor-pointer flex items-center justify-center"
+                                            >
+                                                {loading ? <span className="animate-spin h-3.5 w-3.5 border-2 border-current border-t-transparent rounded-full" /> : "Sign In"}
+                                            </button>
+                                        </Form.Item>
+
+                                        <div className="text-center pt-1">
+                                            <span className="text-xs text-text-secondary">Don't have an account? </span>
+                                            <Link to="/register" className="text-xs font-semibold text-text-primary hover:underline">
+                                                Sign Up
+                                            </Link>
+                                        </div>
+                                    </Form>
+                                </Card>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

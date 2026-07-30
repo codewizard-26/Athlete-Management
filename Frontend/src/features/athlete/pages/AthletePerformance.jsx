@@ -135,11 +135,11 @@ function AthletePerformance() {
                         </h2>
 
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                            <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
+                            <Card variant="borderless" className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                                 <Statistic 
                                     title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Matches Played</span>}
                                     value={summary.totalMatches} 
-                                    valueStyle={{ color: 'var(--color-primary)', fontWeight: '750', fontSize: '22px' }}
+                                    styles={{ content: { color: 'var(--color-primary)', fontWeight: '750', fontSize: '22px' } }}
                                     prefix={<CalendarOutlined className="text-brand-primary mr-1.5 text-base" />}
                                 />
                             </Card>
@@ -147,54 +147,54 @@ function AthletePerformance() {
                             {/* Render Sport Specific Cards */}
                             {sport === "football" ? (
                                 <>
-                                    <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
+                                    <Card variant="borderless" className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                                         <Statistic 
                                             title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Goals Scored</span>}
                                             value={summary.stats.goals || 0} 
-                                            valueStyle={{ color: 'var(--color-secondary)', fontWeight: '750', fontSize: '22px' }}
+                                            styles={{ content: { color: 'var(--color-secondary)', fontWeight: '750', fontSize: '22px' } }}
                                             prefix={<BarChartOutlined className="text-brand-secondary mr-1.5 text-base" />}
                                         />
                                     </Card>
-                                    <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
+                                    <Card variant="borderless" className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                                         <Statistic 
                                             title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Assists Delivered</span>}
                                             value={summary.stats.assists || 0} 
-                                            valueStyle={{ color: 'var(--color-primary)', fontWeight: '750', fontSize: '22px' }}
+                                            styles={{ content: { color: 'var(--color-primary)', fontWeight: '750', fontSize: '22px' } }}
                                             prefix={<DashboardOutlined className="text-brand-primary mr-1.5 text-base" />}
                                         />
                                     </Card>
-                                    <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
+                                    <Card variant="borderless" className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                                         <Statistic 
                                             title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Clean Sheets</span>}
                                             value={summary.stats.cleanSheets || 0} 
-                                            valueStyle={{ color: 'var(--color-accent)', fontWeight: '750', fontSize: '22px' }}
+                                            styles={{ content: { color: 'var(--color-accent)', fontWeight: '750', fontSize: '22px' } }}
                                             prefix={<TrophyOutlined className="text-brand-accent mr-1.5 text-base" />}
                                         />
                                     </Card>
                                 </>
                             ) : (
                                 <>
-                                    <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
+                                    <Card variant="borderless" className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                                         <Statistic 
                                             title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Runs Scored</span>}
                                             value={summary.stats.runs || 0} 
-                                            valueStyle={{ color: 'var(--color-secondary)', fontWeight: '750', fontSize: '22px' }}
+                                            styles={{ content: { color: 'var(--color-secondary)', fontWeight: '750', fontSize: '22px' } }}
                                             prefix={<BarChartOutlined className="text-brand-secondary mr-1.5 text-base" />}
                                         />
                                     </Card>
-                                    <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
+                                    <Card variant="borderless" className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                                         <Statistic 
                                             title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Wickets Taken</span>}
                                             value={summary.stats.wickets || 0} 
-                                            valueStyle={{ color: 'var(--color-primary)', fontWeight: '750', fontSize: '22px' }}
+                                            styles={{ content: { color: 'var(--color-primary)', fontWeight: '750', fontSize: '22px' } }}
                                             prefix={<DashboardOutlined className="text-brand-primary mr-1.5 text-base" />}
                                         />
                                     </Card>
-                                    <Card bordered={false} className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
+                                    <Card variant="borderless" className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl">
                                         <Statistic 
                                             title={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Strike Rate (Avg)</span>}
                                             value={summary.stats.strikeRate || 0} 
-                                            valueStyle={{ color: 'var(--color-accent)', fontWeight: '750', fontSize: '22px' }}
+                                            styles={{ content: { color: 'var(--color-accent)', fontWeight: '750', fontSize: '22px' } }}
                                             prefix={<TrophyOutlined className="text-brand-accent mr-1.5 text-base" />}
                                         />
                                     </Card>
@@ -205,7 +205,7 @@ function AthletePerformance() {
 
                     {/* Progress Breakdown */}
                     {summary.totalMatches > 0 && (
-                        <Card bordered={false} className="border border-border-subtle bg-bg-surface p-5 rounded-xl shadow-sm">
+                        <Card variant="borderless" className="border border-border-subtle bg-bg-surface p-5 rounded-xl shadow-sm">
                             <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider mb-5">Metric Targets Progress</h3>
                             <Row gutter={[24, 20]}>
                                 {Object.entries(summary.stats).map(([key, val]) => {
@@ -239,7 +239,7 @@ function AthletePerformance() {
                         </h2>
 
                         {history.length === 0 ? (
-                            <Card bordered={false} className="border border-border-subtle bg-bg-surface py-12 text-center rounded-xl shadow-sm">
+                            <Card variant="borderless" className="border border-border-subtle bg-bg-surface py-12 text-center rounded-xl shadow-sm">
                                 <Empty description={<span className="text-text-secondary text-xs">No match history records registered in the system.</span>} />
                             </Card>
                         ) : (

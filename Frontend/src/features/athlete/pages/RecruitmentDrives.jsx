@@ -69,7 +69,7 @@ function RecruitmentDrives() {
     });
 
     return (
-        <div className="space-y-6 animate-fadeIn">
+        <div className="space-y-8 animate-fadeIn">
             
             {/* Header */}
             <div className="pb-4 border-b border-border-subtle">
@@ -78,47 +78,49 @@ function RecruitmentDrives() {
             </div>
 
             {/* Filter Section */}
-            <Card bordered={false} className="border border-border-subtle bg-bg-surface p-4 rounded-xl shadow-sm">
-                <Row gutter={[12, 12]} align="middle">
-                    <Col xs={24} md={8}>
+            <div className="bg-bg-surface border border-border-subtle p-3 rounded-2xl shadow-sm">
+                <div className="flex flex-col md:flex-row gap-3">
+                    <div className="flex-grow">
                         <Input 
                             placeholder="Search by drive title or team..." 
-                            prefix={<SearchOutlined className="text-text-secondary mr-1" />}
+                            prefix={<SearchOutlined className="text-text-secondary mr-2" />}
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
-                            className="bg-bg-surface border-border-subtle hover:border-brand-primary"
+                            className="w-full h-10 bg-bg-base border-transparent hover:border-brand-primary focus:border-brand-primary rounded-xl"
                         />
-                    </Col>
-                    <Col xs={12} md={5}>
+                    </div>
+                    <div className="w-full md:w-48">
                         <Select 
                             value={sportFilter} 
                             onChange={setSportFilter}
-                            className="w-full"
+                            className="w-full h-10 [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!bg-bg-base [&_.ant-select-selector]:!border-transparent hover:[&_.ant-select-selector]:!border-brand-primary"
+                            popupClassName="rounded-xl"
                         >
                             <Option value="all">All Sports</Option>
                             <Option value="football">Football</Option>
                             <Option value="cricket">Cricket</Option>
                         </Select>
-                    </Col>
-                    <Col xs={12} md={5}>
+                    </div>
+                    <div className="w-full md:w-56">
                         <Input 
-                            placeholder="Filter by city/location..." 
-                            prefix={<EnvironmentOutlined className="text-text-secondary mr-1" />}
+                            placeholder="Filter by city..." 
+                            prefix={<EnvironmentOutlined className="text-text-secondary mr-2" />}
                             value={locationFilter}
                             onChange={(e) => setLocationFilter(e.target.value)}
-                            className="bg-bg-surface border-border-subtle hover:border-brand-primary"
+                            className="w-full h-10 bg-bg-base border-transparent hover:border-brand-primary focus:border-brand-primary rounded-xl"
                         />
-                    </Col>
-                    <Col xs={24} md={6} className="text-right">
+                    </div>
+                    <div className="w-full md:w-auto">
                         <Button 
+                            type="primary"
                             onClick={fetchDrives} 
-                            className="w-full border-border-subtle hover:border-brand-primary hover:text-brand-primary text-xs font-semibold cursor-pointer"
+                            className="w-full md:w-auto h-10 px-6 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all"
                         >
-                            Refresh Drives
+                            Refresh
                         </Button>
-                    </Col>
-                </Row>
-            </Card>
+                    </div>
+                </div>
+            </div>
 
             {/* Drives Grid */}
             {loading ? (
@@ -132,76 +134,84 @@ function RecruitmentDrives() {
                     <Empty description={<span className="text-text-secondary text-xs">No active recruitment drives found matching the filters.</span>} />
                 </Card>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
                     {filteredDrives.map(drive => (
-                        <Card 
+                        <div 
                             key={drive._id}
-                            bordered={false} 
-                            className="border border-border-subtle bg-bg-surface shadow-sm hover:border-brand-primary/25 hover:shadow-md transition-all duration-150 rounded-xl flex flex-col justify-between group"
+                            className="border border-border-subtle bg-bg-surface shadow-sm hover:border-brand-primary/30 hover:shadow-md transition-all duration-200 rounded-xl flex flex-col group overflow-hidden"
                         >
-                            {/* Card Body */}
-                            <div className="space-y-4 flex-grow">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center space-x-3 min-w-0">
-                                        {(drive.teamId?.logo?.url || (typeof drive.teamId?.logo === "string" && drive.teamId?.logo)) ? (
-                                            <img src={drive.teamId?.logo?.url || drive.teamId?.logo} alt="Logo" className="w-9 h-9 rounded object-cover border border-border-subtle shrink-0" />
-                                        ) : (
-                                            <Avatar size={36} icon={<UserOutlined />} className="bg-brand-primary rounded font-bold shrink-0" />
-                                        )}
-                                        <div className="min-w-0">
-                                            <h3 className="text-xs font-semibold text-text-primary leading-tight truncate">{drive.title}</h3>
-                                            <p className="text-[10px] text-text-secondary truncate mt-0.5">{drive.teamId?.teamName || "Apex Team"}</p>
+                            {/* Card Body - Flex Grow to push footer down */}
+                            <div className="p-5 flex-grow flex flex-col space-y-4">
+                                
+                                {/* Header: Avatar, Title, Team & Tag */}
+                                <div className="flex items-center gap-4">
+                                    {(drive.teamId?.logo?.url || (typeof drive.teamId?.logo === "string" && drive.teamId?.logo)) ? (
+                                        <img src={drive.teamId?.logo?.url || drive.teamId?.logo} alt="Logo" className="w-12 h-12 rounded-xl object-cover border border-border-subtle shrink-0 shadow-sm" />
+                                    ) : (
+                                        <Avatar size={48} icon={<UserOutlined />} className="bg-brand-primary rounded-xl font-bold shrink-0 shadow-sm" />
+                                    )}
+                                    <div className="min-w-0 flex-grow">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <h3 className="text-sm font-bold text-text-primary leading-tight truncate">{drive.title}</h3>
+                                            <Tag color={drive.sport?.toLowerCase() === "football" ? "blue" : "gold"} className="m-0 border-0 text-[9px] font-bold uppercase shrink-0 px-2 py-0.5 rounded-md">
+                                                {drive.sport}
+                                            </Tag>
                                         </div>
+                                        <p className="text-[11.5px] font-semibold text-text-secondary truncate">{drive.teamId?.teamName || "Apex Team"}</p>
                                     </div>
-                                    <Tag color={drive.sport?.toLowerCase() === "football" ? "blue" : "gold"} className="m-0 border-0 text-[9px] font-semibold uppercase">
-                                        {drive.sport}
-                                    </Tag>
                                 </div>
 
-                                <p className="text-xs text-text-secondary line-clamp-3 leading-relaxed">
+                                {/* Description */}
+                                <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed flex-grow">
                                     {drive.description}
                                 </p>
 
-                                <div className="grid grid-cols-2 gap-3.5 bg-bg-elevated/50 border border-border-subtle p-3.5 rounded-lg text-[11px]">
-                                    <div>
-                                        <span className="text-text-secondary block uppercase font-semibold text-[8px]">Location</span>
-                                        <span className="text-text-primary font-medium flex items-center mt-0.5 truncate">
-                                            <EnvironmentOutlined className="mr-1 text-brand-primary" />
-                                            {drive.location}
-                                        </span>
+                                {/* Stats & Info Grid (Clean, no heavy borders) */}
+                                <div className="grid grid-cols-2 gap-2.5 pt-2">
+                                    <div className="flex items-center space-x-2 bg-bg-elevated/40 p-2 rounded-md border border-border-subtle/50">
+                                        <div className="bg-bg-surface p-1.5 rounded text-brand-primary shadow-sm border border-border-subtle/30">
+                                            <EnvironmentOutlined className="text-[10px]" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <span className="text-[9px] font-bold text-text-secondary uppercase block leading-none">Location</span>
+                                            <span className="text-[11px] font-semibold text-text-primary truncate block mt-0.5 leading-none">{drive.location}</span>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <span className="text-text-secondary block uppercase font-semibold text-[8px]">Age Group</span>
-                                        <span className="text-text-primary font-medium flex items-center mt-0.5">
-                                            <TrophyOutlined className="mr-1 text-brand-secondary" />
-                                            {drive.ageCategory}
-                                        </span>
+                                    <div className="flex items-center space-x-2 bg-bg-elevated/40 p-2 rounded-md border border-border-subtle/50">
+                                        <div className="bg-bg-surface p-1.5 rounded text-brand-secondary shadow-sm border border-border-subtle/30">
+                                            <TrophyOutlined className="text-[10px]" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <span className="text-[9px] font-bold text-text-secondary uppercase block leading-none">Age Group</span>
+                                            <span className="text-[11px] font-semibold text-text-primary truncate block mt-0.5 leading-none">{drive.ageCategory}</span>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div className="flex items-center justify-between text-[11px] border-t border-border-subtle pt-3 text-text-secondary">
-                                    <span className="flex items-center text-xs">
-                                        <CalendarOutlined className="mr-1 text-[10px]" />
-                                        Deadline: {drive.applicationDeadline ? new Date(drive.applicationDeadline).toLocaleDateString() : "N/A"}
+                                
+                                {/* Deadline & Spots */}
+                                <div className="flex items-center justify-between text-[11px] font-medium pt-1">
+                                    <span className="flex items-center text-text-secondary bg-bg-elevated px-2 py-1 rounded-full border border-border-subtle/50">
+                                        <CalendarOutlined className="mr-1.5 text-[10px]" />
+                                        Ends: {drive.applicationDeadline ? new Date(drive.applicationDeadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : "N/A"}
                                     </span>
-                                    <span className="font-semibold text-brand-primary">
-                                        {drive.vacancies || 0} Open Spots
+                                    <span className="text-brand-accent bg-brand-accent/10 px-2 py-1 rounded-full border border-brand-accent/20 font-bold">
+                                        {drive.vacancies || 0} Spots
                                     </span>
                                 </div>
                             </div>
 
-                            {/* Card Footer Actions */}
-                            <div className="mt-5 border-t border-border-subtle pt-4">
+                            {/* Card Footer Actions (Pinned to bottom) */}
+                            <div className="p-4 bg-bg-elevated/30 border-t border-border-subtle mt-auto">
                                 <Button 
                                     type="primary" 
-                                    className="w-full flex items-center justify-center font-semibold text-xs h-9 rounded-md cursor-pointer"
+                                    className="w-full flex items-center justify-center font-bold text-[13px] h-9 rounded-lg shadow-sm transition-transform active:scale-[0.98] cursor-pointer"
                                     onClick={() => handleApply(drive._id)}
                                     loading={submitting[drive._id]}
                                 >
                                     Apply for Scouting
                                 </Button>
                             </div>
-                        </Card>
+                        </div>
                     ))}
                 </div>
             )}

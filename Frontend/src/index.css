@@ -1,84 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* --------------------------------------------------------------------------
-   DESIGN SYSTEM - CSS VARIABLES (GLASSMORPHISM EXTENDED)
+   STITCH SEMANTIC DESIGN SYSTEM - COLOR BLENDING & CONTRAST TOKENS
    -------------------------------------------------------------------------- */
+
+/* Light Mode (Nordic Clean Studio Light - DEFAULT) */
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  
-  /* Light Mode Colors (Glassmorphism Tinted) */
-  --color-bg-base: #F1F3F7;
-  --color-bg-surface: rgba(255, 255, 255, 0.45);
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+
+  --color-bg-base: #F8F9FA;
+  --color-bg-surface: #FFFFFF;
   --color-bg-surface-rgb: 255, 255, 255;
-  --color-bg-elevated: rgba(243, 244, 246, 0.6);
-  
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #475569;
-  
-  --color-primary: #4F46E5;
-  --color-primary-hover: #4338CA;
-  --color-secondary: #059669;
-  --color-accent: #D97706;
-  
-  --color-border-subtle: rgba(15, 23, 42, 0.08);
-  --color-border-hover: rgba(79, 70, 229, 0.2);
-  --color-border-glass: rgba(255, 255, 255, 0.4);
-  
-  --color-success: #059669;
+  --color-bg-elevated: #F1F3F5;
+  --color-bg-inset: #F8F9FA;
+
+  --color-text-primary: #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted: #6B7280;
+
+  --color-primary: #111827;
+  --color-primary-hover: #1F2937;
+  --color-primary-text: #FFFFFF;
+
+  --color-brand: #111827;
+  --color-border-subtle: #E5E7EB;
+  --color-border-hover: #9CA3AF;
+  --color-border-glass: #E5E7EB;
+
+  --color-success: #16A34A;
   --color-warning: #D97706;
   --color-danger: #DC2626;
   --color-info: #0284C7;
-  
-  --color-shadow: rgba(31, 38, 135, 0.04);
-  --color-shadow-lg: rgba(31, 38, 135, 0.08);
-  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
 }
 
-/* Dark Mode Overrides */
+/* Dark Mode (Nordic Obsidian Dark) */
 .dark, [data-theme="dark"] {
-  /* Dark Mode Colors (Glassmorphism Tinted) */
-  --color-bg-base: #07090E;
-  --color-bg-surface: rgba(15, 22, 36, 0.45);
-  --color-bg-surface-rgb: 15, 22, 36;
-  --color-bg-elevated: rgba(22, 30, 49, 0.6);
-  
-  --color-text-primary: #F8FAFC;
-  --color-text-secondary: #94A3B8;
-  
-  --color-primary: #6366F1;
-  --color-primary-hover: #4F46E5;
-  --color-secondary: #34D399;
-  --color-accent: #F59E0B;
-  
-  --color-border-subtle: rgba(255, 255, 255, 0.06);
-  --color-border-hover: rgba(99, 102, 241, 0.25);
-  --color-border-glass: rgba(255, 255, 255, 0.04);
-  
-  --color-success: #34D399;
-  --color-warning: #F59E0B;
+  --color-bg-base: #0B0E14;
+  --color-bg-surface: #111827;
+  --color-bg-surface-rgb: 17, 24, 39;
+  --color-bg-elevated: #1F2937;
+  --color-bg-inset: #1A2332;
+
+  --color-text-primary: #F9FAFB;
+  --color-text-secondary: #D1D5DB;
+  --color-text-muted: #9CA3AF;
+
+  --color-primary: #FFFFFF;
+  --color-primary-hover: #F3F4F6;
+  --color-primary-text: #0B0E14;
+
+  --color-brand: #FFFFFF;
+  --color-border-subtle: #1F2937;
+  --color-border-hover: #374151;
+  --color-border-glass: #1F2937;
+
+  --color-success: #22C55E;
+  --color-warning: #EAB308;
   --color-danger: #EF4444;
-  --color-info: #38BDF8;
-  
-  --color-shadow: rgba(0, 0, 0, 0.2);
-  --color-shadow-lg: rgba(0, 0, 0, 0.4);
-  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --color-info: #3B82F6;
+
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.5);
 }
 
 /* --------------------------------------------------------------------------
-   TAILWIND V4 THEME CONFIGURATION
+   TAILWIND V4 THEME MAPPING
    -------------------------------------------------------------------------- */
 @theme {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
   --color-bg-base: var(--color-bg-base);
   --color-bg-surface: var(--color-bg-surface);
   --color-bg-elevated: var(--color-bg-elevated);
+  --color-bg-inset: var(--color-bg-inset);
   
   --color-text-primary: var(--color-text-primary);
   --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
   
   --color-brand-primary: var(--color-primary);
-  --color-brand-primary-hover: var(--color-primary-hover);
-  --color-brand-secondary: var(--color-secondary);
-  --color-brand-accent: var(--color-accent);
   
   --color-border-subtle: var(--color-border-subtle);
   --color-border-hover: var(--color-border-hover);
@@ -87,14 +93,10 @@
   --color-status-warning: var(--color-warning);
   --color-status-danger: var(--color-danger);
   --color-status-info: var(--color-info);
-  
-  --shadow-sm: var(--shadow-glass);
-  --shadow-md: var(--shadow-glass);
-  --shadow-lg: var(--color-shadow-lg);
 }
 
 /* --------------------------------------------------------------------------
-   GLOBAL RESET & ANIMATED BACKGROUND
+   GLOBAL RESET & BODY
    -------------------------------------------------------------------------- */
 html, body, #root {
   margin: 0;
@@ -106,55 +108,18 @@ html, body, #root {
   color: var(--color-text-primary) !important;
   min-height: 100vh;
   font-family: var(--font-sans);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Dynamic Animated Background Blobs */
-body {
-  position: relative;
+/* Tabular Mono numbers */
+.font-mono, .metric-val, .ant-statistic-content-value {
+  font-family: var(--font-mono) !important;
+  font-variant-numeric: tabular-nums;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  top: -10%;
-  left: -10%;
-  width: 55%;
-  height: 55%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0) 70%);
-  border-radius: 50%;
-  z-index: -1;
-  filter: blur(80px);
-  pointer-events: none;
-  animation: float-slow 22s infinite alternate ease-in-out;
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  bottom: -10%;
-  right: -10%;
-  width: 60%;
-  height: 60%;
-  background: radial-gradient(circle, rgba(52, 211, 153, 0.08) 0%, rgba(52, 211, 153, 0) 70%);
-  border-radius: 50%;
-  z-index: -1;
-  filter: blur(100px);
-  pointer-events: none;
-  animation: float-slow-reverse 28s infinite alternate ease-in-out;
-}
-
-@keyframes float-slow {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(8%, 12%) scale(1.15); }
-}
-
-@keyframes float-slow-reverse {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-12%, -6%) scale(1.1); }
-}
-
-/* Subtle custom scrollbar */
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -163,265 +128,218 @@ body::after {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border-subtle);
+  background: rgba(120, 120, 120, 0.2);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
+  background: rgba(120, 120, 120, 0.4);
 }
 
-/* --------------------------------------------------------------------------
-   PREMIUM GLASSMORPHISM CORE
-   -------------------------------------------------------------------------- */
-.premium-card, .ant-card {
+/* Card & Surface Defaults */
+.premium-card {
   background-color: var(--color-bg-surface) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid var(--color-border-glass) !important;
-  box-shadow: var(--shadow-glass) !important;
-  border-radius: 16px !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-.premium-card:hover, .ant-card:hover {
+.premium-card:hover {
   border-color: var(--color-border-hover) !important;
-  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12) !important;
-  transform: translateY(-2px);
 }
 
-/* Apply backdrop-blur globally to headers, modals, drawers, and select dropdowns */
-header, 
-.ant-modal-content, 
-.ant-drawer-content,
-.ant-select-dropdown {
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  background-color: var(--color-bg-surface) !important;
-  border-color: var(--color-border-glass) !important;
-}
-
-aside {
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  background: linear-gradient(135deg, rgba(var(--color-bg-surface-rgb), 0.3) 0%, rgba(255, 255, 255, 0.06) 100%) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
-/* Tables */
-.premium-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.premium-table th {
-  padding: 12px 16px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-secondary);
-  border-bottom: 1px solid var(--color-border-subtle);
-  background-color: rgba(var(--color-bg-surface-rgb), 0.3);
-}
-
-.premium-table td {
-  padding: 14px 16px;
-  font-size: 13px;
-  color: var(--color-text-primary);
-  border-bottom: 1px solid var(--color-border-subtle);
-  transition: background-color 0.2s ease;
-}
-
-.premium-table tr:hover td {
-  background-color: rgba(var(--color-bg-surface-rgb), 0.4);
+.glass-panel {
+  background-color: rgba(var(--color-bg-surface-rgb), 0.85) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-glass) !important;
 }
 
 /* --------------------------------------------------------------------------
-   ANT DESIGN OVERRIDES FOR GLASS INTEGRATION
+   ANT DESIGN COMPONENT REFINEMENT
    -------------------------------------------------------------------------- */
-.ant-btn {
+.ant-btn, button {
   font-family: var(--font-sans) !important;
-  box-shadow: none !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  transition: all 0.15s ease !important;
+}
+
+.ant-btn:active, button:active {
+  transform: translateY(1px) !important;
 }
 
 .ant-btn-primary {
   background-color: var(--color-primary) !important;
-  border-color: var(--color-primary) !important;
+  color: var(--color-primary-text) !important;
+  border: 1px solid var(--color-primary) !important;
 }
+
 .ant-btn-primary:hover {
   background-color: var(--color-primary-hover) !important;
   border-color: var(--color-primary-hover) !important;
-  transform: translateY(-1px);
+  color: var(--color-primary-text) !important;
+}
+
+/* Fix Ant Design Menu Selection Box */
+.ant-menu-item-selected {
+  background-color: var(--color-bg-elevated) !important;
+  color: var(--color-text-primary) !important;
+  font-weight: 600 !important;
+}
+
+.ant-menu-item-selected .ant-menu-title-content,
+.ant-menu-item-selected .anticon {
+  color: var(--color-text-primary) !important;
+}
+
+.ant-menu-item:hover {
+  background-color: var(--color-bg-elevated) !important;
 }
 
 .ant-card-head {
   border-bottom: 1px solid var(--color-border-subtle) !important;
   background: transparent !important;
+  padding: 12px 16px !important;
 }
 
 .ant-card-head-title {
   color: var(--color-text-primary) !important;
+  font-family: var(--font-sans) !important;
   font-weight: 600 !important;
+  font-size: 14px !important;
 }
 
 .ant-statistic-title {
   color: var(--color-text-secondary) !important;
+  font-family: var(--font-mono) !important;
   font-size: 11px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
 }
 
 .ant-statistic-content-value {
   color: var(--color-text-primary) !important;
-  font-weight: 700 !important;
-  font-size: 24px !important;
-}
-
-.ant-select-item-option-selected {
-  background-color: var(--color-primary) !important;
-  color: #FFFFFF !important;
-}
-
-.ant-select-item-option-active {
-  background-color: rgba(var(--color-bg-surface-rgb), 0.2) !important;
+  font-family: var(--font-mono) !important;
+  font-weight: 600 !important;
+  font-size: 22px !important;
 }
 
 /* --------------------------------------------------------------------------
-   PREMIUM GLASS INPUTS & AUTOFILL FIX
+   ANT DESIGN RADIO SEGMENTED BUTTONS
    -------------------------------------------------------------------------- */
-.ant-input, 
-.ant-input-password, 
-.ant-input-affix-wrapper, 
-.ant-select-selector, 
-.ant-picker,
-input, 
-select, 
-textarea {
-  background-color: rgba(var(--color-bg-surface-rgb), 0.25) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  color: var(--color-text-primary) !important;
+.ant-radio-group {
+  background-color: var(--color-bg-inset) !important;
+  padding: 3px !important;
   border-radius: 8px !important;
-  padding: 8px 12px !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid var(--color-border-subtle) !important;
 }
 
-.ant-input:hover, 
-.ant-input-affix-wrapper:hover, 
-.ant-select-selector:hover, 
-.ant-picker:hover,
-input:hover, 
-select:hover, 
-textarea:hover {
-  border-color: var(--color-border-hover) !important;
-  background-color: rgba(var(--color-bg-surface-rgb), 0.35) !important;
+.ant-radio-button-wrapper {
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--color-text-secondary) !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  transition: all 0.15s ease !important;
+  box-shadow: none !important;
 }
 
+.ant-radio-button-wrapper:not(:first-child)::before {
+  display: none !important;
+}
+
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  background-color: var(--color-bg-surface) !important;
+  color: var(--color-text-primary) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+}
+
+.ant-radio-button-wrapper:hover {
+  color: var(--color-text-primary) !important;
+}
+
+/* --------------------------------------------------------------------------
+   FORM CONTROLS & ZERO-DOUBLE-BORDER RULES
+   -------------------------------------------------------------------------- */
+
+/* Prevent double borders on Select by removing outer styles */
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+/* Ensure placeholder and selection items are highly legible */
+.ant-select-selection-placeholder,
+.ant-input::placeholder,
+.ant-picker-input > input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-muted) !important;
+  opacity: 1 !important;
+}
+
+.ant-select-selection-item,
+.ant-input,
+.ant-input-number-input,
+.ant-picker-input > input,
+textarea {
+  color: var(--color-text-primary) !important;
+  font-weight: 500 !important;
+}
+
+/* Fix Affix Wrappers (Input with icons) to prevent double borders */
+.ant-input-affix-wrapper {
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+.ant-input-affix-wrapper .ant-input {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Clean, non-heavy focus ring */
 .ant-input:focus, 
 .ant-input-focused, 
 .ant-input-affix-wrapper-focused, 
-.ant-select-focused .ant-select-selector, 
-.ant-picker-focused,
-input:focus, 
-select:focus, 
-textarea:focus {
-  background-color: rgba(var(--color-bg-surface-rgb), 0.45) !important;
-  border-color: var(--color-primary) !important;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15) !important;
+.ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector,
+.ant-picker-focused {
+  border-color: var(--color-brand) !important;
+  box-shadow: 0 0 0 2px rgba(94, 106, 210, 0.15) !important;
   outline: none !important;
 }
 
-/* Chrome/Safari/Firefox Autofill Overrides: Prevents solid white background */
+/* Dropdown Option Menus */
+.ant-select-dropdown {
+  background-color: var(--color-bg-surface) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: 4px !important;
+  border-radius: 8px !important;
+}
+
+.ant-select-item {
+  color: var(--color-text-primary) !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: var(--color-bg-elevated) !important;
+  color: var(--color-text-primary) !important;
+  font-weight: 600 !important;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: var(--color-bg-elevated) !important;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active,
-.ant-input:-webkit-autofill,
-.ant-input-affix-wrapper input:-webkit-autofill {
+input:-webkit-autofill:focus {
   transition: background-color 5000s ease-in-out 0s !important;
   -webkit-text-fill-color: var(--color-text-primary) !important;
-  background-color: transparent !important;
-}
-
-/* --------------------------------------------------------------------------
-   MICRO-ANIMATIONS
-   -------------------------------------------------------------------------- */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-slideUp {
-  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0;
-}
-
-.animate-slideInRight {
-  animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0;
-}
-
-.animate-scaleIn {
-  animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0;
-}
-
-/* Stagger Utilities */
-.stagger-1 { animation-delay: 100ms; }
-.stagger-2 { animation-delay: 200ms; }
-.stagger-3 { animation-delay: 300ms; }
-.stagger-4 { animation-delay: 400ms; }
-.stagger-5 { animation-delay: 500ms; }
-
-/* Ensure menu items in sidebar animate nicely */
-.ant-menu-item {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-.ant-menu-item:hover {
-  transform: translateX(3px);
 }

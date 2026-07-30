@@ -19,6 +19,8 @@ function AthleteSettings() {
             if (res.data) {
                 form.setFieldsValue({
                     ...res.data,
+                    sport: res.data.sport ? res.data.sport.toLowerCase() : undefined,
+                    gender: res.data.gender ? res.data.gender.toLowerCase() : undefined,
                     dob: res.data.dob ? dayjs(res.data.dob) : null
                 });
             }
@@ -232,9 +234,9 @@ function AthleteSettings() {
             {pageLoading ? (
                 <div className="py-16 flex justify-center"><Spin size="middle" /></div>
             ) : (
-                <Card bordered={false} className="premium-card p-2 sm:p-4">
+                <div className="border border-border-subtle bg-bg-surface p-6 sm:p-8 rounded-2xl shadow-sm">
                     <Tabs defaultActiveKey="profile" items={tabItems} className="custom-tabs" />
-                </Card>
+                </div>
             )}
         </div>
     );

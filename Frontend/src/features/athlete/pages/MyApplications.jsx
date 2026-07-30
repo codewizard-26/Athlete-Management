@@ -87,19 +87,20 @@ function MyApplications() {
                                 className="border border-border-subtle bg-bg-surface shadow-sm hover:border-brand-primary/20 hover:shadow-md transition-all duration-150 rounded-xl flex flex-col justify-between"
                             >
                                 <div className="space-y-4">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex items-center space-x-3 min-w-0">
-                                            {(team.logo?.url || (typeof team.logo === "string" && team.logo)) ? (
-                                                <img src={team.logo?.url || team.logo} alt="Logo" className="w-9 h-9 rounded object-cover border border-border-subtle shrink-0" />
-                                            ) : (
-                                                <Avatar size={36} icon={<UserOutlined />} className="bg-brand-primary rounded font-bold shrink-0" />
-                                            )}
-                                            <div className="min-w-0">
-                                                <h3 className="text-[10px] font-bold text-text-secondary leading-none truncate uppercase tracking-wider">
+                                    {/* Header: Avatar, Title, Team & Tag */}
+                                    <div className="flex items-center gap-4">
+                                        {(team.logo?.url || (typeof team.logo === "string" && team.logo)) ? (
+                                            <img src={team.logo?.url || team.logo} alt="Logo" className="w-12 h-12 rounded-xl object-cover border border-border-subtle shrink-0 shadow-sm" />
+                                        ) : (
+                                            <Avatar size={48} icon={<UserOutlined />} className="bg-brand-primary rounded-xl font-bold shrink-0 shadow-sm" />
+                                        )}
+                                        <div className="min-w-0 flex-grow">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <h3 className="text-[12px] font-bold text-text-secondary leading-none truncate uppercase tracking-wider">
                                                     {team.teamName || "Apex Squad"}
                                                 </h3>
-                                                <p className="text-xs font-semibold text-text-primary truncate mt-1.5">{drive.title || "Open Recruitment Call"}</p>
                                             </div>
+                                            <p className="text-[13px] font-semibold text-text-primary truncate">{drive.title || "Open Recruitment Call"}</p>
                                         </div>
                                     </div>
 
