@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/auth/authSlice";
 import { ConfigProvider, theme, Button, Avatar, Dropdown, Menu, message, Drawer } from "antd";
+import { useTheme } from "../context/ThemeContext";
 import {
     DashboardOutlined,
     UserOutlined,
@@ -28,23 +29,7 @@ function AthleteLayout() {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    // Theme Mode state (defaults to light mode)
-    const [themeMode, setThemeMode] = useState(() => {
-        return localStorage.getItem("themeMode") || "light";
-    });
-
-    useEffect(() => {
-        localStorage.setItem("themeMode", themeMode);
-        if (themeMode === "dark") {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
-    }, [themeMode]);
-
-    const toggleTheme = () => {
-        setThemeMode((prev) => (prev === "dark" ? "light" : "dark"));
-    };
+    const { themeMode, toggleTheme } = useTheme();
 
     const handleLogout = () => {
         dispatch(logout());

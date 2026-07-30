@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import { useSelector, useDispatch } from "react-redux";
 import { Button, ConfigProvider, theme, Menu, Avatar, message, Spin, Drawer } from "antd";
 import { 
@@ -29,10 +30,7 @@ function TeamLayout() {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     
-    // Theme state
-    const [themeMode, setThemeMode] = useState(() => {
-        return localStorage.getItem("themeMode") || "light";
-    });
+    const { themeMode, toggleTheme } = useTheme();
 
     const fetchTeamData = async () => {
         try {
@@ -52,22 +50,6 @@ function TeamLayout() {
     useEffect(() => {
         fetchTeamData();
     }, []);
-
-    // Theme effect
-    useEffect(() => {
-        if (themeMode === "dark") {
-            document.documentElement.classList.add("dark");
-            document.documentElement.setAttribute("data-theme", "dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-            document.documentElement.setAttribute("data-theme", "light");
-        }
-        localStorage.setItem("theme", themeMode);
-    }, [themeMode]);
-
-    const toggleTheme = () => {
-        setThemeMode(prev => prev === "dark" ? "light" : "dark");
-    };
 
     const handleLogout = () => {
         dispatch(logout());

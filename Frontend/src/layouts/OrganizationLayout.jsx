@@ -14,7 +14,7 @@ import {
     DashboardOutlined,
     MenuOutlined
 } from "@ant-design/icons";
-import { logout } from "../features/auth/authSlice";
+import { useTheme } from "../context/ThemeContext";
 
 function OrganizationLayout() {
     const navigate = useNavigate();
@@ -23,26 +23,7 @@ function OrganizationLayout() {
     const { user } = useSelector((state) => state.auth);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     
-    // Theme state
-    const [themeMode, setThemeMode] = useState(() => {
-        return localStorage.getItem("theme") || "light";
-    });
-
-    // Theme effect
-    useEffect(() => {
-        if (themeMode === "dark") {
-            document.documentElement.classList.add("dark");
-            document.documentElement.setAttribute("data-theme", "dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-            document.documentElement.setAttribute("data-theme", "light");
-        }
-        localStorage.setItem("theme", themeMode);
-    }, [themeMode]);
-
-    const toggleTheme = () => {
-        setThemeMode(prev => prev === "dark" ? "light" : "dark");
-    };
+    const { themeMode, toggleTheme } = useTheme();
 
     const handleLogout = () => {
         dispatch(logout());

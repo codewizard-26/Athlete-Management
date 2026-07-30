@@ -168,22 +168,8 @@ const AnimatedHeroLogo = () => {
     );
 };
 
-function Home() {
-    const [themeMode, setThemeMode] = useState(() => localStorage.getItem("themeMode") || "light");
-
-    useEffect(() => {
-        if (themeMode === "dark") {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
-    }, [themeMode]);
-
-    const toggleTheme = () => {
-        const newTheme = themeMode === "dark" ? "light" : "dark";
-        setThemeMode(newTheme);
-        localStorage.setItem("themeMode", newTheme);
-    };
+export default function Home() {
+    const { themeMode, toggleTheme } = useTheme();
 
     const features = [
         { icon: <Trophy style={{ fontSize: 22 }} />, title: "Tournament Management", desc: "Automate brackets, scheduling, and league standings effortlessly." },
@@ -466,5 +452,3 @@ function Home() {
         </div>
     );
 }
-
-export default Home;

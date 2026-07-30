@@ -11,6 +11,7 @@ import {
     SunOutlined,
     MoonOutlined
 } from "@ant-design/icons";
+import { useTheme } from "../../../context/ThemeContext";
 
 function Login() {
     const navigate = useNavigate();
@@ -19,21 +20,7 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState("");
     const [success, setSuccess] = useState(false);
-    const [themeMode, setThemeMode] = useState(() => localStorage.getItem("themeMode") || "light");
-
-    useEffect(() => {
-        if (themeMode === "dark") {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
-    }, [themeMode]);
-
-    const toggleTheme = () => {
-        const newTheme = themeMode === "dark" ? "light" : "dark";
-        setThemeMode(newTheme);
-        localStorage.setItem("themeMode", newTheme);
-    };
+    const { themeMode, toggleTheme } = useTheme();
 
     const handleSubmit = async (values) => {
         try {
@@ -219,7 +206,7 @@ function Login() {
                                     </div>
                                 </Card>
                             ) : (
-                                <Card className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl p-3 sm:p-4">
+                                <div className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl p-5 sm:p-6">
                                     
                                     <div className="mb-4">
                                         <h2 className="text-lg font-bold text-text-primary tracking-tight">
@@ -280,7 +267,7 @@ function Login() {
                                             </Link>
                                         </div>
                                     </Form>
-                                </Card>
+                                </div>
                             )}
                         </div>
                     </div>

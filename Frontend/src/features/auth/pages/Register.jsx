@@ -12,30 +12,17 @@ import {
     SunOutlined,
     MoonOutlined
 } from "@ant-design/icons";
+import { useTheme } from "../../../context/ThemeContext";
 
-function Register() {
+const Register = () => {
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState("");
     const [success, setSuccess] = useState(false);
-    const [themeMode, setThemeMode] = useState(() => localStorage.getItem("themeMode") || "light");
+    const { themeMode, toggleTheme } = useTheme();
 
     const role = Form.useWatch("role", form) || "athlete";
-
-    useEffect(() => {
-        if (themeMode === "dark") {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
-    }, [themeMode]);
-
-    const toggleTheme = () => {
-        const newTheme = themeMode === "dark" ? "light" : "dark";
-        setThemeMode(newTheme);
-        localStorage.setItem("themeMode", newTheme);
-    };
 
     const handleSubmit = async (values) => {
         try {
@@ -221,7 +208,7 @@ function Register() {
                         <div className="w-full max-w-[420px]">
                             
                             {success ? (
-                                <Card className="border border-border-subtle bg-bg-surface text-center shadow-sm rounded-xl py-6 animate-fadeIn">
+                                <div className="border border-border-subtle bg-bg-surface text-center shadow-sm rounded-xl py-6 animate-fadeIn">
                                     <div className="mx-auto w-10 h-10 bg-status-success/10 text-status-success rounded-full flex items-center justify-center mb-3">
                                         <CheckCircleFilled className="text-base" />
                                     </div>
@@ -231,9 +218,9 @@ function Register() {
                                         <span className="animate-spin h-3.5 w-3.5 border-2 border-text-primary border-t-transparent rounded-full" />
                                         <span>Redirecting...</span>
                                     </div>
-                                </Card>
+                                </div>
                             ) : (
-                                <Card className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl p-3 sm:p-4">
+                                <div className="border border-border-subtle bg-bg-surface shadow-sm rounded-xl p-4 sm:p-5">
                                     
                                     {/* Smooth Motion Header Header with Fixed Height Budget */}
                                     <div className="mb-3 min-h-[48px] flex flex-col justify-center">
@@ -256,7 +243,7 @@ function Register() {
                                     </div>
 
                                     {apiError && (
-                                        <div className="mb-2.5 p-2 bg-status-danger/10 border border-status-danger/20 rounded-lg text-xs text-status-danger font-medium">
+                                        <div className="mb-3 p-2 bg-status-danger/10 border border-status-danger/20 rounded-lg text-xs text-status-danger font-medium">
                                             {apiError}
                                         </div>
                                     )}
@@ -265,83 +252,61 @@ function Register() {
                                         form={form}
                                         layout="vertical"
                                         onFinish={handleSubmit}
-                                        initialValues={{ role: "athlete" }}
                                         requiredMark={false}
+                                        initialValues={{ role: "athlete" }}
                                     >
-                                        <Form.Item
-                                            name="role"
-                                            label={<span className="text-[9px] font-bold text-text-secondary uppercase tracking-wider">I am registering as an</span>}
-                                            className="mb-2.5"
-                                        >
-                                            <Radio.Group buttonStyle="solid" className="w-full grid grid-cols-2 gap-2">
-                                                <Radio.Button value="athlete" className="text-center text-xs font-bold h-8 leading-8 rounded-md">
-                                                    Athlete
-                                                </Radio.Button>
-                                                <Radio.Button value="organization" className="text-center text-xs font-bold h-8 leading-8 rounded-md">
-                                                    Organization
-                                                </Radio.Button>
-                                            </Radio.Group>
-                                        </Form.Item>
-
-                                        <Form.Item
-                                            name="name"
-                                            label={
-                                                <AnimatePresence mode="wait">
-                                                    <motion.span 
-                                                        key={role}
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        exit={{ opacity: 0 }}
-                                                        transition={{ duration: 0.12 }}
-                                                        className="text-[9px] font-bold text-text-secondary uppercase tracking-wider block"
-                                                    >
-                                                        {role === "organization" ? "Organization Name" : "Full Name"}
-                                                    </motion.span>
-                                                </AnimatePresence>
-                                            }
-                                            rules={[{ required: true, message: `Please enter your ${role === "organization" ? "organization name" : "full name"}` }]}
-                                            className="mb-2.5"
-                                        >
-                                            <Input 
-                                                placeholder={role === "organization" ? "E.g. Metro Sports Academy" : "E.g. Alex Morgan"} 
-                                                prefix={<UserOutlined className="text-text-secondary/50 mr-1 text-xs" />} 
+                                        <Form.Item name="role" className="mb-3">
+                                            <Segmented
+                                                block
+                                                options={[
+                                                    { label: "Athlete", value: "athlete" },
+                                                    { label: "Team Manager", value: "team" },
+                                                    { label: "Organization", value: "organization" }
+                                                ]}
+                                                className="w-full text-xs font-semibold uppercase tracking-wider"
                                             />
                                         </Form.Item>
 
                                         <Form.Item
+                                            name="name"
+                                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Full Name / Org Name</span>}
+                                            rules={[{ required: true, message: "Please enter your name" }]}
+                                            className="mb-2"
+                                        >
+                                            <Input placeholder="e.g. Alex Morgan or Apex Club" prefix={<UserOutlined className="text-text-secondary/50 mr-1 text-xs" />} />
+                                        </Form.Item>
+
+                                        <Form.Item
                                             name="email"
-                                            label={<span className="text-[9px] font-bold text-text-secondary uppercase tracking-wider">Email Address</span>}
+                                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Email Address</span>}
                                             rules={[
                                                 { required: true, message: "Please enter your email" },
-                                                { type: "email", message: "Please enter a valid email address" }
+                                                { type: "email", message: "Please enter a valid email" }
                                             ]}
-                                            className="mb-2.5"
+                                            className="mb-2"
                                         >
                                             <Input placeholder="name@domain.com" prefix={<MailOutlined className="text-text-secondary/50 mr-1 text-xs" />} />
                                         </Form.Item>
 
                                         <Form.Item
                                             name="phoneNumber"
-                                            label={<span className="text-[9px] font-bold text-text-secondary uppercase tracking-wider">Phone Number</span>}
+                                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Phone Number</span>}
                                             rules={[{ required: true, message: "Please enter your phone number" }]}
-                                            className="mb-2.5"
+                                            className="mb-2"
                                         >
                                             <Input placeholder="+1 (555) 000-0000" prefix={<PhoneOutlined className="text-text-secondary/50 mr-1 text-xs" />} />
                                         </Form.Item>
 
                                         <Form.Item
                                             name="password"
-                                            label={<span className="text-[9px] font-bold text-text-secondary uppercase tracking-wider">Password</span>}
-                                            rules={[
-                                                { required: true, message: "Please enter your password" },
-                                                { min: 6, message: "Password must be at least 6 characters" }
-                                            ]}
-                                            className="mb-2.5"
+                                            label={<span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Password</span>}
+                                            rules={[{ required: true, message: "Please enter a password" }]}
+                                            className="mb-3"
                                         >
                                             <Input.Password placeholder="••••••••" prefix={<LockOutlined className="text-text-secondary/50 mr-1 text-xs" />} />
                                         </Form.Item>
 
-                                        <Form.Item className="mt-4 mb-2">
+                                        <Form.Item className="mt-3 mb-2">
                                             <button
                                                 type="submit"
                                                 disabled={loading}
@@ -358,7 +323,7 @@ function Register() {
                                             </Link>
                                         </div>
                                     </Form>
-                                </Card>
+                                </div>
                             )}
                         </div>
                     </div>
