@@ -338,11 +338,9 @@ function TeamsList() {
                                     
                                     <div className="flex items-center justify-between pt-3 border-t border-border-subtle">
                                         <div className="flex items-center gap-2">
-                                            <Badge 
-                                                count={team.ageCategory} 
-                                                color="var(--color-primary)" 
-                                                className="font-bold text-[10px]"
-                                            />
+                                            <span className="px-2 py-0.5 rounded bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-[10px] uppercase border border-blue-600/20">
+                                                {team.ageCategory || "Open"}
+                                            </span>
                                             <span className="text-[10px] text-text-secondary uppercase tracking-wider font-semibold">
                                                 Age Division
                                             </span>
