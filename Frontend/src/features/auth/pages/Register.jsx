@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../../api/axios";
-import { Form, Input, Radio, Card, ConfigProvider, theme } from "antd";
+import { Form, Input, Radio, Card, ConfigProvider, theme,  Segmented} from "antd";
 import { 
     UserOutlined, 
     MailOutlined, 
