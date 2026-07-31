@@ -193,6 +193,7 @@ function AppRoutes() {
                 <Route path="recruitment" element={<TeamRecruitmentDrives />} />
                 <Route path="recruitment/create" element={<CreateRecruitmentDrive />} />
                 <Route path="applications" element={<TeamApplications />} />
+                <Route path="applications/:driveId" element={<TeamApplications />} />
                 <Route path="roster" element={<TeamRoster />} />
                 <Route path="performance" element={<TeamPerformance />} />
                 <Route path="settings" element={<TeamSettings />} />
