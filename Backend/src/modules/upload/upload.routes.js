@@ -22,12 +22,24 @@ router.post(
 
         const folder = req.body.folder || 'general'; // Default folder if none provided
         
-        const result = await uploadImageToCloudinary(req.file.buffer, folder);
-
-        return res.status(200).json({
-            success: true,
-            data: result // { url, public_id }
-        });
+        try {
+            const result = await uploadImageToCloudinary(req.file.buffer, folder);
+            return res.status(200).json({
+                success: true,
+                data: result // { url, public_id }
+            });
+        } catch (cloudinaryErr) {
+            console.error("Cloudinary service failed, generating buffer Data URL fallback:", cloudinaryErr.message);
+            const mimeType = req.file.mimetype || 'image/png';
+            const base64Str = `data:${mimeType};base64,${req.file.buffer.toString('base64')}`;
+            return res.status(200).json({
+                success: true,
+                data: {
+                    url: base64Str,
+                    public_id: null
+                }
+            });
+        }
     } catch (error) {
         console.error("Upload Route Error:", error);
         return res.status(500).json({
