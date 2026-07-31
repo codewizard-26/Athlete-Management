@@ -15,6 +15,8 @@ import {
     MenuOutlined
 } from "@ant-design/icons";
 import { useTheme } from "../context/ThemeContext";
+import { logout } from "../features/auth/authSlice";
+import api from "../api/axios";
 
 function OrganizationLayout() {
     const navigate = useNavigate();
@@ -22,8 +24,24 @@ function OrganizationLayout() {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [logoUrl, setLogoUrl] = useState(null);
     
     const { themeMode, toggleTheme } = useTheme();
+
+    useEffect(() => {
+        const fetchLogo = async () => {
+            try {
+                const res = await api.get("/organization/me");
+                if (res.data && res.data.logo) {
+                    const url = res.data.logo?.url || (typeof res.data.logo === "string" ? res.data.logo : null);
+                    setLogoUrl(url);
+                }
+            } catch (err) {
+                console.error("Error fetching org logo for layout:", err);
+            }
+        };
+        fetchLogo();
+    }, [location.pathname]);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -152,7 +170,7 @@ function OrganizationLayout() {
 
                     <div className="p-3 border-t border-border-subtle bg-bg-elevated/50 flex flex-col gap-2">
                         <div className="flex items-center gap-2.5 px-1 py-1">
-                            <Avatar size={32} icon={<UserOutlined />} className="bg-brand-primary shrink-0" />
+                            <Avatar size={32} src={logoUrl || undefined} icon={!logoUrl ? <UserOutlined /> : undefined} className="bg-brand-primary shrink-0" />
                             <div className="min-w-0 flex-grow overflow-hidden">
                                 <p className="text-xs font-semibold text-text-primary truncate leading-tight">{user?.name || "Manager"}</p>
                                 <p className="text-[10px] text-text-secondary truncate font-mono mt-0.5 leading-tight">{user?.email}</p>
@@ -221,7 +239,7 @@ function OrganizationLayout() {
 
                             {user && (
                                 <div className="flex items-center gap-3 px-3 py-1 bg-bg-elevated border border-border-subtle rounded-full">
-                                    <Avatar size={32} icon={<UserOutlined />} className="bg-brand-primary text-white text-[10px] flex items-center justify-center" />
+                                    <Avatar size={32} src={logoUrl || undefined} icon={!logoUrl ? <UserOutlined /> : undefined} className="bg-brand-primary text-white text-[10px] flex items-center justify-center shrink-0" />
                                     <div className="flex items-center gap-2">
                                         <span className="text-sm font-semibold text-text-primary truncate max-w-[120px]">{user.name}</span>
                                         <span className="text-[9px] bg-brand-secondary/15 text-brand-secondary font-bold uppercase px-1.5 py-0.5 rounded border border-brand-secondary/10 shrink-0">

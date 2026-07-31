@@ -187,7 +187,7 @@ function TeamLayout() {
                     <div className="p-3 border-t border-border-subtle bg-bg-elevated/50 flex flex-col gap-2">
                         {!collapsed && (
                             <div className="flex items-center gap-2.5 px-1 py-1">
-                                <Avatar size={32} icon={<UserOutlined />} className="bg-brand-primary shrink-0" />
+                                <Avatar size={32} src={(teamData?.logo?.url || (typeof teamData?.logo === "string" ? teamData.logo : undefined))} icon={!(teamData?.logo?.url || teamData?.logo) ? <UserOutlined /> : undefined} className="bg-brand-primary shrink-0" />
                                 <div className="min-w-0 flex-grow overflow-hidden">
                                     <p className="text-xs font-semibold text-text-primary truncate leading-tight">{user?.name || "Team Manager"}</p>
                                     <p className="text-[10px] text-text-secondary truncate font-mono mt-0.5 leading-tight">{user?.email}</p>

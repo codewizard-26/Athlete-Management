@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/auth/authSlice";
 import { ConfigProvider, theme, Button, Avatar, Dropdown, Menu, message, Drawer } from "antd";
 import { useTheme } from "../context/ThemeContext";
+import api from "../api/axios";
 import {
     DashboardOutlined,
     UserOutlined,
@@ -28,6 +29,22 @@ function AthleteLayout() {
 
     const [collapsed, setCollapsed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [photoUrl, setPhotoUrl] = useState(null);
+
+    useEffect(() => {
+        const fetchPhoto = async () => {
+            try {
+                const res = await api.get("/athleteprofile/me");
+                if (res.data) {
+                    const url = res.data.photo?.url || res.data.avatar?.url || (typeof res.data.photo === "string" ? res.data.photo : null);
+                    setPhotoUrl(url);
+                }
+            } catch (err) {
+                console.error("Error fetching athlete photo for layout:", err);
+            }
+        };
+        fetchPhoto();
+    }, [location.pathname]);
 
     const { themeMode, toggleTheme } = useTheme();
 
@@ -167,7 +184,7 @@ function AthleteLayout() {
                     <div className="p-3 border-t border-border-subtle bg-bg-elevated/50 flex flex-col gap-2">
                         {!collapsed && (
                             <div className="flex items-center gap-2.5 px-1 py-1">
-                                <Avatar size={32} icon={<UserOutlined />} className="bg-brand-primary shrink-0" />
+                                <Avatar size={32} src={photoUrl || undefined} icon={!photoUrl ? <UserOutlined /> : undefined} className="bg-brand-primary shrink-0" />
                                 <div className="min-w-0 flex-grow overflow-hidden">
                                     <p className="text-xs font-semibold text-text-primary truncate leading-tight">{user?.name || "Athlete"}</p>
                                     <p className="text-[10px] text-text-secondary truncate font-mono mt-0.5 leading-tight">{user?.email}</p>
@@ -208,7 +225,7 @@ function AthleteLayout() {
                                     className="text-text-secondary hover:text-text-primary mr-1"
                                 />
                                 <Link to="/athlete/dashboard" className="flex items-center space-x-2 cursor-pointer">
-                                    <div className="h-7 w-7 rounded-md bg-[#1A1A1A] dark:bg-white text-white dark:text-[#0A0A0A] flex items-center justify-center">
+                                    <div className="h-7 w-7 rounded-md bg-[#1A1A1A] dark:bg-white text-[#0A0A0A] flex items-center justify-center">
                                         <svg viewBox="0 0 100 100" className="w-4 h-4 fill-current">
                                             <path d="M50 15 L15 85 L32 85 L50 45 L68 85 L85 85 Z" />
                                             <path d="M38 65 L62 65" stroke="currentColor" strokeWidth="7" strokeLinecap="round" opacity="0.6" />
@@ -244,7 +261,7 @@ function AthleteLayout() {
 
                             {/* User Profile Badge */}
                             <div className="flex items-center gap-3 bg-bg-elevated border border-border-subtle px-3 py-1 rounded-full">
-                                <Avatar size={32} icon={<UserOutlined />} className="bg-brand-primary shrink-0" />
+                                <Avatar size={32} src={photoUrl || undefined} icon={!photoUrl ? <UserOutlined /> : undefined} className="bg-brand-primary shrink-0" />
                                 <span className="text-sm font-semibold text-text-primary max-w-[120px] truncate">{user?.name}</span>
                                 {user?.sport && (
                                     <span className="text-[10px] font-bold text-brand-primary bg-brand-primary/10 border border-brand-primary/20 px-1.5 py-0.2 rounded uppercase">
