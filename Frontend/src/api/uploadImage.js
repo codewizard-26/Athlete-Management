@@ -9,8 +9,11 @@ import api from './axios';
 export const uploadImage = async (file, folder) => {
     if (!file) throw new Error("No file provided for upload");
     
+    // Extract raw browser File object if Ant Design wrapper object is passed
+    const rawFile = file.originFileObj || file;
+
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append('image', rawFile);
     if (folder) {
         formData.append('folder', folder);
     }
