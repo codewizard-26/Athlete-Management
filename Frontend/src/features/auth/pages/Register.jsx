@@ -260,7 +260,6 @@ const Register = () => {
                                                 block
                                                 options={[
                                                     { label: "Athlete", value: "athlete" },
-                                                    { label: "Team Manager", value: "team" },
                                                     { label: "Organization", value: "organization" }
                                                 ]}
                                                 className="w-full text-xs font-semibold uppercase tracking-wider"
