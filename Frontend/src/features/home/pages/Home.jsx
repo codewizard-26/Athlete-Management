@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { useTheme } from "../../../context/ThemeContext";
 import { motion, useScroll, useTransform } from "framer-motion";
 import CountUpPkg from "react-countup";
 const CountUp = CountUpPkg.default ? CountUpPkg.default : CountUpPkg;
