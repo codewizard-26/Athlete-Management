@@ -162,10 +162,12 @@ function CreateProfile() {
                         <div className="text-center sm:text-left space-y-2 min-w-0">
                             <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary leading-tight">{user?.name}</h1>
                             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                                <span className="bg-brand-primary text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md">
+                                <span className="bg-blue-600 dark:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md shadow-sm">
                                     {form.getFieldValue("sport")?.toUpperCase() || "ATHLETE"}
                                 </span>
-                                <span className="text-xs text-text-primary font-semibold">{form.getFieldValue("primaryRole")}</span>
+                                {form.getFieldValue("primaryRole") && (
+                                    <span className="text-xs text-text-primary font-semibold">{form.getFieldValue("primaryRole")}</span>
+                                )}
                                 {form.getFieldValue("secondaryRole") && form.getFieldValue("secondaryRole") !== "None" && (
                                     <>
                                         <span className="text-text-secondary">•</span>
