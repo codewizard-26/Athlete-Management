@@ -284,7 +284,7 @@ const Register = () => {
                                             ]}
                                             className="mb-2"
                                         >
-                                            <Input placeholder="name@domain.com" prefix={<MailOutlined className="text-text-secondary/50 mr-1 text-xs" />} />
+                                            <Input placeholder="name@domain.com" prefix={<MailOutlined className="text-text-secondary/50 mr-1 text-xs" />} autoComplete="email" />
                                         </Form.Item>
 
                                         <Form.Item
@@ -302,7 +302,7 @@ const Register = () => {
                                             rules={[{ required: true, message: "Please enter a password" }]}
                                             className="mb-3"
                                         >
-                                            <Input.Password placeholder="••••••••" prefix={<LockOutlined className="text-text-secondary/50 mr-1 text-xs" />} />
+                                            <Input.Password placeholder="••••••••" prefix={<LockOutlined className="text-text-secondary/50 mr-1 text-xs" />} autoComplete="new-password" />
                                         </Form.Item>
 
                                         <Form.Item className="mt-3 mb-2">

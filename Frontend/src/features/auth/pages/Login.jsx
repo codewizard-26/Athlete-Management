@@ -238,7 +238,7 @@ function Login() {
                                             ]}
                                             className="mb-3"
                                         >
-                                            <Input placeholder="name@domain.com" prefix={<MailOutlined className="text-text-secondary/50 mr-1" />} />
+                                            <Input placeholder="name@domain.com" prefix={<MailOutlined className="text-text-secondary/50 mr-1" />} autoComplete="email" />
                                         </Form.Item>
 
                                         <Form.Item
@@ -247,7 +247,7 @@ function Login() {
                                             rules={[{ required: true, message: "Please enter your password" }]}
                                             className="mb-3"
                                         >
-                                            <Input.Password placeholder="••••••••" prefix={<LockOutlined className="text-text-secondary/50 mr-1" />} />
+                                            <Input.Password placeholder="••••••••" prefix={<LockOutlined className="text-text-secondary/50 mr-1" />} autoComplete="current-password" />
                                         </Form.Item>
 
                                         <Form.Item className="mt-5 mb-2">
