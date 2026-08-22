@@ -123,10 +123,10 @@ const Register = () => {
 
     return (
         <ConfigProvider theme={antdTheme}>
-            <div className="h-screen max-h-screen w-full flex flex-col bg-bg-base text-text-primary font-sans overflow-hidden transition-colors duration-200">
+            <div className="min-h-screen lg:h-screen w-full flex flex-col bg-bg-base text-text-primary font-sans overflow-y-auto lg:overflow-hidden transition-colors duration-200">
                 
                 {/* Navbar Header (Fixed 52px height) */}
-                <header className="h-13 shrink-0 w-full flex items-center justify-between px-6 sm:px-10 bg-bg-surface border-b border-border-subtle z-20">
+                <header className="h-13 shrink-0 w-full flex items-center justify-between px-4 sm:px-10 bg-bg-surface border-b border-border-subtle z-20">
                     <Link to="/" className="flex items-center space-x-3">
                         <div className="h-7 w-7 rounded-lg bg-[#1A1A1A] dark:bg-white text-white dark:text-[#0A0A0A] flex items-center justify-center shadow-sm shrink-0">
                             <svg viewBox="0 0 100 100" className="w-3.5 h-3.5 fill-current">
@@ -152,10 +152,10 @@ const Register = () => {
                 </header>
 
                 {/* Main Content Split */}
-                <div className="flex-grow flex flex-col lg:flex-row w-full h-[calc(100vh-52px)] overflow-hidden">
+                <div className="flex-grow flex flex-col lg:flex-row w-full lg:h-[calc(100vh-52px)]">
                     
-                    {/* Left Side Banner */}
-                    <div className="relative z-0 w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-bg-surface text-text-primary border-b lg:border-b-0 lg:border-r border-border-subtle overflow-hidden h-full">
+                    {/* Left Side Banner (Desktop Only) */}
+                    <div className="relative z-0 hidden lg:flex w-full lg:w-1/2 flex-col justify-between p-8 lg:p-12 bg-bg-surface text-text-primary border-b lg:border-b-0 lg:border-r border-border-subtle overflow-hidden h-full">
                         {/* Background Grid */}
                         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
 
@@ -220,8 +220,8 @@ const Register = () => {
                     </div>
 
                     {/* Right Side Form */}
-                    <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-bg-base h-full overflow-y-auto lg:overflow-hidden">
-                        <div className="w-full max-w-[420px]">
+                    <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-12 bg-bg-base flex-grow">
+                        <div className="w-full max-w-[420px] py-4">
                             
                             {success ? (
                                 <div className="border border-border-subtle bg-bg-surface text-center shadow-sm rounded-xl py-6 animate-fadeIn">

@@ -263,14 +263,14 @@ function TeamLayout() {
                             </button>
 
                             {!loading && teamData && (
-                                <div className="flex items-center gap-3 px-3 py-1 bg-bg-elevated border border-border-subtle rounded-full">
+                                <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1 bg-bg-elevated border border-border-subtle rounded-full">
                                     {(teamData.logo?.url || (typeof teamData.logo === "string" && teamData.logo)) ? (
-                                        <img src={teamData.logo?.url || teamData.logo} alt="Logo" className="w-8 h-8 rounded-full object-cover shrink-0" />
+                                        <img src={teamData.logo?.url || teamData.logo} alt="Logo" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover shrink-0" />
                                     ) : (
-                                        <Avatar size={32} icon={<TeamOutlined />} className="bg-brand-primary text-white text-[10px] flex items-center justify-center" />
+                                        <Avatar size={28} icon={<TeamOutlined />} className="bg-brand-primary text-white text-[10px] flex items-center justify-center" />
                                     )}
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm font-semibold text-text-primary truncate max-w-[120px]">{teamData.teamName}</span>
+                                    <div className="hidden sm:flex items-center gap-2">
+                                        <span className="text-xs sm:text-sm font-semibold text-text-primary truncate max-w-[120px]">{teamData.teamName}</span>
                                         <span className="text-[9px] bg-brand-primary/10 text-brand-primary font-bold uppercase px-1.5 py-0.5 rounded border border-brand-primary/10 shrink-0">
                                             {teamData.sport}
                                         </span>
@@ -278,7 +278,7 @@ function TeamLayout() {
                                 </div>
                             )}
 
-                            <div className="md:hidden">
+                            <div className="hidden sm:block md:hidden">
                                 <Button 
                                     type="text" 
                                     danger 
@@ -300,7 +300,7 @@ function TeamLayout() {
                                 <p className="text-xs text-text-secondary mt-3 tracking-wider">Syncing workspace...</p>
                             </div>
                         ) : (
-                            <div className="p-6 md:p-8 max-w-7xl w-full mx-auto">
+                            <div className="p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
                                 <Outlet context={{ teamData, setTeamData, fetchTeamData }} />
                             </div>
                         )}

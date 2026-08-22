@@ -238,10 +238,10 @@ function OrganizationLayout() {
                             </button>
 
                             {user && (
-                                <div className="flex items-center gap-3 px-3 py-1 bg-bg-elevated border border-border-subtle rounded-full">
-                                    <Avatar size={32} src={logoUrl || undefined} icon={!logoUrl ? <UserOutlined /> : undefined} className="bg-brand-primary text-white text-[10px] flex items-center justify-center shrink-0" />
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm font-semibold text-text-primary truncate max-w-[120px]">{user.name}</span>
+                                <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1 bg-bg-elevated border border-border-subtle rounded-full">
+                                    <Avatar size={28} src={logoUrl || undefined} icon={!logoUrl ? <UserOutlined /> : undefined} className="bg-brand-primary text-white text-[10px] flex items-center justify-center shrink-0" />
+                                    <div className="hidden sm:flex items-center gap-2">
+                                        <span className="text-xs sm:text-sm font-semibold text-text-primary truncate max-w-[120px]">{user.name}</span>
                                         <span className="text-[9px] bg-brand-secondary/15 text-brand-secondary font-bold uppercase px-1.5 py-0.5 rounded border border-brand-secondary/10 shrink-0">
                                             Admin
                                         </span>
@@ -249,7 +249,7 @@ function OrganizationLayout() {
                                 </div>
                             )}
 
-                            <div className="md:hidden">
+                            <div className="hidden sm:block md:hidden">
                                 <Button 
                                     type="text" 
                                     danger 
@@ -265,7 +265,7 @@ function OrganizationLayout() {
 
                     {/* Content Outlets */}
                     <div className="flex-grow overflow-y-auto bg-transparent">
-                        <div className="p-6 md:p-8 max-w-7xl w-full mx-auto">
+                        <div className="p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
                             <Outlet />
                         </div>
                     </div>

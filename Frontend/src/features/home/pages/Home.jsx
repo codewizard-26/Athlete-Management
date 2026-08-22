@@ -209,29 +209,29 @@ export default function Home() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 sm:px-12 py-4 bg-bg-surface/90 backdrop-blur-md border-b border-border-subtle"
+                className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-4 sm:px-12 py-3 sm:py-4 bg-bg-surface/90 backdrop-blur-md border-b border-border-subtle"
             >
-                <div className="flex items-center space-x-3">
-                    <div className="h-8 w-8 rounded-lg bg-[#1A1A1A] dark:bg-white text-white dark:text-[#0A0A0A] flex items-center justify-center shadow-sm shrink-0">
-                        <AthletixEmblem className="w-4 h-4" />
+                <div className="flex items-center space-x-2.5 sm:space-x-3">
+                    <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-[#1A1A1A] dark:bg-white text-white dark:text-[#0A0A0A] flex items-center justify-center shadow-sm shrink-0">
+                        <AthletixEmblem className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
-                    <span className="text-base font-extrabold tracking-wider text-text-primary uppercase">ATHLETIX</span>
+                    <span className="text-sm sm:text-base font-extrabold tracking-wider text-text-primary uppercase">ATHLETIX</span>
                 </div>
 
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 sm:space-x-4">
                     <button 
                         onClick={toggleTheme}
-                        className="p-2 rounded-md bg-bg-elevated hover:bg-bg-inset text-text-primary border border-border-subtle transition-all cursor-pointer flex items-center justify-center"
+                        className="p-1.5 sm:p-2 rounded-md bg-bg-elevated hover:bg-bg-inset text-text-primary border border-border-subtle transition-all cursor-pointer flex items-center justify-center"
                         title="Toggle Light/Dark Theme"
                     >
-                        {themeMode === "dark" ? <SunOutlined className="text-amber-400 text-sm" /> : <MoonOutlined className="text-slate-600 text-sm" />}
+                        {themeMode === "dark" ? <SunOutlined className="text-amber-400 text-xs sm:text-sm" /> : <MoonOutlined className="text-slate-600 text-xs sm:text-sm" />}
                     </button>
-                    <Link to="/login" className="text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors px-3 py-1.5">
+                    <Link to="/login" className="text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors px-2 sm:px-3 py-1.5">
                         Sign In
                     </Link>
                     <Link 
                         to="/register" 
-                        className="inline-flex items-center justify-center px-5 py-2 text-xs font-bold bg-[#1A1A1A] text-white hover:bg-[#2A2A2A] dark:bg-white dark:text-[#0A0A0A] dark:hover:bg-[#E5E5E5] rounded-full shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                        className="inline-flex items-center justify-center px-3.5 py-1.5 sm:px-5 sm:py-2 text-[11px] sm:text-xs font-bold bg-[#1A1A1A] text-white hover:bg-[#2A2A2A] dark:bg-white dark:text-[#0A0A0A] dark:hover:bg-[#E5E5E5] rounded-full shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
                     >
                         Register
                     </Link>
@@ -239,24 +239,24 @@ export default function Home() {
             </motion.header>
 
             {/* HERO SECTION */}
-            <section className="relative w-full min-h-screen flex flex-col items-center justify-center pt-24 pb-16 px-6 z-10">
+            <section className="relative w-full min-h-screen flex flex-col items-center justify-center pt-24 sm:pt-28 pb-16 px-4 sm:px-6 z-10">
                 <AnimatedHeroLogo />
 
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-center max-w-3xl mx-auto space-y-6"
+                    className="text-center max-w-3xl mx-auto space-y-4 sm:space-y-6"
                 >
-                    <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-text-primary uppercase">
+                    <h1 className="text-4xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-text-primary uppercase">
                         ATHLETIX
                     </h1>
                     
-                    <h2 className="text-lg sm:text-2xl font-semibold tracking-tight text-text-secondary">
+                    <h2 className="text-base sm:text-2xl font-semibold tracking-tight text-text-secondary px-2">
                         Connecting Talent. Teams. Tournaments.
                     </h2>
                     
-                    <p className="text-xs sm:text-base text-text-secondary max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-xs sm:text-base text-text-secondary max-w-2xl mx-auto leading-relaxed px-2">
                         The complete platform for athlete recruitment, team management, tournament organization, match scheduling, and performance analytics.
                     </p>
 
@@ -377,9 +377,9 @@ export default function Home() {
             </section>
 
             {/* STATS SECTION */}
-            <section className="py-20 px-6 sm:px-12 relative z-10 border-t border-b border-border-subtle bg-bg-surface">
+            <section className="py-14 sm:py-20 px-4 sm:px-12 relative z-10 border-t border-b border-border-subtle bg-bg-surface">
                 <div className="max-w-5xl mx-auto">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 text-center">
                         {stats.map((stat, idx) => (
                             <motion.div
                                 key={idx}

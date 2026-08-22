@@ -260,11 +260,11 @@ function AthleteLayout() {
                             </button>
 
                             {/* User Profile Badge */}
-                            <div className="flex items-center gap-3 bg-bg-elevated border border-border-subtle px-3 py-1 rounded-full">
-                                <Avatar size={32} src={photoUrl || undefined} icon={!photoUrl ? <UserOutlined /> : undefined} className="bg-brand-primary shrink-0" />
-                                <span className="text-sm font-semibold text-text-primary max-w-[120px] truncate">{user?.name}</span>
+                            <div className="flex items-center gap-2 sm:gap-3 bg-bg-elevated border border-border-subtle px-2 sm:px-3 py-1 rounded-full">
+                                <Avatar size={28} src={photoUrl || undefined} icon={!photoUrl ? <UserOutlined /> : undefined} className="bg-brand-primary shrink-0" />
+                                <span className="hidden sm:inline text-xs sm:text-sm font-semibold text-text-primary max-w-[120px] truncate">{user?.name}</span>
                                 {user?.sport && (
-                                    <span className="text-[10px] font-bold text-brand-primary bg-brand-primary/10 border border-brand-primary/20 px-1.5 py-0.2 rounded uppercase">
+                                    <span className="hidden sm:inline text-[10px] font-bold text-brand-primary bg-brand-primary/10 border border-brand-primary/20 px-1.5 py-0.2 rounded uppercase">
                                         {user.sport}
                                     </span>
                                 )}
@@ -273,7 +273,7 @@ function AthleteLayout() {
                     </header>
 
                     {/* Dynamic Page Content Outlet */}
-                    <main className="flex-grow p-6 overflow-y-auto bg-bg-base transition-colors duration-200">
+                    <main className="flex-grow p-4 sm:p-6 md:p-8 overflow-y-auto bg-bg-base transition-colors duration-200">
                         <Outlet context={{ athleteData: user }} />
                     </main>
                 </div>
