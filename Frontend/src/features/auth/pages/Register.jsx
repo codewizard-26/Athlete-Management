@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../authSlice";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../../api/axios";
 import { Form, Input, Radio, Card, ConfigProvider, theme,  Segmented} from "antd";
@@ -16,6 +18,7 @@ import { useTheme } from "../../../context/ThemeContext";
 
 const Register = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState("");
@@ -29,7 +32,7 @@ const Register = () => {
             setLoading(true);
             setApiError("");
 
-            await api.post("/auth/register", {
+            const res = await api.post("/auth/register", {
                 name: values.name,
                 email: values.email,
                 phoneNumber: values.phoneNumber,
@@ -37,10 +40,23 @@ const Register = () => {
                 role: values.role
             });
 
+            const { user, token } = res.data;
+
+            if (token) {
+                localStorage.setItem("token", token);
+                dispatch(loginSuccess({ user, token }));
+            }
+
             setSuccess(true);
             setTimeout(() => {
-                navigate("/login");
-            }, 2500);
+                if (user?.role === "athlete" && !user?.isProfileCompleted) {
+                    navigate("/athlete/profile");
+                } else if (user?.role === "organization" && !user?.isProfileCompleted) {
+                    navigate("/organization/profile");
+                } else {
+                    navigate("/dashboard");
+                }
+            }, 1500);
 
         } catch (err) {
             setApiError(
@@ -213,10 +229,10 @@ const Register = () => {
                                         <CheckCircleFilled className="text-base" />
                                     </div>
                                     <h2 className="text-sm font-bold text-text-primary mb-1">Registration Successful</h2>
-                                    <p className="text-text-secondary text-xs mb-4">Your account has been created. Redirecting to login...</p>
+                                    <p className="text-text-secondary text-xs mb-4">Your account has been created. Setting up your workspace...</p>
                                     <div className="flex items-center justify-center space-x-2 text-text-primary font-semibold text-xs tracking-wider font-mono">
                                         <span className="animate-spin h-3.5 w-3.5 border-2 border-text-primary border-t-transparent rounded-full" />
-                                        <span>Redirecting...</span>
+                                        <span>Signing in...</span>
                                     </div>
                                 </div>
                             ) : (

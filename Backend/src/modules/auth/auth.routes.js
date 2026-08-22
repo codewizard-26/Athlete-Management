@@ -23,14 +23,33 @@ router.post("/register",async(req,res)=>{
             return res.status(409).json({message:"User already exist"})
         }
         const hashedpassword = await bcrypt.hash(password,10);
-        await User.create({
+        const user = await User.create({
             name,
             email,
             password:hashedpassword,
             phoneNumber,
             role
         });
-        res.status(201).json({message:"User reg succesfull"})
+        const token = jwt.sign(
+            {
+                id: user._id,
+                role: user.role
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d"
+            }
+        );
+        res.status(201).json({
+            message:"User reg succesfull",
+            token,
+            user:{
+                name:user.name,
+                email:user.email,
+                role:user.role,
+                isProfileCompleted:user.isProfileCompleted
+            }
+        })
     }
     catch(err){
         console.log("err",err)

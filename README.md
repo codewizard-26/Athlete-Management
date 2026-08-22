@@ -111,10 +111,18 @@ Athlete-Management/
 └── Backend/                  # Express 5 + Node.js API Server
     ├── src/
     │   ├── config/           # Database & Cloudinary configurations
-    │   ├── controllers/      # Auth, Athlete, Team, Org, Match, Tournament controllers
     │   ├── middleware/       # JWT Auth & Multer upload middleware
-    │   ├── models/           # Mongoose schemas (User, Athlete, Team, Drive, Match, etc.)
-    │   ├── routes/           # API Endpoint routes
+    │   ├── modules/          # Feature-based architecture (routes, models, controllers)
+    │   │   ├── athlete/      # Athlete profile & applications logic
+    │   │   ├── auth/         # JWT authentication & registration
+    │   │   ├── match/        # Match scheduling & reporting
+    │   │   ├── organization/ # Multi-tenant organization admin logic
+    │   │   ├── team/         # Team rosters & scouting drives
+    │   │   ├── tournament/   # Brackets & league management
+    │   │   ├── upload/       # Cloudinary image/CSV handling
+    │   │   └── user/         # User roles & unified accounts
+    │   ├── utils/            # Helper functions & error handlers
+    │   ├── app.js            # Express app configuration & global middleware
     │   └── server.js         # Entry point server file
     └── package.json
 ```
