@@ -203,10 +203,10 @@ npm run dev
 ---
 
 ## 📄 License
-Distributed under the ISC License. See `LICENSE` for more information.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
 <p center>
-  Made with ❤️ by <strong>Team ATHLETIX</strong>
+ <strong>Team ATHLETIX</strong>
 </p>
